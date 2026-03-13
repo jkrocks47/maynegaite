@@ -53,15 +53,13 @@
 
 <section class="relative bg-cosmos-black py-20 px-4">
 	<div class="max-w-7xl mx-auto">
-		<!-- Section title with HUD brackets -->
-		<div class="relative inline-block mx-auto w-full text-center mb-12">
-			<h2 class="font-display font-bold text-astro-cream text-2xl md:text-3xl uppercase tracking-[0.15em] inline-block relative px-8">
-				<span class="absolute -left-1 top-0 w-3 h-3 border-l border-t border-astro-cyan/25"></span>
-				<span class="absolute -right-1 top-0 w-3 h-3 border-r border-t border-astro-cyan/25"></span>
-				<span class="absolute -left-1 bottom-0 w-3 h-3 border-l border-b border-astro-cyan/25"></span>
-				<span class="absolute -right-1 bottom-0 w-3 h-3 border-r border-b border-astro-cyan/25"></span>
+		<!-- Section title — left-aligned, brutalist with HUD bracket accent -->
+		<div class="mb-10 relative">
+			<h2 class="font-display font-bold text-astro-cream text-2xl md:text-3xl uppercase tracking-[0.12em] relative inline-block">
+				<span class="absolute -left-4 top-0 w-3 h-3 border-l border-t border-astro-cream/15"></span>
 				Deep Field Gallery
 			</h2>
+			<div class="mt-3 h-px w-20 bg-astro-cream/15"></div>
 		</div>
 
 		{#if images.length === 0}

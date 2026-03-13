@@ -1,15 +1,10 @@
 <script lang="ts">
 	import GlassPanel from '$lib/components/astronomy/GlassPanel.svelte';
+	import type { ActionData } from './$types';
 
-	let name = $state('');
-	let email = $state('');
-	let message = $state('');
-	let submitted = $state(false);
+	let { form }: { form: ActionData } = $props();
 
-	function handleSubmit(e: Event) {
-		e.preventDefault();
-		submitted = true;
-	}
+	let submitting = $state(false);
 </script>
 
 <svelte:head>
@@ -82,30 +77,31 @@
 
 			<!-- Contact Form -->
 			<GlassPanel class="p-6 sm:p-8">
-				{#if submitted}
+				{#if form?.success}
 					<div class="text-center py-8">
 						<p class="font-display text-xl font-bold text-astro-cream mb-2">Message Sent</p>
 						<p class="font-body text-sm text-astro-cream/60">
 							Thank you for reaching out. We will get back to you soon.
 						</p>
-						<button
-							class="pill-btn mt-6"
-							onclick={() => { submitted = false; name = ''; email = ''; message = ''; }}
-						>
-							SEND ANOTHER
-						</button>
 					</div>
 				{:else}
 					<h3 class="font-display text-lg font-bold text-astro-cream mb-6">Send a Message</h3>
-					<form onsubmit={handleSubmit} class="space-y-5">
+
+					{#if form?.error}
+						<div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+							<p class="font-body text-sm text-red-400">{form.error}</p>
+						</div>
+					{/if}
+
+					<form method="POST" class="space-y-5" onsubmit={() => submitting = true}>
 						<div>
 							<label for="name" class="font-mono text-[10px] tracking-[0.2em] text-astro-cream/40 block mb-2">
 								NAME
 							</label>
 							<input
 								id="name"
+								name="name"
 								type="text"
-								bind:value={name}
 								required
 								class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-body text-sm text-astro-cream placeholder:text-astro-cream/20 focus:outline-none focus:border-astro-indigo/50 transition-colors"
 								placeholder="Your name"
@@ -117,8 +113,8 @@
 							</label>
 							<input
 								id="email"
+								name="email"
 								type="email"
-								bind:value={email}
 								required
 								class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-body text-sm text-astro-cream placeholder:text-astro-cream/20 focus:outline-none focus:border-astro-indigo/50 transition-colors"
 								placeholder="you@example.com"
@@ -130,15 +126,15 @@
 							</label>
 							<textarea
 								id="message"
-								bind:value={message}
+								name="message"
 								required
 								rows="5"
 								class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-body text-sm text-astro-cream placeholder:text-astro-cream/20 focus:outline-none focus:border-astro-indigo/50 transition-colors resize-none"
 								placeholder="What would you like to know?"
 							></textarea>
 						</div>
-						<button type="submit" class="pill-btn w-full justify-center">
-							SEND MESSAGE
+						<button type="submit" class="pill-btn w-full justify-center" disabled={submitting}>
+							{submitting ? 'SENDING...' : 'SEND MESSAGE'}
 						</button>
 					</form>
 				{/if}

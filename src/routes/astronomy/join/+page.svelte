@@ -1,88 +1,185 @@
 <script lang="ts">
-	import GlassPanel from '$lib/components/astronomy/GlassPanel.svelte';
+	import AmbientParticles from '$lib/components/astronomy/AmbientParticles.svelte';
 </script>
 
 <svelte:head>
 	<title>Join | UIC Astronomy Club</title>
 </svelte:head>
 
-<section class="min-h-screen px-4 sm:px-6 lg:px-8 py-24">
-	<div class="max-w-4xl mx-auto">
-		<!-- Header -->
-		<div class="mb-16 text-center">
-			<p class="font-mono text-xs tracking-[0.3em] text-astro-indigo/80 mb-4">BECOME A MEMBER</p>
-			<h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-astro-cream chromatic-text">
-				JOIN THE OBSERVATORY
-			</h1>
-			<div class="mt-4 mx-auto w-24 h-px bg-gradient-to-r from-transparent via-astro-indigo to-transparent"></div>
-		</div>
+<section class="join-page relative min-h-screen overflow-hidden">
+	<!-- Background nebula atmosphere -->
+	<div class="absolute inset-0 join-bg"></div>
+	<div class="absolute inset-0 pointer-events-none opacity-20 grid-overlay"></div>
+	<AmbientParticles count={30} color="rgba(255,240,220,0.2)" speed={0.06} />
 
-		<!-- Benefits -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
-			<GlassPanel class="p-6">
-				<div class="flex items-start gap-4">
-					<span class="text-astro-cyan text-xl flex-shrink-0">&#9734;</span>
-					<div>
-						<h3 class="font-display text-lg font-bold text-astro-cream mb-2">Observing Sessions</h3>
-						<p class="font-body text-sm text-astro-cream/60">
-							Access to telescope equipment and guided observing nights on campus and at dark sky sites.
-						</p>
-					</div>
-				</div>
-			</GlassPanel>
-
-			<GlassPanel class="p-6">
-				<div class="flex items-start gap-4">
-					<span class="text-astro-cyan text-xl flex-shrink-0">&#9734;</span>
-					<div>
-						<h3 class="font-display text-lg font-bold text-astro-cream mb-2">Guest Lectures</h3>
-						<p class="font-body text-sm text-astro-cream/60">
-							Hear from professional astronomers, astrophysicists, and researchers at the forefront of discovery.
-						</p>
-					</div>
-				</div>
-			</GlassPanel>
-
-			<GlassPanel class="p-6">
-				<div class="flex items-start gap-4">
-					<span class="text-astro-cyan text-xl flex-shrink-0">&#9734;</span>
-					<div>
-						<h3 class="font-display text-lg font-bold text-astro-cream mb-2">Workshops</h3>
-						<p class="font-body text-sm text-astro-cream/60">
-							Learn astrophotography, telescope operation, celestial navigation, and more through hands-on workshops.
-						</p>
-					</div>
-				</div>
-			</GlassPanel>
-
-			<GlassPanel class="p-6">
-				<div class="flex items-start gap-4">
-					<span class="text-astro-cyan text-xl flex-shrink-0">&#9734;</span>
-					<div>
-						<h3 class="font-display text-lg font-bold text-astro-cream mb-2">Community</h3>
-						<p class="font-body text-sm text-astro-cream/60">
-							Connect with fellow space enthusiasts, build lasting friendships, and be part of a passionate community.
-						</p>
-					</div>
-				</div>
-			</GlassPanel>
-		</div>
-
-		<!-- CTA -->
-		<GlassPanel glow class="p-8 sm:p-12 text-center">
-			<h2 class="font-display text-2xl font-bold text-astro-cream mb-4">Ready to explore the cosmos?</h2>
-			<p class="font-body text-base text-astro-cream/60 mb-8 max-w-lg mx-auto">
-				No experience necessary. All UIC students are welcome to join, regardless of major or year.
-				Come to a meeting and see what we are all about.
+	<div class="relative z-10 max-w-5xl mx-auto px-6 sm:px-10 lg:px-16 py-24 lg:py-32">
+		<!-- Header — brutalist, left-aligned -->
+		<div class="mb-16">
+			<p class="font-mono text-[10px] tracking-[0.3em] text-astro-cream/30 uppercase mb-3">
+				UIC ASTRONOMY CLUB // MEMBERSHIP
 			</p>
-			<div class="flex flex-col sm:flex-row gap-4 justify-center">
-				<a href="/astronomy/events" class="pill-btn no-underline">
-					VIEW UPCOMING EVENTS
-				</a>
-				<a href="/astronomy/contact" class="pill-btn no-underline">
-					GET IN TOUCH
-				</a>
+			<h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-astro-cream uppercase" style="line-height: 0.92;">
+				JOIN THE<br />OBSERVATORY
+			</h1>
+			<div class="mt-4 h-px w-20 bg-astro-cream/15"></div>
+		</div>
+
+		<!-- Two-column layout: benefits + registration CTA -->
+		<div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
+			<!-- Left column: What you get -->
+			<div class="lg:col-span-3 space-y-8">
+				<p class="font-body text-base text-astro-cream/55 max-w-lg">
+					No experience necessary. All UIC students are welcome regardless of major or year.
+					Create an account to RSVP for events, access the gallery, and join the community.
+				</p>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+					{#each [
+						{ icon: '&#9790;', title: 'Observing Sessions', desc: 'Telescope access and guided nights on campus rooftops and at dark sky sites.' },
+						{ icon: '&#9733;', title: 'Guest Lectures', desc: 'Hear from astronomers, astrophysicists, and researchers at the frontier.' },
+						{ icon: '&#9788;', title: 'Workshops', desc: 'Astrophotography, telescope operation, celestial navigation — hands on.' },
+						{ icon: '&#10038;', title: 'Community', desc: 'Connect with fellow space enthusiasts. Build friendships under the stars.' }
+					] as benefit}
+						<div class="benefit-card">
+							<div class="flex items-start gap-3">
+								<span class="font-mono text-lg text-astro-cyan/60 flex-shrink-0">{@html benefit.icon}</span>
+								<div>
+									<h3 class="font-display text-sm font-bold text-astro-cream uppercase tracking-[0.06em] mb-1">{benefit.title}</h3>
+									<p class="font-body text-xs text-astro-cream/40 leading-relaxed">{benefit.desc}</p>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
 			</div>
-		</GlassPanel>
+
+			<!-- Right column: Registration CTA card -->
+			<div class="lg:col-span-2">
+				<div class="register-card">
+					<!-- Corner brackets -->
+					<div class="absolute top-2 left-2 w-4 h-4 border-l border-t border-astro-cyan/20"></div>
+					<div class="absolute top-2 right-2 w-4 h-4 border-r border-t border-astro-cyan/20"></div>
+					<div class="absolute bottom-2 left-2 w-4 h-4 border-l border-b border-astro-cyan/20"></div>
+					<div class="absolute bottom-2 right-2 w-4 h-4 border-r border-b border-astro-cyan/20"></div>
+
+					<div class="p-8">
+						<p class="font-mono text-[9px] tracking-[0.25em] text-astro-cyan/40 uppercase mb-4">
+							&#9679; REGISTRATION PORTAL
+						</p>
+
+						<h2 class="font-display text-xl font-bold text-astro-cream mb-3">
+							Create Your Account
+						</h2>
+
+						<p class="font-body text-sm text-astro-cream/45 mb-6 leading-relaxed">
+							Register with your <span class="text-astro-cream/70">@uic.edu</span> email to become a member. You'll be able to RSVP for events, manage your profile, and stay updated.
+						</p>
+
+						<div class="space-y-3">
+							<!-- Preview of what registration involves -->
+							<div class="flex items-center gap-3 text-astro-cream/30">
+								<span class="font-mono text-[10px] w-5 h-5 rounded-full border border-astro-cream/15 flex items-center justify-center flex-shrink-0">1</span>
+								<span class="font-body text-xs">Choose new or returning member</span>
+							</div>
+							<div class="flex items-center gap-3 text-astro-cream/30">
+								<span class="font-mono text-[10px] w-5 h-5 rounded-full border border-astro-cream/15 flex items-center justify-center flex-shrink-0">2</span>
+								<span class="font-body text-xs">Create account with UIC email</span>
+							</div>
+							<div class="flex items-center gap-3 text-astro-cream/30">
+								<span class="font-mono text-[10px] w-5 h-5 rounded-full border border-astro-cream/15 flex items-center justify-center flex-shrink-0">3</span>
+								<span class="font-body text-xs">Select clubs & interests</span>
+							</div>
+						</div>
+
+						<a href="/register" class="register-btn">
+							[ REGISTER NOW ]
+						</a>
+
+						<p class="mt-5 font-mono text-[9px] text-astro-cream/20 tracking-wider text-center">
+							Already a member? <a href="/login" class="text-astro-cyan/40 hover:text-astro-cyan/70 transition-colors no-underline">Sign in</a>
+						</p>
+					</div>
+				</div>
+
+				<!-- Additional links -->
+				<div class="mt-6 space-y-3">
+					<a href="/astronomy/events" class="secondary-link">
+						<span class="font-mono text-[10px] text-astro-cream/25">&#8594;</span>
+						<span class="font-body text-xs text-astro-cream/35 hover:text-astro-cream/60 transition-colors">View upcoming events</span>
+					</a>
+					<a href="/astronomy/contact" class="secondary-link">
+						<span class="font-mono text-[10px] text-astro-cream/25">&#8594;</span>
+						<span class="font-body text-xs text-astro-cream/35 hover:text-astro-cream/60 transition-colors">Contact us</span>
+					</a>
+				</div>
+			</div>
+		</div>
 	</div>
 </section>
+
+<style>
+	.join-page {
+		background: #080510;
+	}
+
+	.join-bg {
+		background:
+			radial-gradient(ellipse 60% 50% at 20% 30%, rgba(80,30,120,0.2) 0%, transparent 60%),
+			radial-gradient(ellipse 40% 40% at 75% 60%, rgba(34,160,200,0.08) 0%, transparent 55%),
+			radial-gradient(ellipse 50% 40% at 50% 20%, rgba(232,120,50,0.1) 0%, transparent 50%),
+			linear-gradient(to bottom, #0c0618 0%, #080510 100%);
+	}
+
+	.benefit-card {
+		padding: 1rem;
+		border: 1px solid rgba(255,255,255,0.04);
+		background: rgba(255,255,255,0.02);
+		transition: border-color 0.3s ease;
+	}
+
+	.benefit-card:hover {
+		border-color: rgba(34,211,238,0.15);
+	}
+
+	.register-card {
+		position: relative;
+		background: rgba(255,255,255,0.03);
+		border: 1px solid rgba(34,211,238,0.15);
+		transition: border-color 0.3s ease;
+	}
+
+	.register-card:hover {
+		border-color: rgba(34,211,238,0.3);
+	}
+
+	.register-btn {
+		display: block;
+		width: 100%;
+		margin-top: 1.75rem;
+		padding: 0.75rem;
+		text-align: center;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.7rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: #f5f0e8;
+		background: rgba(34,211,238,0.1);
+		border: 1px solid rgba(34,211,238,0.3);
+		text-decoration: none;
+		transition: all 0.3s ease;
+		cursor: pointer;
+	}
+
+	.register-btn:hover {
+		background: rgba(34,211,238,0.2);
+		border-color: rgba(34,211,238,0.5);
+		box-shadow: 0 0 25px rgba(34,211,238,0.12);
+	}
+
+	.secondary-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		text-decoration: none;
+	}
+</style>

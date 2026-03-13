@@ -41,6 +41,7 @@ export default {
 			},
 			fontFamily: {
 				display: ['Space Grotesk', 'sans-serif'],
+				'display-hero': ['Anton', 'Impact', 'sans-serif'],
 				mono: ['JetBrains Mono', 'Fira Mono', 'monospace'],
 				body: ['Inter', 'system-ui', 'sans-serif']
 			},

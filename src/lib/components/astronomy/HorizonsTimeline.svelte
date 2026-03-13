@@ -94,15 +94,12 @@
 	</svg>
 
 	<div class="relative max-w-6xl mx-auto">
-		<!-- Section title with decorative lines -->
-		<div class="flex items-center justify-center gap-6 mb-16">
-			<div class="h-px flex-1 max-w-[120px] bg-cosmos-black/15"></div>
-			<span class="font-mono text-[10px] text-cosmos-black/25 tracking-[0.3em]">&#10022;</span>
-			<h2 class="font-display font-bold text-cosmos-black text-2xl md:text-3xl uppercase tracking-[0.15em]">
+		<!-- Section title — left-aligned, brutalist -->
+		<div class="mb-14">
+			<h2 class="font-display font-bold text-cosmos-black text-2xl md:text-3xl uppercase tracking-[0.12em]">
 				Upcoming Horizons
 			</h2>
-			<span class="font-mono text-[10px] text-cosmos-black/25 tracking-[0.3em]">&#10022;</span>
-			<div class="h-px flex-1 max-w-[120px] bg-cosmos-black/15"></div>
+			<div class="mt-3 h-px w-24 bg-cosmos-black/20"></div>
 		</div>
 
 		{#if events.length === 0}

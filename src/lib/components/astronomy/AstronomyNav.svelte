@@ -30,17 +30,45 @@
 	class="frosted-nav fixed top-0 left-0 w-full z-40 transition-all duration-300 {scrolled ? 'frosted-nav-scrolled nav-scrolled-glow' : ''}"
 >
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		<div class="flex items-center justify-between h-20">
-			<!-- Logo with TOCK vertical text -->
+		<!-- Row 1: Brand + Club Logo -->
+		<div class="flex items-center justify-between pt-3 pb-2">
 			<a href="/astronomy" class="flex items-center gap-3 no-underline">
 				<span class="font-mono text-[9px] tracking-[0.3em] text-astro-cream/40 uppercase" style="writing-mode: vertical-rl; transform: rotate(180deg);">TOCK</span>
-				<span class="font-display text-xl md:text-2xl font-bold tracking-[0.1em] text-astro-cream uppercase">
+				<span class="font-display text-2xl md:text-3xl font-bold tracking-[0.08em] text-astro-cream uppercase">
 					UIC ASTRONOMY
 				</span>
 			</a>
 
-			<!-- Desktop Nav Links with + separators -->
-			<div class="hidden md:flex items-center gap-3">
+			<div class="flex items-center gap-4">
+				<!-- Mobile Hamburger -->
+				<button
+					class="md:hidden text-astro-cream p-2"
+					aria-label="Toggle menu"
+					onclick={() => (mobileOpen = !mobileOpen)}
+				>
+					{#if mobileOpen}
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					{:else}
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+						</svg>
+					{/if}
+				</button>
+				<div class="hidden md:block">
+					<ClubLogo size="xs" />
+				</div>
+			</div>
+		</div>
+
+		<!-- Divider line -->
+		<div class="hidden md:block h-px bg-white/10"></div>
+
+		<!-- Row 2: Nav links + Search + Login -->
+		<div class="hidden md:flex items-center justify-between py-2.5">
+			<!-- Nav Links with + separators -->
+			<div class="flex items-center gap-3">
 				{#each navLinks as link, i}
 					{#if i > 0}
 						<span class="font-mono text-xs text-white/15 select-none">+</span>
@@ -54,8 +82,8 @@
 				{/each}
 			</div>
 
-			<!-- Right Section -->
-			<div class="hidden md:flex items-center gap-5">
+			<!-- Right Section: Search + Login -->
+			<div class="flex items-center gap-5">
 				<button
 					class="text-astro-cream/60 hover:text-astro-cream transition-colors"
 					aria-label="Search"
@@ -71,27 +99,7 @@
 				>
 					LOGIN
 				</a>
-				<div class="ml-1">
-					<ClubLogo size="xs" />
-				</div>
 			</div>
-
-			<!-- Mobile Hamburger -->
-			<button
-				class="md:hidden text-astro-cream p-2"
-				aria-label="Toggle menu"
-				onclick={() => (mobileOpen = !mobileOpen)}
-			>
-				{#if mobileOpen}
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-					</svg>
-				{:else}
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-					</svg>
-				{/if}
-			</button>
 		</div>
 
 		<!-- Mobile Menu -->

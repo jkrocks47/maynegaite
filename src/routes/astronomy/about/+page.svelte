@@ -1,6 +1,5 @@
 <script lang="ts">
 	import GlassPanel from '$lib/components/astronomy/GlassPanel.svelte';
-
 	let { data } = $props();
 </script>
 
