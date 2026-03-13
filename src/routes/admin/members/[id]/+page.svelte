@@ -1,0 +1,142 @@
+<script lang="ts">
+	import { enhance } from '$app/forms';
+
+	let { data, form } = $props();
+	const member = $derived(data.member);
+</script>
+
+<svelte:head>
+	<title>{member.firstName} {member.lastName} - Members - Admin</title>
+</svelte:head>
+
+<div class="member-detail">
+	<a href="/admin/members" class="back-link">&larr; All Members</a>
+
+	{#if form?.success}
+		<div class="success-message">Member updated.</div>
+	{/if}
+
+	<!-- Profile card -->
+	<div class="card profile-card">
+		<div class="profile-header">
+			<div>
+				<h1 class="member-name">{member.firstName} {member.lastName}</h1>
+				<p class="member-email">{member.email}</p>
+			</div>
+			<div class="profile-badges">
+				{#if member.astronomyMember}<span class="club-badge astro">Astronomy</span>{/if}
+				{#if member.physicsMember}<span class="club-badge phys">Physics</span>{/if}
+				<span class="verify-badge" class:verified={member.emailVerified} class:unverified={!member.emailVerified}>
+					{member.emailVerified ? 'Verified' : 'Unverified'}
+				</span>
+			</div>
+		</div>
+
+		<div class="profile-grid">
+			<div><span class="label">Year</span><span class="value">{member.year || '--'}</span></div>
+			<div><span class="label">Major</span><span class="value">{member.major || '--'}</span></div>
+			<div><span class="label">Joined</span><span class="value">{member.createdAt?.toISOString().split('T')[0] || '--'}</span></div>
+			<div>
+				<span class="label">Role</span>
+				<form method="POST" action="?/updateRole" use:enhance class="inline-form">
+					<select name="role" onchange={(e) => e.currentTarget.form?.requestSubmit()} class="role-select">
+						<option value="member" selected={member.role === 'member'}>Member</option>
+						<option value="board" selected={member.role === 'board'}>Board</option>
+					</select>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Events Attended -->
+	<div class="card">
+		<h2 class="card-title">Events Attended ({data.attended.length})</h2>
+		{#if data.attended.length === 0}
+			<p class="empty">No events attended.</p>
+		{:else}
+			<table class="mini-table">
+				<thead><tr><th>Event</th><th>Date</th><th>Club</th></tr></thead>
+				<tbody>
+					{#each data.attended as event}
+						<tr>
+							<td>{event.title}</td>
+							<td>{event.date}</td>
+							<td><span class="club-mini" class:astro={event.clubType === 'astronomy'} class:phys={event.clubType === 'physics'}>{event.clubType}</span></td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</div>
+
+	<!-- RSVPs -->
+	<div class="card">
+		<h2 class="card-title">RSVPs ({data.rsvps.length})</h2>
+		{#if data.rsvps.length === 0}
+			<p class="empty">No RSVPs.</p>
+		{:else}
+			<table class="mini-table">
+				<thead><tr><th>Event</th><th>Date</th><th>Status</th></tr></thead>
+				<tbody>
+					{#each data.rsvps as rsvp}
+						<tr>
+							<td>{rsvp.title}</td>
+							<td>{rsvp.date}</td>
+							<td>
+								<span class="rsvp-badge" class:going={rsvp.status === 'going'} class:maybe={rsvp.status === 'maybe'} class:not-going={rsvp.status === 'not_going'}>
+									{rsvp.status.replace('_', ' ')}
+								</span>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</div>
+</div>
+
+<style>
+	.member-detail { max-width: 800px; }
+
+	.back-link { font-size: 0.8rem; color: #4f46e5; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+	.back-link:hover { text-decoration: underline; }
+
+	.success-message { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem; }
+
+	.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1rem; }
+
+	.profile-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem; }
+	.member-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: #191923; }
+	.member-email { font-size: 0.85rem; color: #6b7280; }
+
+	.profile-badges { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+	.club-badge { font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 9999px; }
+	.club-badge.astro { background: #eef2ff; color: #4f46e5; }
+	.club-badge.phys { background: #e0f2fe; color: #0e79b2; }
+	.verify-badge { font-size: 0.65rem; font-weight: 500; padding: 0.15rem 0.5rem; border-radius: 9999px; }
+	.verify-badge.verified { background: #dcfce7; color: #16a34a; }
+	.verify-badge.unverified { background: #fef3c7; color: #d97706; }
+
+	.profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+	.label { display: block; font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+	.value { font-size: 0.9rem; color: #374151; }
+
+	.inline-form { display: inline; }
+	.role-select { padding: 0.25rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.8rem; }
+
+	.card-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem; }
+	.empty { font-size: 0.85rem; color: #9ca3af; }
+
+	.mini-table { width: 100%; border-collapse: collapse; }
+	.mini-table th { font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; }
+	.mini-table td { font-size: 0.825rem; color: #374151; padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
+
+	.club-mini { font-size: 0.6rem; font-weight: 600; padding: 0.1rem 0.35rem; border-radius: 9999px; text-transform: capitalize; }
+	.club-mini.astro { background: #eef2ff; color: #4f46e5; }
+	.club-mini.phys { background: #e0f2fe; color: #0e79b2; }
+
+	.rsvp-badge { font-size: 0.65rem; font-weight: 500; padding: 0.1rem 0.4rem; border-radius: 9999px; text-transform: capitalize; }
+	.rsvp-badge.going { background: #dcfce7; color: #16a34a; }
+	.rsvp-badge.maybe { background: #fef3c7; color: #d97706; }
+	.rsvp-badge.not-going { background: #fef2f2; color: #dc2626; }
+</style>

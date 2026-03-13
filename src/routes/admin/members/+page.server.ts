@@ -1,0 +1,96 @@
+import { fail } from '@sveltejs/kit';
+import { eq, desc, sql, ilike, or } from 'drizzle-orm';
+import { db } from '$lib/server/db';
+import { members, eventCheckins } from '$lib/server/db/schema';
+import type { Actions, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ url }) => {
+	const search = url.searchParams.get('search') || '';
+	const clubFilter = url.searchParams.get('club') || '';
+	const roleFilter = url.searchParams.get('role') || '';
+
+	let query = db.select().from(members).orderBy(desc(members.createdAt)).$dynamic();
+
+	if (search) {
+		query = query.where(
+			or(
+				ilike(members.email, `%${search}%`),
+				ilike(members.firstName, `%${search}%`),
+				ilike(members.lastName, `%${search}%`)
+			)
+		);
+	}
+
+	const allMembers = await query;
+
+	// Filter in JS for club and role (simpler than dynamic query building)
+	let filtered = allMembers;
+	if (clubFilter === 'astronomy') filtered = filtered.filter((m) => m.astronomyMember);
+	if (clubFilter === 'physics') filtered = filtered.filter((m) => m.physicsMember);
+	if (roleFilter) filtered = filtered.filter((m) => m.role === roleFilter);
+
+	// Get attendance counts
+	const checkinCounts = await db
+		.select({
+			memberId: eventCheckins.memberId,
+			count: sql<number>`count(*)`
+		})
+		.from(eventCheckins)
+		.groupBy(eventCheckins.memberId);
+
+	const checkinMap: Record<string, number> = {};
+	for (const row of checkinCounts) {
+		checkinMap[row.memberId] = Number(row.count);
+	}
+
+	const membersWithStats = filtered.map((m) => ({
+		...m,
+		eventsAttended: checkinMap[m.id] || 0
+	}));
+
+	return {
+		members: membersWithStats,
+		search,
+		clubFilter,
+		roleFilter,
+		totalCount: allMembers.length
+	};
+};
+
+export const actions: Actions = {
+	updateRole: async ({ request }) => {
+		const formData = await request.formData();
+		const id = formData.get('id') as string;
+		const role = formData.get('role') as 'member' | 'board';
+
+		if (!id || !['member', 'board'].includes(role)) {
+			return fail(400, { error: 'Invalid input.' });
+		}
+
+		await db.update(members).set({ role, updatedAt: new Date() }).where(eq(members.id, id));
+
+		return { success: true };
+	},
+
+	exportCsv: async () => {
+		const allMembers = await db.select().from(members).orderBy(members.lastName);
+
+		const header = 'First Name,Last Name,Email,Role,Verified,Astronomy,Physics,Year,Major,Joined';
+		const rows = allMembers.map((m) =>
+			[
+				m.firstName,
+				m.lastName,
+				m.email,
+				m.role,
+				m.emailVerified ? 'Yes' : 'No',
+				m.astronomyMember ? 'Yes' : 'No',
+				m.physicsMember ? 'Yes' : 'No',
+				m.year || '',
+				m.major || '',
+				m.createdAt?.toISOString().split('T')[0] || ''
+			].join(',')
+		);
+
+		return { csv: [header, ...rows].join('\n') };
+	}
+};

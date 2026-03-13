@@ -1,0 +1,148 @@
+<script lang="ts">
+	import GlassPanel from '$lib/components/astronomy/GlassPanel.svelte';
+
+	let name = $state('');
+	let email = $state('');
+	let message = $state('');
+	let submitted = $state(false);
+
+	function handleSubmit(e: Event) {
+		e.preventDefault();
+		submitted = true;
+	}
+</script>
+
+<svelte:head>
+	<title>Contact | UIC Astronomy Club</title>
+</svelte:head>
+
+<section class="min-h-screen px-4 sm:px-6 lg:px-8 py-24">
+	<div class="max-w-4xl mx-auto">
+		<!-- Header -->
+		<div class="mb-16 text-center">
+			<p class="font-mono text-xs tracking-[0.3em] text-astro-indigo/80 mb-4">REACH OUT</p>
+			<h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-astro-cream chromatic-text">
+				CONTACT
+			</h1>
+			<div class="mt-4 mx-auto w-24 h-px bg-gradient-to-r from-transparent via-astro-indigo to-transparent"></div>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+			<!-- Contact Info -->
+			<div class="flex flex-col gap-6">
+				<GlassPanel class="p-6">
+					<h3 class="font-display text-lg font-bold text-astro-cream mb-4">Get in Touch</h3>
+					<div class="space-y-4">
+						<div>
+							<p class="font-mono text-[10px] tracking-[0.2em] text-astro-cream/40 mb-1">EMAIL</p>
+							<a href="mailto:astro@uic.edu" class="font-mono text-sm text-astro-cyan hover:text-astro-cyan/80 transition-colors no-underline">
+								astro@uic.edu
+							</a>
+						</div>
+						<div>
+							<p class="font-mono text-[10px] tracking-[0.2em] text-astro-cream/40 mb-1">LOCATION</p>
+							<p class="font-body text-sm text-astro-cream/70">
+								University of Illinois at Chicago<br />
+								Chicago, IL 60607
+							</p>
+						</div>
+					</div>
+				</GlassPanel>
+
+				<GlassPanel class="p-6">
+					<h3 class="font-display text-lg font-bold text-astro-cream mb-4">Follow Us</h3>
+					<div class="flex gap-4">
+						<a
+							href="https://instagram.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
+						>
+							INSTAGRAM
+						</a>
+						<a
+							href="https://twitter.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
+						>
+							TWITTER
+						</a>
+						<a
+							href="https://discord.gg"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
+						>
+							DISCORD
+						</a>
+					</div>
+				</GlassPanel>
+			</div>
+
+			<!-- Contact Form -->
+			<GlassPanel class="p-6 sm:p-8">
+				{#if submitted}
+					<div class="text-center py-8">
+						<p class="font-display text-xl font-bold text-astro-cream mb-2">Message Sent</p>
+						<p class="font-body text-sm text-astro-cream/60">
+							Thank you for reaching out. We will get back to you soon.
+						</p>
+						<button
+							class="pill-btn mt-6"
+							onclick={() => { submitted = false; name = ''; email = ''; message = ''; }}
+						>
+							SEND ANOTHER
+						</button>
+					</div>
+				{:else}
+					<h3 class="font-display text-lg font-bold text-astro-cream mb-6">Send a Message</h3>
+					<form onsubmit={handleSubmit} class="space-y-5">
+						<div>
+							<label for="name" class="font-mono text-[10px] tracking-[0.2em] text-astro-cream/40 block mb-2">
+								NAME
+							</label>
+							<input
+								id="name"
+								type="text"
+								bind:value={name}
+								required
+								class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-body text-sm text-astro-cream placeholder:text-astro-cream/20 focus:outline-none focus:border-astro-indigo/50 transition-colors"
+								placeholder="Your name"
+							/>
+						</div>
+						<div>
+							<label for="email" class="font-mono text-[10px] tracking-[0.2em] text-astro-cream/40 block mb-2">
+								EMAIL
+							</label>
+							<input
+								id="email"
+								type="email"
+								bind:value={email}
+								required
+								class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-body text-sm text-astro-cream placeholder:text-astro-cream/20 focus:outline-none focus:border-astro-indigo/50 transition-colors"
+								placeholder="you@example.com"
+							/>
+						</div>
+						<div>
+							<label for="message" class="font-mono text-[10px] tracking-[0.2em] text-astro-cream/40 block mb-2">
+								MESSAGE
+							</label>
+							<textarea
+								id="message"
+								bind:value={message}
+								required
+								rows="5"
+								class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-body text-sm text-astro-cream placeholder:text-astro-cream/20 focus:outline-none focus:border-astro-indigo/50 transition-colors resize-none"
+								placeholder="What would you like to know?"
+							></textarea>
+						</div>
+						<button type="submit" class="pill-btn w-full justify-center">
+							SEND MESSAGE
+						</button>
+					</form>
+				{/if}
+			</GlassPanel>
+		</div>
+	</div>
+</section>

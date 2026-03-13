@@ -1,0 +1,12 @@
+/* Physics Section Theme Variables */
+:root {
+	--physics-bg-primary: #fbfef9;
+	--physics-bg-secondary: #f0f4ed;
+	--physics-bg-dark: #191923;
+	--physics-text-primary: #191923;
+	--physics-text-secondary: rgba(25, 25, 35, 0.7);
+	--physics-text-muted: rgba(25, 25, 35, 0.4);
+	--physics-accent-blue: #0e79b2;
+	--physics-accent-dark: #2563eb;
+	--physics-border: rgba(14, 121, 178, 0.15);
+}

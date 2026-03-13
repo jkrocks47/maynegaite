@@ -1,0 +1,15 @@
+/* Astronomy Section Theme Variables */
+:root {
+	--astro-bg-primary: #0a0a0f;
+	--astro-bg-secondary: #0d1b2a;
+	--astro-bg-tertiary: #1b2838;
+	--astro-text-primary: #f5f0e8;
+	--astro-text-secondary: rgba(245, 240, 232, 0.6);
+	--astro-text-muted: rgba(245, 240, 232, 0.35);
+	--astro-accent-indigo: #4f46e5;
+	--astro-accent-cyan: #22d3ee;
+	--astro-accent-purple: #a855f7;
+	--astro-accent-orange: #f97316;
+	--astro-accent-gold: #fbbf24;
+	--astro-border: rgba(79, 70, 229, 0.15);
+}
