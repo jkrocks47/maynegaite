@@ -44,9 +44,6 @@
 								{[member.memberYear, member.memberMajor].filter(Boolean).join(' · ')}
 							</p>
 						{/if}
-						{#if member.bio}
-							<p class="font-body text-sm text-physics-dark/50 mt-3">{member.bio}</p>
-						{/if}
 						{#if member.email}
 							<a
 								href="mailto:{member.email}"
@@ -55,6 +52,12 @@
 								{member.email}
 							</a>
 						{/if}
+						<a
+							href="/physics/board/{member.id}"
+							class="inline-block font-body text-xs text-physics-blue/70 hover:text-physics-blue mt-4 transition-colors no-underline border border-physics-blue/20 hover:border-physics-blue/40 rounded-full px-4 py-1.5"
+						>
+							View Bio
+						</a>
 					</div>
 				{/each}
 			</div>

@@ -45,9 +45,6 @@
 								{[member.memberYear, member.memberMajor].filter(Boolean).join(' · ')}
 							</p>
 						{/if}
-						{#if member.bio}
-							<p class="font-body text-sm text-astro-cream/50 mt-3">{member.bio}</p>
-						{/if}
 						{#if member.email}
 							<a
 								href="mailto:{member.email}"
@@ -56,6 +53,12 @@
 								{member.email}
 							</a>
 						{/if}
+						<a
+							href="/astronomy/board/{member.id}"
+							class="inline-block font-mono text-xs tracking-[0.15em] text-astro-indigo/70 hover:text-astro-indigo mt-4 transition-colors no-underline border border-astro-indigo/20 hover:border-astro-indigo/40 rounded-full px-4 py-1.5"
+						>
+							VIEW BIO
+						</a>
 					</GlassPanel>
 				{/each}
 			</div>
