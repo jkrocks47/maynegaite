@@ -68,22 +68,33 @@ export const actions: Actions = {
 		const passwordHash = await hashPassword(parsed.data.password);
 		const displayName = `${parsed.data.firstName} ${parsed.data.lastName}`;
 
-		const [member] = await db
-			.insert(members)
-			.values({
-				email: parsed.data.email,
-				passwordHash,
-				firstName: parsed.data.firstName,
-				lastName: parsed.data.lastName,
-				displayName,
-				year: parsed.data.year || null,
-				major: parsed.data.major || null,
-				astronomyMember: parsed.data.astronomyMember,
-				physicsMember: parsed.data.physicsMember,
-				eventPreferences: parsed.data.eventPreferences || [],
-			unsubscribeToken: randomBytes(32).toString('hex')
-			})
-			.returning({ id: members.id });
+		let member;
+		try {
+			[member] = await db
+				.insert(members)
+				.values({
+					email: parsed.data.email,
+					passwordHash,
+					firstName: parsed.data.firstName,
+					lastName: parsed.data.lastName,
+					displayName,
+					year: parsed.data.year || null,
+					major: parsed.data.major || null,
+					astronomyMember: parsed.data.astronomyMember,
+					physicsMember: parsed.data.physicsMember,
+					eventPreferences: parsed.data.eventPreferences || [],
+					unsubscribeToken: randomBytes(32).toString('hex')
+				})
+				.returning({ id: members.id });
+		} catch (err) {
+			console.error('[Register] INSERT failed:', err);
+			return fail(500, { error: 'Registration failed. Please try again.', email: data.email, firstName: data.firstName, lastName: data.lastName });
+		}
+
+		if (!member) {
+			console.error('[Register] INSERT returned no rows');
+			return fail(500, { error: 'Registration failed. Please try again.', email: data.email, firstName: data.firstName, lastName: data.lastName });
+		}
 
 		// Generate verification token and send email
 		const token = await generateVerificationToken(member.id);
