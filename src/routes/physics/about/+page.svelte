@@ -87,7 +87,7 @@
 		<div class="bg-white rounded-2xl border border-gray-100 p-8 sm:p-12">
 			<h2 class="font-display text-2xl font-bold text-physics-dark mb-4">History</h2>
 			<p class="font-body text-base text-physics-dark/60 leading-relaxed">
-				{data.content['history-body'] ?? 'Our chapter of the Society of Physics Students has been active at UIC for decades, fostering a community of curious minds and future physicists. We have hosted distinguished speakers, organized trips to national laboratories like Fermilab and Argonne, and supported students in their academic and research pursuits. Our alumni have gone on to careers in academia, industry, and beyond.'}
+				{data.content['history-body'] ?? 'Our chapter of the Society of Physics Students has been active at UIC since 1988, fostering a community of curious minds and future physicists. We have hosted distinguished speakers, organized trips to national laboratories like Fermilab and Argonne, and supported students in their academic and research pursuits. Our alumni have gone on to careers in academia, industry, and beyond.'}
 			</p>
 		</div>
 	</div>

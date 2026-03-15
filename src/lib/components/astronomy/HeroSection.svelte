@@ -766,6 +766,7 @@
 		transform: translateY(40px);
 		transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 		letter-spacing: -0.03em;
+		white-space: nowrap;
 	}
 
 	.hero-cosmos.mounted {

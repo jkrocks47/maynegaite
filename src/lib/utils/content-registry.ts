@@ -84,7 +84,7 @@ export const clubDefaults: Record<string, Record<string, { defaultTitle?: string
 		},
 		physics: {
 			defaultBody:
-				'Our chapter of the Society of Physics Students has been active at UIC for decades, fostering a community of curious minds and future physicists. We have hosted distinguished speakers, organized trips to national laboratories like Fermilab and Argonne, and supported students in their academic and research pursuits. Our alumni have gone on to careers in academia, industry, and beyond.'
+				'Our chapter of the Society of Physics Students has been active at UIC since 1988, fostering a community of curious minds and future physicists. We have hosted distinguished speakers, organized trips to national laboratories like Fermilab and Argonne, and supported students in their academic and research pursuits. Our alumni have gone on to careers in academia, industry, and beyond.'
 		}
 	},
 
@@ -263,7 +263,7 @@ export const contentEntries: ContentEntry[] = [
 		label: 'History lead text (italic intro line)',
 		fieldType: 'long',
 		defaultBody:
-			'Our chapter has been active at UIC for decades, fostering a community of curious minds and future physicists.',
+			'Our chapter has been active at UIC since 1988, fostering a community of curious minds and future physicists.',
 		page: 'Root Homepage',
 		clubSpecific: false
 	},
@@ -282,7 +282,7 @@ export const contentEntries: ContentEntry[] = [
 		section: 'stats-1',
 		label: 'Stats strip \u2014 first item',
 		fieldType: 'short',
-		defaultBody: 'DECADES ACTIVE',
+		defaultBody: 'EST. 1988',
 		page: 'Root Homepage',
 		clubSpecific: false
 	},
@@ -309,7 +309,7 @@ export const contentEntries: ContentEntry[] = [
 		section: 'footer-text',
 		label: 'Footer text at bottom of landing page',
 		fieldType: 'short',
-		defaultBody: 'SPS + UIC + CHICAGO + EST. 2010',
+		defaultBody: 'SPS + UIC + CHICAGO + EST. 1988',
 		page: 'Root Homepage',
 		clubSpecific: false
 	},

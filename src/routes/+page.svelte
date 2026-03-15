@@ -158,7 +158,7 @@
 			<ScrollReveal delay={150}>
 				<div class="history-block">
 					<p class="history-lead">
-						{data.content['history-lead'] ?? 'Our chapter has been active at UIC for decades, fostering a community of curious minds and future physicists.'}
+						{data.content['history-lead'] ?? 'Our chapter has been active at UIC since 1988, fostering a community of curious minds and future physicists.'}
 					</p>
 					<p class="section-text">
 						{data.content['history-body'] ?? 'We have hosted distinguished speakers, organized trips to national laboratories like Fermilab and Argonne, and supported students in their academic and research pursuits. Our alumni have gone on to careers in academia, industry, and beyond.'}
@@ -188,7 +188,7 @@
 
 			<!-- Stats strip -->
 			<div class="stats-strip" aria-hidden="true">
-				<span>{data.content['stats-1'] ?? 'DECADES ACTIVE'}</span>
+				<span>{data.content['stats-1'] ?? 'EST. 1988'}</span>
 				<span class="stats-dot">&bull;</span>
 				<span>{data.content['stats-2'] ?? 'FERMILAB TRIPS'}</span>
 				<span class="stats-dot">&bull;</span>
@@ -199,7 +199,7 @@
 	</main>
 
 	<footer class="site-footer">
-		<p>{data.content['footer-text'] ?? 'SPS + UIC + CHICAGO + EST. 2010'}</p>
+		<p>{data.content['footer-text'] ?? 'SPS + UIC + CHICAGO + EST. 1988'}</p>
 	</footer>
 </div>
 
