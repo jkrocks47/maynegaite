@@ -29,7 +29,7 @@
 	];
 
 	let currentPath = $derived($page.url.pathname);
-	let member = $derived($page.data.member);
+	let member = $derived($page.data.currentUser);
 </script>
 
 {#if !member?.adminRole}

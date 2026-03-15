@@ -32,7 +32,7 @@ function getUnsubscribeHeaders(unsubscribeToken: string) {
 
 export async function sendVerificationEmail(email: string, token: string, name: string) {
 	const resend = getResend();
-	const verifyUrl = `${env.PUBLIC_BASE_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
+	const verifyUrl = `${getBaseUrl()}/verify-email?token=${token}`;
 
 	await resend.emails.send({
 		from: FROM_EMAIL,
@@ -113,7 +113,7 @@ export async function sendPreferenceReviewEmail(email: string, name: string, uns
 
 export async function sendPasswordResetEmail(email: string, token: string, name: string) {
 	const resend = getResend();
-	const resetUrl = `${env.PUBLIC_BASE_URL || 'http://localhost:5173'}/reset-password?token=${token}`;
+	const resetUrl = `${getBaseUrl()}/reset-password?token=${token}`;
 
 	await resend.emails.send({
 		from: FROM_EMAIL,
