@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { enhance } from '$app/forms';
 	import { browser } from '$app/environment';
 
 	let { children } = $props();
@@ -82,7 +81,7 @@
 					{#if member.astronomyMember}<span class="club-badge astro">Astro</span>{/if}
 					{#if member.physicsMember}<span class="club-badge phys">Physics</span>{/if}
 				</div>
-				<form method="POST" action="/api/member/logout" use:enhance>
+				<form method="POST" action="/api/member/logout">
 					<button type="submit" class="logout-btn">Logout</button>
 				</form>
 			</div>
