@@ -3,6 +3,7 @@
 
 	let { data, form } = $props();
 	const member = $derived(data.member);
+	let showDeleteConfirm = $state(false);
 </script>
 
 <svelte:head>
@@ -14,6 +15,10 @@
 
 	{#if form?.success}
 		<div class="success-message">Member updated.</div>
+	{/if}
+
+	{#if form?.error}
+		<div class="error-message">{form.error}</div>
 	{/if}
 
 	<!-- Profile card -->
@@ -110,6 +115,25 @@
 			</table>
 		{/if}
 	</div>
+
+	<!-- Delete Member -->
+	{#if data.currentUserRole === 'super_admin'}
+		<div class="card danger-card">
+			<h2 class="card-title danger-title">Danger Zone</h2>
+			{#if !showDeleteConfirm}
+				<p class="danger-text">Permanently delete this member and all their associated data (sessions, RSVPs, check-ins, etc.).</p>
+				<button class="btn-danger" onclick={() => showDeleteConfirm = true}>Delete Member</button>
+			{:else}
+				<p class="danger-text">Are you sure you want to delete <strong>{member.firstName} {member.lastName}</strong>? This action cannot be undone.</p>
+				<div class="danger-actions">
+					<form method="POST" action="?/deleteMember" use:enhance>
+						<button type="submit" class="btn-danger-confirm">Yes, Delete</button>
+					</form>
+					<button class="btn-cancel" onclick={() => showDeleteConfirm = false}>Cancel</button>
+				</div>
+			{/if}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -158,4 +182,17 @@
 	.rsvp-badge.not-going { background: #fef2f2; color: #dc2626; }
 
 	.admin-badge { font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 9999px; background: #fef3c7; color: #d97706; text-transform: capitalize; }
+
+	.error-message { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem; }
+
+	.danger-card { border-color: #fecaca; }
+	.danger-title { color: #dc2626; }
+	.danger-text { font-size: 0.85rem; color: #6b7280; margin-bottom: 0.75rem; }
+	.btn-danger { padding: 0.4rem 1rem; background: #fff; color: #dc2626; border: 1px solid #dc2626; border-radius: 0.375rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+	.btn-danger:hover { background: #fef2f2; }
+	.danger-actions { display: flex; gap: 0.5rem; }
+	.btn-danger-confirm { padding: 0.4rem 1rem; background: #dc2626; color: #fff; border: none; border-radius: 0.375rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+	.btn-danger-confirm:hover { background: #b91c1c; }
+	.btn-cancel { padding: 0.4rem 1rem; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer; }
+	.btn-cancel:hover { background: #e5e7eb; }
 </style>

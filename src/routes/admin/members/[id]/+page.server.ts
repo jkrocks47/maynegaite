@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { members, eventCheckins, eventRsvps, events } from '$lib/server/db/schema';
@@ -85,5 +85,19 @@ export const actions: Actions = {
 			.where(eq(members.id, params.id));
 
 		return { success: true };
+	},
+
+	deleteMember: async ({ params, locals }) => {
+		if (locals.member?.adminRole !== 'super_admin') {
+			return fail(403, { error: 'Only super admins can delete members.' });
+		}
+
+		if (params.id === locals.member.id) {
+			return fail(400, { error: 'You cannot delete your own account.' });
+		}
+
+		await db.delete(members).where(eq(members.id, params.id));
+
+		redirect(303, '/admin/members');
 	}
 };
