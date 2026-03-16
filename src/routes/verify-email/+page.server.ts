@@ -14,6 +14,21 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		if (result) {
 			return { verified: true, alreadyVerified: false };
 		}
+
+		// Token was already consumed (double-click, prefetch, etc.)
+		// Check if the logged-in user is actually already verified.
+		if (locals.member) {
+			const [fresh] = await db
+				.select({ emailVerified: members.emailVerified })
+				.from(members)
+				.where(eq(members.id, locals.member.id))
+				.limit(1);
+
+			if (fresh?.emailVerified) {
+				return { verified: true, alreadyVerified: true };
+			}
+		}
+
 		return { verified: false, alreadyVerified: false, error: 'Invalid or expired verification link.' };
 	}
 
