@@ -13,16 +13,40 @@
 	<div class="verify-card">
 		<h1 class="verify-title">UICSpacetime</h1>
 
-		{#if data.verified}
+		{#if data.verified || form?.verified}
 			<div class="icon success-icon">&#10003;</div>
 			<h2>Email Verified!</h2>
 			<p>Your email has been verified successfully. You can now access your dashboard.</p>
 			<a href="/dashboard" class="action-btn">Go to Dashboard</a>
-		{:else if data.error}
+		{:else if data.tokenValid}
+			<div class="icon pending-icon">&#9993;</div>
+			<h2>Confirm Verification</h2>
+			<p>Click the button below to verify your email address.</p>
+			{#if form?.verifyError}
+				<div class="error-msg">{form.verifyError}</div>
+			{/if}
+			<form
+				method="POST"
+				action="?/verify"
+				use:enhance={() => {
+					resending = true;
+					return async ({ update }) => {
+						resending = false;
+						await update();
+					};
+				}}
+			>
+				<input type="hidden" name="token" value={data.token} />
+				<button type="submit" class="action-btn" disabled={resending}>
+					{resending ? 'Verifying...' : 'Verify My Email'}
+				</button>
+			</form>
+		{:else if data.error || form?.verifyError}
 			<div class="icon error-icon">&#10007;</div>
 			<h2>Verification Failed</h2>
-			<p>{data.error}</p>
+			<p>{data.error || form?.verifyError}</p>
 			<a href="/login" class="action-btn">Sign In</a>
+			<p class="hint">Need a new link? <a href="/verify-email">Resend verification email</a></p>
 		{:else}
 			<div class="icon pending-icon">&#9993;</div>
 			<h2>Check Your Email</h2>

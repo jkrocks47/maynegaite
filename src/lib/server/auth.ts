@@ -131,6 +131,21 @@ export async function generateVerificationToken(memberId: string): Promise<strin
 	return token;
 }
 
+export async function checkVerificationToken(
+	token: string
+): Promise<{ memberId: string } | null> {
+	const result = await db
+		.select({ memberId: emailVerificationTokens.memberId })
+		.from(emailVerificationTokens)
+		.where(
+			and(eq(emailVerificationTokens.token, token), gt(emailVerificationTokens.expiresAt, new Date()))
+		)
+		.limit(1);
+
+	if (result.length === 0) return null;
+	return { memberId: result[0].memberId };
+}
+
 export async function validateVerificationToken(
 	token: string
 ): Promise<{ memberId: string } | null> {
