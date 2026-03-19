@@ -348,6 +348,11 @@
 		transition: border-color 0.15s;
 	}
 
+	.form-group select option {
+		background: #1e1e2e;
+		color: #e5e7eb;
+	}
+
 	.form-group input:focus,
 	.form-group select:focus {
 		outline: none;

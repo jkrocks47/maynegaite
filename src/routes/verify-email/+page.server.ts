@@ -2,8 +2,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { checkVerificationToken, validateVerificationToken, generateVerificationToken, destroyMemberSession } from '$lib/server/auth';
 import { sendVerificationEmail } from '$lib/server/email';
 import { db } from '$lib/server/db';
-import { members } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { members, emailVerificationTokens } from '$lib/server/db/schema';
+import { eq, desc } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
@@ -65,6 +65,23 @@ export const actions: Actions = {
 
 		if (locals.member.emailVerified) {
 			return fail(400, { resendError: 'Your email is already verified.' });
+		}
+
+		// Rate limit: 3 minutes between resends
+		const recentToken = await db
+			.select({ createdAt: emailVerificationTokens.createdAt })
+			.from(emailVerificationTokens)
+			.where(eq(emailVerificationTokens.memberId, locals.member.id))
+			.orderBy(desc(emailVerificationTokens.createdAt))
+			.limit(1);
+
+		if (recentToken.length > 0 && recentToken[0].createdAt) {
+			const elapsed = Date.now() - recentToken[0].createdAt.getTime();
+			const cooldownMs = 3 * 60 * 1000;
+			if (elapsed < cooldownMs) {
+				const remaining = Math.ceil((cooldownMs - elapsed) / 1000);
+				return fail(429, { resendError: `Please wait ${remaining} seconds before requesting another email.` });
+			}
 		}
 
 		const member = await db

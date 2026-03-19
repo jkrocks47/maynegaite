@@ -243,6 +243,11 @@
 		color: #e5e7eb;
 	}
 
+	.form-group select option {
+		background: #1e1e2e;
+		color: #e5e7eb;
+	}
+
 	.form-group input:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;

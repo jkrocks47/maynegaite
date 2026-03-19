@@ -3,6 +3,15 @@
 
 	let { data, form } = $props();
 	let resending = $state(false);
+	let cooldown = $state(false);
+
+	$effect(() => {
+		if (form?.resent) {
+			cooldown = true;
+			const timer = setTimeout(() => { cooldown = false; }, 3 * 60 * 1000);
+			return () => clearTimeout(timer);
+		}
+	});
 </script>
 
 <svelte:head>
@@ -75,8 +84,14 @@
 					};
 				}}
 			>
-				<button type="submit" class="resend-btn" disabled={resending}>
-					{resending ? 'Sending...' : 'Resend Verification Email'}
+				<button type="submit" class="resend-btn" disabled={resending || cooldown}>
+					{#if resending}
+						Sending...
+					{:else if cooldown}
+						Email Sent — Check Your Inbox
+					{:else}
+						Resend Verification Email
+					{/if}
 				</button>
 			</form>
 
