@@ -41,7 +41,7 @@
 			{#if data.member}
 			<a href="/dashboard" class="login-link">Dashboard</a>
 		{:else}
-			<a href="/login" class="login-link">Sign In / Join</a>
+			<a href="/register" class="login-link">Sign In / Join</a>
 		{/if}
 		</div>
 

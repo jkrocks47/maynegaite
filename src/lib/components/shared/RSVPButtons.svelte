@@ -40,7 +40,7 @@
 
 {#if !isLoggedIn}
 	<div class="rsvp-prompt">
-		<a href="/login{redirectTo ? `?redirectTo=${redirectTo}` : ''}" class="rsvp-login-link">Sign in to RSVP</a>
+		<a href="/register{redirectTo ? `?redirectTo=${redirectTo}` : ''}" class="rsvp-login-link">Sign in to RSVP</a>
 	</div>
 {:else if !isVerified}
 	<div class="rsvp-prompt">

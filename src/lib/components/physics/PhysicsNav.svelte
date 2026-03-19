@@ -93,7 +93,7 @@
 					</a>
 				{:else}
 					<a
-						href="/login?redirectTo={$page.url.pathname}"
+						href="/register?redirectTo={$page.url.pathname}"
 						class="font-body text-sm font-medium text-physics-blue border border-physics-blue/40 px-3 py-1.5 rounded hover:bg-physics-blue/10 hover:border-physics-blue/70 transition-all duration-200 no-underline"
 					>
 						Sign In / Join
@@ -165,7 +165,7 @@
 					</a>
 				{:else}
 					<a
-						href="/login?redirectTo={$page.url.pathname}"
+						href="/register?redirectTo={$page.url.pathname}"
 						class="font-body text-sm text-physics-dark/60 hover:text-physics-blue transition-colors no-underline"
 						onclick={() => (mobileOpen = false)}
 					>
