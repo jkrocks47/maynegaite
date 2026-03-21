@@ -3,6 +3,7 @@ import { eq, desc, sql, ilike, or } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { members, eventCheckins } from '$lib/server/db/schema';
 import { ROLES } from '$lib/utils/constants';
+import { getInterestOptions } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
@@ -55,6 +56,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		eventsAttended: checkinMap[m.id] || 0
 	}));
 
+	const interestOpts = await getInterestOptions();
+
 	return {
 		members: membersWithStats,
 		search,
@@ -62,7 +65,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		roleFilter,
 		interestFilter,
 		totalCount: allMembers.length,
-		currentUserRole: locals.member?.adminRole ?? null
+		currentUserRole: locals.member?.adminRole ?? null,
+		interestOptions: interestOpts
 	};
 };
 

@@ -10,6 +10,7 @@ import {
 } from '$lib/server/auth';
 import { sendVerificationEmail } from '$lib/server/email';
 import { registrationSchema } from '$lib/utils/validation';
+import { getInterestOptions } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
 
 function safeRedirect(redirectTo: string | null): string {
@@ -24,7 +25,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	if (locals.member) {
 		throw redirect(303, safeRedirect(redirectTo));
 	}
-	return { redirectTo };
+	const interestOpts = await getInterestOptions();
+	return { redirectTo, interestOptions: interestOpts };
 };
 
 export const actions: Actions = {

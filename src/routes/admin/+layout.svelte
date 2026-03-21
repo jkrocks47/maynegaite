@@ -61,6 +61,11 @@
 							{link.label}
 						</a>
 					{/each}
+					{#if member?.adminRole === 'super_admin'}
+						<a href="/admin/interests" class="nav-item" class:active={currentPath === '/admin/interests'}>
+							Interests
+						</a>
+					{/if}
 				</div>
 
 				{#if canManageAstronomy}

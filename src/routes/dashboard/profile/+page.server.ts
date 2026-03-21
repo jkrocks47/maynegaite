@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import { members } from '$lib/server/db/schema';
 import { profileUpdateSchema } from '$lib/utils/validation';
 import { processAndStoreImage, deleteImage } from '$lib/server/images';
+import { getInterestOptions } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -28,7 +29,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.where(eq(members.id, member.id))
 		.limit(1);
 
-	return { profile: result[0] };
+	const interestOpts = await getInterestOptions();
+	return { profile: result[0], interestOptions: interestOpts };
 };
 
 export const actions: Actions = {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { YEARS, EVENT_PREFERENCES } from '$lib/utils/constants';
+	import { YEARS } from '$lib/utils/constants';
 
 	let { form, data } = $props();
 
@@ -143,7 +143,7 @@
 						<div class="form-group">
 							<label>Event interests</label>
 							<div class="checkbox-grid">
-								{#each EVENT_PREFERENCES as pref}
+								{#each data.interestOptions as pref}
 									<label class="checkbox-label">
 										<input type="checkbox" name="eventPreferences" value={pref} />
 										{pref}

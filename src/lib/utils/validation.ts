@@ -105,6 +105,16 @@ export const officerSchema = z.object({
 	memberId: z.string().uuid().optional().or(z.literal(''))
 });
 
+export const checkinQuestionSchema = z.object({
+	id: z.string().min(1),
+	question: z.string().min(1, 'Question text is required').max(500),
+	type: z.enum(['text', 'select', 'checkbox']),
+	options: z.array(z.string()).optional(),
+	required: z.boolean().default(false)
+});
+
+export const checkinQuestionsArraySchema = z.array(checkinQuestionSchema).max(10);
+
 export const contentSchema = z.object({
 	slug: z.string().min(1),
 	clubType: z.enum(['astronomy', 'physics']),

@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { RsvpMemberDetail, EventStats } from '$lib/server/db/queries';
+	import type { CheckinQuestion } from '$lib/server/db/schema';
+
+	interface CheckinResponseRow {
+		memberId: string;
+		firstName: string;
+		lastName: string;
+		responses: Record<string, string | string[]> | null;
+		checkedInAt: Date;
+	}
 
 	interface Props {
 		event: {
@@ -19,9 +28,15 @@
 		backHref: string;
 		announcementRecipientCount: number;
 		announcementAlreadySent: boolean;
+		checkinQuestions?: CheckinQuestion[];
+		checkinResponses?: CheckinResponseRow[];
 	}
 
-	let { event, rsvpList, stats, historicalRate, clubType, backHref, announcementRecipientCount, announcementAlreadySent }: Props = $props();
+	let { event, rsvpList, stats, historicalRate, clubType, backHref, announcementRecipientCount, announcementAlreadySent, checkinQuestions = [], checkinResponses = [] }: Props = $props();
+
+	let showResponses = $state(false);
+
+	let hasResponseData = $derived(checkinQuestions.length > 0 && checkinResponses.some(r => r.responses && Object.keys(r.responses).length > 0));
 
 	let announcementSending = $state(false);
 	let announcementResult = $state<{ success?: boolean; sentCount?: number; error?: string } | null>(null);
@@ -256,6 +271,85 @@
 			</table>
 		{/if}
 	</div>
+
+	{#if hasResponseData}
+		<div class="responses-card">
+			<div class="responses-header" onclick={() => showResponses = !showResponses}>
+				<h2>Check-in Responses ({checkinResponses.filter(r => r.responses).length})</h2>
+				<span class="toggle-text">{showResponses ? 'Hide' : 'Show'}</span>
+			</div>
+
+			{#if showResponses}
+				<!-- Summary per question -->
+				{#each checkinQuestions as q}
+					<div class="response-summary">
+						<p class="response-question">{q.question}</p>
+						{#if q.type === 'text'}
+							{@const textAnswers = checkinResponses
+								.filter(r => r.responses && r.responses[q.id])
+								.map(r => ({ name: `${r.firstName} ${r.lastName}`, answer: r.responses![q.id] as string }))}
+							{#each textAnswers as entry}
+								<div class="response-answer-row">
+									<span class="response-answer">{entry.name}: {entry.answer}</span>
+								</div>
+							{/each}
+						{:else}
+							{@const answerCounts = (() => {
+								const counts: Record<string, number> = {};
+								for (const r of checkinResponses) {
+									if (!r.responses || !r.responses[q.id]) continue;
+									const val = r.responses[q.id];
+									const answers = Array.isArray(val) ? val : [val];
+									for (const a of answers) {
+										counts[a] = (counts[a] || 0) + 1;
+									}
+								}
+								return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+							})()}
+							{#each answerCounts as [answer, count]}
+								<div class="response-answer-row">
+									<span class="response-answer">{answer}</span>
+									<span class="response-count-badge">{count}</span>
+								</div>
+							{/each}
+						{/if}
+					</div>
+				{/each}
+
+				<!-- Detailed per-member table -->
+				<table class="response-detail-table">
+					<thead>
+						<tr>
+							<th>Member</th>
+							{#each checkinQuestions as q}
+								<th>{q.question}</th>
+							{/each}
+						</tr>
+					</thead>
+					<tbody>
+						{#each checkinResponses.filter(r => r.responses) as row}
+							<tr>
+								<td>{row.firstName} {row.lastName}</td>
+								{#each checkinQuestions as q}
+									<td>
+										{#if row.responses && row.responses[q.id]}
+											{#if Array.isArray(row.responses[q.id])}
+												{(row.responses[q.id] as string[]).join(', ')}
+											{:else}
+												{row.responses[q.id]}
+											{/if}
+										{:else}
+											<span class="checkin-no">&mdash;</span>
+										{/if}
+									</td>
+								{/each}
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{/if}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -549,6 +643,95 @@
 
 	.checkin-yes { color: #16a34a; font-weight: 600; }
 	.checkin-no { color: #d1d5db; }
+
+	/* Responses Section */
+	.responses-card {
+		background: #fff;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		overflow: hidden;
+		margin-top: 1.5rem;
+	}
+
+	.responses-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem;
+		border-bottom: 1px solid #e5e7eb;
+		cursor: pointer;
+	}
+
+	.responses-header:hover { background: #f9fafb; }
+
+	.responses-header h2 {
+		font-size: 1rem;
+		font-weight: 600;
+		color: #374151;
+		margin: 0;
+	}
+
+	.toggle-text {
+		font-size: 0.75rem;
+		color: #9ca3af;
+	}
+
+	.response-summary {
+		padding: 1rem;
+		border-bottom: 1px solid #f3f4f6;
+	}
+
+	.response-question {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #374151;
+		margin-bottom: 0.5rem;
+	}
+
+	.response-answer-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.2rem 0;
+	}
+
+	.response-answer {
+		font-size: 0.8rem;
+		color: #6b7280;
+	}
+
+	.response-count-badge {
+		font-size: 0.7rem;
+		font-weight: 600;
+		color: #4f46e5;
+		background: #eef2ff;
+		padding: 0.1rem 0.4rem;
+		border-radius: 9999px;
+	}
+
+	.response-detail-table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	.response-detail-table th {
+		background: #f9fafb;
+		padding: 0.5rem 0.75rem;
+		text-align: left;
+		font-size: 0.7rem;
+		font-weight: 600;
+		color: #6b7280;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border-bottom: 1px solid #e5e7eb;
+	}
+
+	.response-detail-table td {
+		padding: 0.5rem 0.75rem;
+		font-size: 0.8rem;
+		color: #374151;
+		border-bottom: 1px solid #f3f4f6;
+	}
 
 	@media (max-width: 768px) {
 		.stats-grid { grid-template-columns: repeat(2, 1fr); }

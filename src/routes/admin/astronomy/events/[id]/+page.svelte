@@ -17,4 +17,6 @@
 	backHref="/admin/astronomy/events"
 	announcementRecipientCount={data.announcementRecipientCount}
 	announcementAlreadySent={data.announcementAlreadySent}
+	checkinQuestions={data.checkinQuestions}
+	checkinResponses={data.checkinResponses}
 />

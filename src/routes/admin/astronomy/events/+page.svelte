@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import CheckinQuestionBuilder from '$lib/components/admin/CheckinQuestionBuilder.svelte';
+	import type { CheckinQuestion } from '$lib/server/db/schema';
 
 	let { data, form } = $props();
 
@@ -7,6 +9,8 @@
 	let editingId = $state<string | null>(null);
 	let showQrId = $state<string | null>(null);
 	let showInterests = $state(false);
+	let createQuestions = $state<CheckinQuestion[]>([]);
+	let editQuestions = $state<CheckinQuestion[]>([]);
 
 	let interestData = $derived(data.interestData ?? []);
 	let topInterest = $derived(interestData.length > 0 && interestData[0].count > 0 ? interestData[0] : null);
@@ -133,6 +137,10 @@
 					</div>
 				</div>
 
+				<div class="full-width">
+					<CheckinQuestionBuilder bind:questions={createQuestions} />
+				</div>
+
 				<div class="form-actions">
 					<button type="submit" class="submit-btn">Create Event</button>
 				</div>
@@ -191,7 +199,7 @@
 								</form>
 							</td>
 							<td class="actions-cell">
-								<button class="action-btn-sm" onclick={() => editingId = editingId === event.id ? null : event.id}>Edit</button>
+								<button class="action-btn-sm" onclick={() => { if (editingId === event.id) { editingId = null; } else { editingId = event.id; editQuestions = event.checkinQuestions ? [...event.checkinQuestions] : []; } }}>Edit</button>
 								{#if event.checkinCode}
 									<button class="action-btn-sm qr" onclick={() => showQrId = showQrId === event.id ? null : event.id}>QR</button>
 									<a href="/admin/poster/{event.id}" target="_blank" class="action-btn-sm poster">Poster</a>
@@ -264,6 +272,10 @@
 												</label>
 											</div>
 										</div>
+										<div class="full-width">
+											<CheckinQuestionBuilder bind:questions={editQuestions} />
+										</div>
+
 										<div class="form-actions">
 											<button type="submit" class="submit-btn">Save Changes</button>
 											<button type="button" class="cancel-btn" onclick={() => editingId = null}>Cancel</button>

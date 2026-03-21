@@ -4,8 +4,7 @@ import { db } from '$lib/server/db';
 import { members } from '$lib/server/db/schema';
 import { verifyPassword, createMemberSession, destroyMemberSession } from '$lib/server/auth';
 import { loginSchema } from '$lib/utils/validation';
-import { getInterestBreakdown, getMembershipStats } from '$lib/server/db/queries';
-import { EVENT_PREFERENCES } from '$lib/utils/constants';
+import { getInterestBreakdown, getMembershipStats, getInterestOptions } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -13,13 +12,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 		return { member: locals.member };
 	}
 
-	const [interestResult, membershipStats] = await Promise.all([
+	const [interestResult, membershipStats, interestOpts] = await Promise.all([
 		getInterestBreakdown(),
-		getMembershipStats()
+		getMembershipStats(),
+		getInterestOptions()
 	]);
 
 	const interestMap = new Map(interestResult.interests.map((i) => [i.preference, i]));
-	const allInterests = EVENT_PREFERENCES.map((pref) =>
+	const allInterests = interestOpts.map((pref) =>
 		interestMap.get(pref) ?? { preference: pref, total: 0, astronomyCount: 0, physicsCount: 0 }
 	);
 

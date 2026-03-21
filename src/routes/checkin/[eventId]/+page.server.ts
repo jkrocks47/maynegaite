@@ -1,8 +1,9 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { events, eventCheckins, members } from '$lib/server/db/schema';
-import type { PageServerLoad } from './$types';
+import type { CheckinQuestion } from '$lib/server/db/schema';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
 	if (!locals.member) {
@@ -22,7 +23,8 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 			title: events.title,
 			date: events.date,
 			clubType: events.clubType,
-			checkinCode: events.checkinCode
+			checkinCode: events.checkinCode,
+			checkinQuestions: events.checkinQuestions
 		})
 		.from(events)
 		.where(and(eq(events.id, params.eventId), eq(events.isPublished, true)))
@@ -38,18 +40,6 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 		error(400, 'Invalid check-in code.');
 	}
 
-	// Auto-join club if not already a member
-	let joinedClub = false;
-	const isMember =
-		event.clubType === 'astronomy' ? locals.member.astronomyMember : locals.member.physicsMember;
-
-	if (!isMember) {
-		const clubField =
-			event.clubType === 'astronomy' ? { astronomyMember: true } : { physicsMember: true };
-		await db.update(members).set(clubField).where(eq(members.id, locals.member.id));
-		joinedClub = true;
-	}
-
 	// Check if already checked in
 	const existing = await db
 		.select({ id: eventCheckins.id })
@@ -63,14 +53,149 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 		.limit(1);
 
 	if (existing.length > 0) {
-		return { event, alreadyCheckedIn: true, success: false, joinedClub };
+		return {
+			event: { id: event.id, title: event.title, date: event.date, clubType: event.clubType },
+			alreadyCheckedIn: true,
+			success: false,
+			joinedClub: false,
+			hasQuestions: false,
+			questions: [] as CheckinQuestion[],
+			code
+		};
 	}
 
-	// Record check-in
-	await db.insert(eventCheckins).values({
-		eventId: event.id,
-		memberId: locals.member.id
-	});
+	const hasQuestions = event.checkinQuestions && event.checkinQuestions.length > 0;
 
-	return { event, alreadyCheckedIn: false, success: true, joinedClub };
+	if (!hasQuestions) {
+		// No questions — auto check-in (existing behavior)
+		let joinedClub = false;
+		const isMember =
+			event.clubType === 'astronomy' ? locals.member.astronomyMember : locals.member.physicsMember;
+
+		if (!isMember) {
+			const clubField =
+				event.clubType === 'astronomy' ? { astronomyMember: true } : { physicsMember: true };
+			await db.update(members).set(clubField).where(eq(members.id, locals.member.id));
+			joinedClub = true;
+		}
+
+		await db.insert(eventCheckins).values({
+			eventId: event.id,
+			memberId: locals.member.id
+		});
+
+		return {
+			event: { id: event.id, title: event.title, date: event.date, clubType: event.clubType },
+			alreadyCheckedIn: false,
+			success: true,
+			joinedClub,
+			hasQuestions: false,
+			questions: [] as CheckinQuestion[],
+			code
+		};
+	}
+
+	// Has questions — return event data with questions, let client show form
+	return {
+		event: { id: event.id, title: event.title, date: event.date, clubType: event.clubType },
+		alreadyCheckedIn: false,
+		success: false,
+		joinedClub: false,
+		hasQuestions: true,
+		questions: event.checkinQuestions!,
+		code
+	};
+};
+
+export const actions: Actions = {
+	checkin: async ({ request, params, locals }) => {
+		if (!locals.member) {
+			return fail(401, { error: 'Not authenticated.' });
+		}
+
+		const formData = await request.formData();
+		const code = formData.get('code') as string;
+
+		// Re-validate event and code
+		const eventResult = await db
+			.select({
+				id: events.id,
+				title: events.title,
+				date: events.date,
+				clubType: events.clubType,
+				checkinCode: events.checkinCode,
+				checkinQuestions: events.checkinQuestions
+			})
+			.from(events)
+			.where(and(eq(events.id, params.eventId), eq(events.isPublished, true)))
+			.limit(1);
+
+		if (eventResult.length === 0) {
+			return fail(404, { error: 'Event not found.' });
+		}
+
+		const event = eventResult[0];
+
+		if (event.checkinCode !== code) {
+			return fail(400, { error: 'Invalid check-in code.' });
+		}
+
+		// Check if already checked in
+		const existing = await db
+			.select({ id: eventCheckins.id })
+			.from(eventCheckins)
+			.where(
+				and(
+					eq(eventCheckins.eventId, event.id),
+					eq(eventCheckins.memberId, locals.member.id)
+				)
+			)
+			.limit(1);
+
+		if (existing.length > 0) {
+			return fail(400, { error: 'Already checked in.' });
+		}
+
+		// Auto-join club if not already a member
+		let joinedClub = false;
+		const isMember =
+			event.clubType === 'astronomy' ? locals.member.astronomyMember : locals.member.physicsMember;
+
+		if (!isMember) {
+			const clubField =
+				event.clubType === 'astronomy' ? { astronomyMember: true } : { physicsMember: true };
+			await db.update(members).set(clubField).where(eq(members.id, locals.member.id));
+			joinedClub = true;
+		}
+
+		// Parse question responses from form data
+		const questions = event.checkinQuestions || [];
+		const responses: Record<string, string | string[]> = {};
+
+		for (const q of questions) {
+			if (q.type === 'checkbox') {
+				const vals = formData.getAll(`q_${q.id}`) as string[];
+				if (vals.length > 0) responses[q.id] = vals;
+			} else {
+				const val = (formData.get(`q_${q.id}`) as string)?.trim();
+				if (val) responses[q.id] = val;
+			}
+
+			// Validate required questions
+			if (q.required) {
+				const val = responses[q.id];
+				if (!val || (Array.isArray(val) && val.length === 0)) {
+					return fail(400, { error: `Please answer: ${q.question}` });
+				}
+			}
+		}
+
+		await db.insert(eventCheckins).values({
+			eventId: event.id,
+			memberId: locals.member.id,
+			questionResponses: Object.keys(responses).length > 0 ? responses : null
+		});
+
+		return { success: true, joinedClub };
+	}
 };

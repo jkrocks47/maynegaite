@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { EVENT_PREFERENCES, ROLES } from '$lib/utils/constants';
+	import { ROLES } from '$lib/utils/constants';
 
 	let { data, form } = $props();
 
@@ -76,7 +76,7 @@
 				class="interest-select"
 			>
 				<option value="">All Interests</option>
-				{#each EVENT_PREFERENCES as pref}
+				{#each data.interestOptions as pref}
 					<option value={pref}>{pref}</option>
 				{/each}
 			</select>

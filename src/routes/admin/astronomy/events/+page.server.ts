@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto';
 import { eq, desc, and, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { events, eventRsvps, eventCheckins } from '$lib/server/db/schema';
-import { eventSchema } from '$lib/utils/validation';
+import { eventSchema, checkinQuestionsArraySchema } from '$lib/utils/validation';
 import { processAndStoreImage, deleteImage } from '$lib/server/images';
 import { getBatchEstimatedTurnout, getHistoricalTurnoutRate, getInterestBreakdown } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
@@ -116,6 +116,17 @@ export const actions: Actions = {
 			}
 		}
 
+		let checkinQuestions = null;
+		const checkinQuestionsRaw = formData.get('checkinQuestions') as string;
+		if (checkinQuestionsRaw) {
+			try {
+				const parsed2 = checkinQuestionsArraySchema.safeParse(JSON.parse(checkinQuestionsRaw));
+				if (parsed2.success && parsed2.data.length > 0) {
+					checkinQuestions = parsed2.data;
+				}
+			} catch { /* ignore invalid JSON */ }
+		}
+
 		await db.insert(events).values({
 			title: parsed.data.title,
 			description: parsed.data.description || null,
@@ -129,6 +140,7 @@ export const actions: Actions = {
 			isPublished: parsed.data.isPublished,
 			maxAttendees: parsed.data.maxAttendees || null,
 			checkinCode: generateCheckinCode(),
+			checkinQuestions,
 			createdBy: locals.member?.id
 		});
 
@@ -160,6 +172,17 @@ export const actions: Actions = {
 			return fail(400, { error: 'Invalid event data.' });
 		}
 
+		let checkinQuestions = undefined;
+		const editCheckinQuestionsRaw = formData.get('checkinQuestions') as string;
+		if (editCheckinQuestionsRaw !== null) {
+			try {
+				const parsed2 = checkinQuestionsArraySchema.safeParse(JSON.parse(editCheckinQuestionsRaw));
+				checkinQuestions = parsed2.success && parsed2.data.length > 0 ? parsed2.data : null;
+			} catch {
+				checkinQuestions = null;
+			}
+		}
+
 		await db
 			.update(events)
 			.set({
@@ -171,6 +194,7 @@ export const actions: Actions = {
 				locationUrl: parsed.data.locationUrl || null,
 				isPublished: parsed.data.isPublished,
 				maxAttendees: parsed.data.maxAttendees || null,
+				checkinQuestions: checkinQuestions !== undefined ? checkinQuestions : undefined,
 				updatedAt: new Date()
 			})
 			.where(and(eq(events.id, id), eq(events.clubType, 'astronomy')));

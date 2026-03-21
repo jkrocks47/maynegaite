@@ -1,5 +1,7 @@
 <script lang="ts">
-	let { data } = $props();
+	import { enhance } from '$app/forms';
+
+	let { data, form } = $props();
 </script>
 
 <svelte:head>
@@ -11,12 +13,12 @@
 		<h1 class="checkin-title">UICSpacetime</h1>
 		<p class="checkin-subtitle">Event Check-In</p>
 
-		{#if data.success}
+		{#if data.success || form?.success}
 			<div class="icon success-icon">&#10003;</div>
 			<h2>Checked In!</h2>
 			<p class="event-name">{data.event.title}</p>
 			<p class="event-date">{data.event.date}</p>
-			{#if data.joinedClub}
+			{#if data.joinedClub || form?.joinedClub}
 				<p class="joined-club">You've joined the {data.event.clubType === 'astronomy' ? 'Astronomy' : 'Physics'} Club!</p>
 			{/if}
 			<p class="message">You've been successfully checked in. Enjoy the event!</p>
@@ -25,9 +27,61 @@
 			<h2>Already Checked In</h2>
 			<p class="event-name">{data.event.title}</p>
 			<p class="message">You're already checked in for this event.</p>
+		{:else if data.hasQuestions}
+			<h2>Check in to: {data.event.title}</h2>
+			<p class="event-date">{data.event.date}</p>
+
+			{#if form?.error}
+				<div class="form-error">{form.error}</div>
+			{/if}
+
+			<form method="POST" action="?/checkin" use:enhance>
+				<input type="hidden" name="code" value={data.code} />
+
+				<div class="questions">
+					{#each data.questions as q}
+						<div class="question-group">
+							<label class="question-label">
+								{q.question}
+								{#if q.required}<span class="required">*</span>{/if}
+							</label>
+
+							{#if q.type === 'text'}
+								<input
+									type="text"
+									name="q_{q.id}"
+									class="question-input"
+									required={q.required}
+									placeholder="Your answer..."
+								/>
+							{:else if q.type === 'select'}
+								<select name="q_{q.id}" class="question-select" required={q.required}>
+									<option value="">Select...</option>
+									{#each q.options || [] as opt}
+										<option value={opt}>{opt}</option>
+									{/each}
+								</select>
+							{:else if q.type === 'checkbox'}
+								<div class="checkbox-options">
+									{#each q.options || [] as opt}
+										<label class="checkbox-label">
+											<input type="checkbox" name="q_{q.id}" value={opt} />
+											{opt}
+										</label>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+
+				<button type="submit" class="action-btn">Check In</button>
+			</form>
 		{/if}
 
-		<a href="/dashboard" class="action-btn">Go to Dashboard</a>
+		{#if data.success || form?.success || data.alreadyCheckedIn}
+			<a href="/dashboard" class="action-btn">Go to Dashboard</a>
+		{/if}
 	</div>
 </div>
 
@@ -121,9 +175,87 @@
 		text-decoration: none;
 		font-size: 0.875rem;
 		font-weight: 500;
+		border: none;
+		cursor: pointer;
+		width: 100%;
 	}
 
 	.action-btn:hover {
 		background: #4338ca;
+	}
+
+	/* Question form */
+	.form-error {
+		background: rgba(220, 38, 38, 0.1);
+		border: 1px solid rgba(220, 38, 38, 0.3);
+		color: #fca5a5;
+		padding: 0.6rem 0.75rem;
+		border-radius: 0.375rem;
+		font-size: 0.8rem;
+		margin-bottom: 1rem;
+	}
+
+	.questions {
+		text-align: left;
+		margin-bottom: 1.25rem;
+	}
+
+	.question-group {
+		margin-bottom: 1rem;
+	}
+
+	.question-label {
+		display: block;
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: #d1d5db;
+		margin-bottom: 0.35rem;
+	}
+
+	.required {
+		color: #f87171;
+	}
+
+	.question-input,
+	.question-select {
+		width: 100%;
+		padding: 0.55rem 0.75rem;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 0.375rem;
+		font-size: 0.85rem;
+		color: #e5e7eb;
+	}
+
+	.question-select option {
+		background: #1e1e2e;
+		color: #e5e7eb;
+	}
+
+	.question-input:focus,
+	.question-select:focus {
+		outline: none;
+		border-color: #4f46e5;
+		box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+	}
+
+	.checkbox-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-top: 0.25rem;
+	}
+
+	.checkbox-label {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.85rem;
+		color: #d1d5db;
+		cursor: pointer;
+	}
+
+	.checkbox-label input[type='checkbox'] {
+		accent-color: #4f46e5;
 	}
 </style>

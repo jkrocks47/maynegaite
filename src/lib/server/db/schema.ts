@@ -101,6 +101,7 @@ export const events = pgTable('events', {
 	isPublished: boolean('is_published').default(true),
 	maxAttendees: integer('max_attendees'),
 	checkinCode: text('checkin_code').unique(),
+	checkinQuestions: jsonb('checkin_questions').$type<CheckinQuestion[]>(),
 	announcementSentAt: timestamp('announcement_sent_at'),
 	createdBy: uuid('created_by').references(() => members.id),
 	createdAt: timestamp('created_at').defaultNow(),
@@ -149,7 +150,8 @@ export const eventCheckins = pgTable(
 		memberId: uuid('member_id')
 			.notNull()
 			.references(() => members.id, { onDelete: 'cascade' }),
-		checkedInAt: timestamp('checked_in_at').notNull().defaultNow()
+		checkedInAt: timestamp('checked_in_at').notNull().defaultNow(),
+		questionResponses: jsonb('question_responses').$type<Record<string, string | string[]>>()
 	},
 	(t) => [unique().on(t.eventId, t.memberId)]
 );
@@ -230,6 +232,25 @@ export const clubInfo = pgTable('club_info', {
 	contactEmail: text('contact_email'),
 	socialLinks: jsonb('social_links').$type<Record<string, string>>(),
 	updatedAt: timestamp('updated_at').defaultNow()
+});
+
+// --- Check-in Question Types ---
+
+export interface CheckinQuestion {
+	id: string;
+	question: string;
+	type: 'text' | 'select' | 'checkbox';
+	options?: string[];
+	required?: boolean;
+}
+
+// --- Interest Options ---
+
+export const interestOptions = pgTable('interest_options', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	name: text('name').notNull().unique(),
+	sortOrder: integer('sort_order').default(0),
+	createdAt: timestamp('created_at').defaultNow()
 });
 
 export const officers = pgTable('officers', {

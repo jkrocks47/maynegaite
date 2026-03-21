@@ -1,6 +1,6 @@
 import { eq, and, sql, inArray, desc } from 'drizzle-orm';
 import { db } from './index';
-import { officers, events, eventRsvps, eventCheckins, members, eventAnnouncementLogs } from './schema';
+import { officers, events, eventRsvps, eventCheckins, members, eventAnnouncementLogs, interestOptions } from './schema';
 import { CONTACT_EMAILS } from '$lib/utils/constants';
 import type { ClubType } from '$lib/utils/constants';
 
@@ -15,6 +15,16 @@ export async function getBoardEmails(clubType: ClubType): Promise<string[]> {
 		.filter((e): e is string => !!e);
 
 	return [...new Set([...CONTACT_EMAILS, ...officerEmails])];
+}
+
+// --- Interest Options ---
+
+export async function getInterestOptions(): Promise<string[]> {
+	const rows = await db
+		.select({ name: interestOptions.name })
+		.from(interestOptions)
+		.orderBy(interestOptions.sortOrder);
+	return rows.map((r) => r.name);
 }
 
 // --- Event Analytics Queries ---
@@ -197,21 +207,28 @@ export async function getEventDetailForAdmin(eventId: string, clubType: ClubType
 	const estimatedTurnout = await getEstimatedTurnout(eventId);
 	const historicalRate = await getHistoricalTurnoutRate(clubType);
 
-	// Compute stats from rsvpList
-	const checkinCount = await db
-		.select({ count: sql<number>`count(*)::int` })
+	// Compute stats from rsvpList and get check-in responses
+	const checkins = await db
+		.select({
+			memberId: eventCheckins.memberId,
+			firstName: members.firstName,
+			lastName: members.lastName,
+			responses: eventCheckins.questionResponses,
+			checkedInAt: eventCheckins.checkedInAt
+		})
 		.from(eventCheckins)
+		.innerJoin(members, eq(eventCheckins.memberId, members.id))
 		.where(eq(eventCheckins.eventId, eventId));
 
 	const stats: EventStats = {
 		going: rsvpList.filter((r) => r.status === 'going').length,
 		maybe: rsvpList.filter((r) => r.status === 'maybe').length,
 		notGoing: rsvpList.filter((r) => r.status === 'not_going').length,
-		checkedIn: checkinCount[0]?.count ?? 0,
+		checkedIn: checkins.length,
 		estimatedTurnout
 	};
 
-	return { event, rsvpList, stats, historicalRate };
+	return { event, rsvpList, stats, historicalRate, checkinResponses: checkins };
 }
 
 /**

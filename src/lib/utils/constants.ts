@@ -15,17 +15,6 @@ export type Year = (typeof YEARS)[number];
 
 export const ACTIVE_MEMBER_THRESHOLD = 3;
 
-export const EVENT_PREFERENCES = [
-	'Stargazing',
-	'Lectures',
-	'Workshops',
-	'Social Events',
-	'Field Trips',
-	'Study Groups',
-	'Research',
-	'Outreach'
-] as const;
-
 export const SITE_NAME = 'UICSpacetime';
 export const SITE_DESCRIPTION =
 	'Society of Physics Students at the University of Illinois Chicago — Astronomy & Physics Clubs';

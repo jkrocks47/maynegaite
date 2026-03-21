@@ -25,7 +25,9 @@ export const load: PageServerLoad = async ({ params }) => {
 		stats: result.stats,
 		historicalRate: result.historicalRate,
 		announcementRecipientCount,
-		announcementAlreadySent: !!result.event.announcementSentAt
+		announcementAlreadySent: !!result.event.announcementSentAt,
+		checkinQuestions: result.event.checkinQuestions ?? [],
+		checkinResponses: result.checkinResponses
 	};
 };
 
