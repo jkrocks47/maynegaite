@@ -14,7 +14,11 @@
 		});
 	}
 
-	const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=${isAstronomy ? '1a1a2e' : '0d1b2a'}&data=${encodeURIComponent(data.checkinUrl)}`;
+	let qrMode = $state<'checkin' | 'rsvp'>('checkin');
+
+	const qrData = $derived(qrMode === 'checkin' ? data.checkinUrl : data.eventUrl);
+	const qrUrl = $derived(`https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=${isAstronomy ? '1a1a2e' : '0d1b2a'}&data=${encodeURIComponent(qrData)}`);
+	const qrLabel = $derived(qrMode === 'checkin' ? 'Scan to Check In' : 'RSVP & Get Reminders');
 </script>
 
 <svelte:head>
@@ -83,14 +87,14 @@
 
 		<!-- QR Code -->
 		<div class="qr-section">
-			<div class="scan-label">Scan to Check In</div>
+			<div class="scan-label">{qrLabel}</div>
 			<div class="qr-frame">
 				<div class="corner tl"></div>
 				<div class="corner tr"></div>
 				<div class="corner bl"></div>
 				<div class="corner br"></div>
 				<div class="qr-code">
-					<img src={qrUrl} alt="Check-in QR Code" />
+					<img src={qrUrl} alt="{qrLabel} QR Code" />
 				</div>
 			</div>
 			<div class="url-label">uicspacetime.org</div>
@@ -110,6 +114,16 @@
 				UIC Spacetime &bull; Est. 1988
 			</div>
 		</div>
+	</div>
+
+	<!-- QR Mode Selector (hidden on print) -->
+	<div class="qr-mode-selector">
+		<button class="qr-mode-btn" class:active={qrMode === 'checkin'} onclick={() => qrMode = 'checkin'}>
+			Check-in
+		</button>
+		<button class="qr-mode-btn" class:active={qrMode === 'rsvp'} onclick={() => qrMode = 'rsvp'}>
+			RSVP &amp; Reminders
+		</button>
 	</div>
 
 	<!-- Print button (hidden on print) -->
@@ -432,6 +446,41 @@
 		letter-spacing: 2px;
 	}
 
+	/* QR Mode Selector */
+	.qr-mode-selector {
+		position: fixed;
+		top: 24px;
+		right: 24px;
+		z-index: 100;
+		display: flex;
+		background: #1e1e2e;
+		border-radius: 8px;
+		overflow: hidden;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.qr-mode-btn {
+		padding: 10px 18px;
+		background: transparent;
+		color: #8892A4;
+		border: none;
+		font-family: 'Space Grotesk', sans-serif;
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.qr-mode-btn:hover {
+		color: #e2e8f0;
+	}
+
+	.qr-mode-btn.active {
+		background: #4f46e5;
+		color: #ffffff;
+	}
+
 	/* Bottom */
 	.bottom-section {
 		display: flex;
@@ -530,6 +579,10 @@
 		}
 
 		.print-btn {
+			display: none !important;
+		}
+
+		.qr-mode-selector {
 			display: none !important;
 		}
 	}
