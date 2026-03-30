@@ -62,6 +62,23 @@
 				{/if}
 			</div>
 
+			<!-- Description -->
+			{#if event.description}
+				<p class="description">{event.description}</p>
+			{/if}
+
+			<!-- RSVP counts -->
+			{#if !data.isPast && (data.rsvpCounts.going > 0 || data.rsvpCounts.maybe > 0)}
+				<div class="rsvp-counts">
+					{#if data.rsvpCounts.going > 0}
+						<span class="count going">{data.rsvpCounts.going} going</span>
+					{/if}
+					{#if data.rsvpCounts.maybe > 0}
+						<span class="count maybe">{data.rsvpCounts.maybe} maybe</span>
+					{/if}
+				</div>
+			{/if}
+
 			<!-- CTA Area -->
 			{#if !data.isPast}
 				<div class="cta-area">
@@ -78,32 +95,18 @@
 							<a href="/verify-email" class="verify-link">Go to verification</a>
 						</div>
 					{:else}
-						<RSVPButtons
-							eventId={event.id}
-							currentStatus={data.memberRsvp}
-							isLoggedIn={data.isLoggedIn}
-							isVerified={data.isVerified}
-							redirectTo={redirectPath}
-						/>
+						<div class="rsvp-inline">
+							<span class="rsvp-label">RSVP</span>
+							<RSVPButtons
+								eventId={event.id}
+								currentStatus={data.memberRsvp}
+								isLoggedIn={data.isLoggedIn}
+								isVerified={data.isVerified}
+								redirectTo={redirectPath}
+							/>
+						</div>
 					{/if}
 				</div>
-			{/if}
-
-			<!-- RSVP counts -->
-			{#if !data.isPast && (data.rsvpCounts.going > 0 || data.rsvpCounts.maybe > 0)}
-				<div class="rsvp-counts">
-					{#if data.rsvpCounts.going > 0}
-						<span class="count going">{data.rsvpCounts.going} going</span>
-					{/if}
-					{#if data.rsvpCounts.maybe > 0}
-						<span class="count maybe">{data.rsvpCounts.maybe} maybe</span>
-					{/if}
-				</div>
-			{/if}
-
-			<!-- Description -->
-			{#if event.description}
-				<p class="description">{event.description}</p>
 			{/if}
 		</div>
 
@@ -237,7 +240,7 @@
 		line-height: 1.1;
 		letter-spacing: 1px;
 		text-transform: uppercase;
-		margin: 0 0 1.25rem;
+		margin: 0 0 1rem;
 	}
 
 	.astronomy .event-title {
@@ -255,14 +258,8 @@
 	.details {
 		display: flex;
 		flex-direction: column;
-		gap: 0.6rem;
-		margin-bottom: 1.25rem;
-		padding-bottom: 1.25rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.physics .details {
-		border-bottom-color: #e5e7eb;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
 	}
 
 	.detail-row {
@@ -312,11 +309,28 @@
 		text-decoration: underline;
 	}
 
+	/* Description */
+	.description {
+		font-family: 'Inter', sans-serif;
+		font-size: 0.85rem;
+		line-height: 1.6;
+		margin: 0 0 1rem;
+		white-space: pre-wrap;
+	}
+
+	.astronomy .description {
+		color: rgba(245, 240, 232, 0.5);
+	}
+
+	.physics .description {
+		color: #6b7280;
+	}
+
 	/* RSVP counts */
 	.rsvp-counts {
 		display: flex;
 		gap: 0.75rem;
-		margin-bottom: 1rem;
+		margin-bottom: 0.75rem;
 	}
 
 	.count {
@@ -330,32 +344,15 @@
 	.physics .count.going { color: #16a34a; }
 	.physics .count.maybe { color: #ca8a04; }
 
-	/* Description */
-	.description {
-		font-family: 'Inter', sans-serif;
-		font-size: 0.9rem;
-		line-height: 1.6;
-		margin: 0;
-		white-space: pre-wrap;
-	}
-
-	.astronomy .description {
-		color: rgba(245, 240, 232, 0.6);
-	}
-
-	.physics .description {
-		color: #6b7280;
-	}
-
 	/* CTA area */
 	.cta-area {
-		margin-top: 1.5rem;
-		padding-top: 1.5rem;
+		margin-top: 0.5rem;
+		padding-top: 1.25rem;
 		border-top: 1px solid rgba(255, 255, 255, 0.08);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
 	}
 
 	.physics .cta-area {
@@ -446,6 +443,54 @@
 
 	.physics .verify-link {
 		color: #0e79b2;
+	}
+
+	/* RSVP inline — override shared RSVPButtons styles */
+	.rsvp-inline {
+		width: 100%;
+	}
+
+	.rsvp-inline :global(.rsvp-buttons) {
+		margin-top: 0;
+		padding-top: 0;
+		border-top: none;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.rsvp-inline :global(.rsvp-label) {
+		display: none;
+	}
+
+	.rsvp-inline :global(.rsvp-btn) {
+		padding: 0.65rem 1.5rem;
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+
+	.rsvp-inline :global(.rsvp-prompt) {
+		margin-top: 0;
+		padding-top: 0;
+		border-top: none;
+	}
+
+	.rsvp-label {
+		display: block;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.65rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.15em;
+		text-align: center;
+		margin-bottom: 0.75rem;
+	}
+
+	.astronomy .rsvp-label {
+		color: rgba(245, 240, 232, 0.35);
+	}
+
+	.physics .rsvp-label {
+		color: #9ca3af;
 	}
 
 	/* Footer link */
