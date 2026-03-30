@@ -94,7 +94,9 @@
 				<div class="corner bl"></div>
 				<div class="corner br"></div>
 				<div class="qr-code">
-					<img src={qrUrl} alt="{qrLabel} QR Code" />
+					{#key qrMode}
+						<img src={qrUrl} alt="{qrLabel} QR Code" />
+					{/key}
 				</div>
 			</div>
 			<div class="url-label">uicspacetime.org</div>
