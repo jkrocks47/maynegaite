@@ -7,6 +7,8 @@ import { processAndStoreImage, deleteImage } from '$lib/server/images';
 import { getInterestOptions } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
 
+export const config = { body: { maxSize: '25mb' } };
+
 export const load: PageServerLoad = async ({ locals }) => {
 	const member = locals.member!;
 

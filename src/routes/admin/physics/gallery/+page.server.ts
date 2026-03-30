@@ -6,6 +6,8 @@ import { galleryImageSchema } from '$lib/utils/validation';
 import { processAndStoreImage, deleteImage } from '$lib/server/images';
 import type { Actions, PageServerLoad } from './$types';
 
+export const config = { body: { maxSize: '25mb' } };
+
 export const load: PageServerLoad = async () => {
 	const images = await db
 		.select({

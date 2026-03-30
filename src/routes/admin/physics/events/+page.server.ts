@@ -8,6 +8,8 @@ import { processAndStoreImage, deleteImage } from '$lib/server/images';
 import { getBatchEstimatedTurnout, getHistoricalTurnoutRate, getInterestBreakdown } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
 
+export const config = { body: { maxSize: '25mb' } };
+
 function generateCheckinCode(): string {
 	return randomBytes(3).toString('hex').toUpperCase();
 }
