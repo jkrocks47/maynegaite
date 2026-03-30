@@ -81,7 +81,7 @@
 										<img
 											src={event.imageUrl}
 											alt={event.title}
-											class="w-full h-full object-cover grayscale"
+											class="w-full h-full object-cover opacity-60"
 										/>
 									</div>
 								{/if}

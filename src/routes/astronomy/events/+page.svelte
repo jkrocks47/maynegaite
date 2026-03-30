@@ -106,7 +106,7 @@
 											src={event.imageUrl}
 											alt={event.title}
 											loading="lazy"
-											class="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-105"
+											class="w-full h-full object-cover opacity-60 transition-all duration-500 group-hover:opacity-100 group-hover:scale-105"
 										/>
 										<div class="image-overlay"></div>
 									</div>

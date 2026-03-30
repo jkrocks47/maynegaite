@@ -27,7 +27,7 @@
 					src={event.imageUrl}
 					alt={event.title}
 					class="w-full h-64 sm:h-96 object-cover"
-					class:grayscale={data.isPast}
+					class:opacity-60={data.isPast}
 				/>
 			</div>
 		{/if}
