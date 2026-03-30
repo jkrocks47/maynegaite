@@ -62,23 +62,6 @@
 				{/if}
 			</div>
 
-			<!-- RSVP counts -->
-			{#if !data.isPast && (data.rsvpCounts.going > 0 || data.rsvpCounts.maybe > 0)}
-				<div class="rsvp-counts">
-					{#if data.rsvpCounts.going > 0}
-						<span class="count going">{data.rsvpCounts.going} going</span>
-					{/if}
-					{#if data.rsvpCounts.maybe > 0}
-						<span class="count maybe">{data.rsvpCounts.maybe} maybe</span>
-					{/if}
-				</div>
-			{/if}
-
-			<!-- Description -->
-			{#if event.description}
-				<p class="description">{event.description}</p>
-			{/if}
-
 			<!-- CTA Area -->
 			{#if !data.isPast}
 				<div class="cta-area">
@@ -104,6 +87,23 @@
 						/>
 					{/if}
 				</div>
+			{/if}
+
+			<!-- RSVP counts -->
+			{#if !data.isPast && (data.rsvpCounts.going > 0 || data.rsvpCounts.maybe > 0)}
+				<div class="rsvp-counts">
+					{#if data.rsvpCounts.going > 0}
+						<span class="count going">{data.rsvpCounts.going} going</span>
+					{/if}
+					{#if data.rsvpCounts.maybe > 0}
+						<span class="count maybe">{data.rsvpCounts.maybe} maybe</span>
+					{/if}
+				</div>
+			{/if}
+
+			<!-- Description -->
+			{#if event.description}
+				<p class="description">{event.description}</p>
 			{/if}
 		</div>
 
