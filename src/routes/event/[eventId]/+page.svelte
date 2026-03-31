@@ -67,18 +67,6 @@
 				<p class="description">{event.description}</p>
 			{/if}
 
-			<!-- RSVP counts -->
-			{#if !data.isPast && (data.rsvpCounts.going > 0 || data.rsvpCounts.maybe > 0)}
-				<div class="rsvp-counts">
-					{#if data.rsvpCounts.going > 0}
-						<span class="count going">{data.rsvpCounts.going} going</span>
-					{/if}
-					{#if data.rsvpCounts.maybe > 0}
-						<span class="count maybe">{data.rsvpCounts.maybe} maybe</span>
-					{/if}
-				</div>
-			{/if}
-
 			<!-- CTA Area -->
 			{#if !data.isPast}
 				<div class="cta-area">
@@ -325,24 +313,6 @@
 	.physics .description {
 		color: #6b7280;
 	}
-
-	/* RSVP counts */
-	.rsvp-counts {
-		display: flex;
-		gap: 0.75rem;
-		margin-bottom: 0.75rem;
-	}
-
-	.count {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-	}
-
-	.count.going { color: #22c55e; }
-	.count.maybe { color: #eab308; }
-
-	.physics .count.going { color: #16a34a; }
-	.physics .count.maybe { color: #ca8a04; }
 
 	/* CTA area */
 	.cta-area {
