@@ -43,6 +43,9 @@
 
 	let correctionSending = $state(false);
 	let correctionResult = $state<{ success?: boolean; sentCount?: number; error?: string } | null>(null);
+	let correctionConfirming = $state(false);
+
+	let announcementConfirming = $state(false);
 
 	let statusFilter = $state<string>('all');
 	let sortBy = $state<'name' | 'status' | 'reliability'>('name');
@@ -183,34 +186,39 @@
 		</p>
 
 		{#if announcementRecipientCount > 0}
-			<form method="POST" action="?/sendAnnouncement" use:enhance={() => {
-				announcementSending = true;
-				announcementResult = null;
-				return async ({ result, update }) => {
-					announcementSending = false;
-					if (result.type === 'success') {
-						announcementResult = { success: true, sentCount: result.data?.sentCount as number };
-					} else if (result.type === 'failure') {
-						announcementResult = { error: result.data?.error as string };
-					}
-					await update({ reset: false });
-				};
-			}}>
+			{#if !announcementConfirming}
 				<button
-					type="submit"
 					class="announce-btn"
-					disabled={announcementSending}
-					onclick={(e) => {
-						if (!confirm(`Send announcement email to ${announcementRecipientCount} members?`)) e.preventDefault();
-					}}
+					onclick={() => announcementConfirming = true}
 				>
-					{#if announcementSending}
-						Sending...
-					{:else}
-						{announcementAlreadySent ? 'Send to New Members' : 'Send Announcement'}
-					{/if}
+					{announcementAlreadySent ? 'Send to New Members' : 'Send Announcement'}
 				</button>
-			</form>
+			{:else}
+				<div class="confirm-box">
+					<p class="confirm-text">Send announcement email to <strong>{announcementRecipientCount}</strong> member{announcementRecipientCount !== 1 ? 's' : ''}?</p>
+					<div class="confirm-actions">
+						<form method="POST" action="?/sendAnnouncement" use:enhance={() => {
+							announcementSending = true;
+							announcementResult = null;
+							announcementConfirming = false;
+							return async ({ result, update }) => {
+								announcementSending = false;
+								if (result.type === 'success') {
+									announcementResult = { success: true, sentCount: result.data?.sentCount as number };
+								} else if (result.type === 'failure') {
+									announcementResult = { error: result.data?.error as string };
+								}
+								await update({ reset: false });
+							};
+						}}>
+							<button type="submit" class="announce-btn" disabled={announcementSending}>
+								{announcementSending ? 'Sending...' : 'Yes, Send'}
+							</button>
+						</form>
+						<button class="cancel-btn" onclick={() => announcementConfirming = false}>Cancel</button>
+					</div>
+				</div>
+			{/if}
 		{/if}
 	</div>
 
@@ -233,30 +241,39 @@
 				Send a correction email with the current event details to all members who received the original announcement.
 			</p>
 
-			<form method="POST" action="?/sendCorrection" use:enhance={() => {
-				correctionSending = true;
-				correctionResult = null;
-				return async ({ result, update }) => {
-					correctionSending = false;
-					if (result.type === 'success') {
-						correctionResult = { success: true, sentCount: result.data?.sentCount as number };
-					} else if (result.type === 'failure') {
-						correctionResult = { error: result.data?.error as string };
-					}
-					await update({ reset: false });
-				};
-			}}>
+			{#if !correctionConfirming}
 				<button
-					type="submit"
 					class="announce-btn correction-btn"
-					disabled={correctionSending}
-					onclick={(e) => {
-						if (!confirm('Send correction email to all members who received the original announcement?')) e.preventDefault();
-					}}
+					onclick={() => correctionConfirming = true}
 				>
-					{correctionSending ? 'Sending...' : 'Send Correction'}
+					Send Correction
 				</button>
-			</form>
+			{:else}
+				<div class="confirm-box">
+					<p class="confirm-text">Send correction email to all members who received the original announcement?</p>
+					<div class="confirm-actions">
+						<form method="POST" action="?/sendCorrection" use:enhance={() => {
+							correctionSending = true;
+							correctionResult = null;
+							correctionConfirming = false;
+							return async ({ result, update }) => {
+								correctionSending = false;
+								if (result.type === 'success') {
+									correctionResult = { success: true, sentCount: result.data?.sentCount as number };
+								} else if (result.type === 'failure') {
+									correctionResult = { error: result.data?.error as string };
+								}
+								await update({ reset: false });
+							};
+						}}>
+							<button type="submit" class="announce-btn correction-btn" disabled={correctionSending}>
+								{correctionSending ? 'Sending...' : 'Yes, Send Correction'}
+							</button>
+						</form>
+						<button class="cancel-btn" onclick={() => correctionConfirming = false}>Cancel</button>
+					</div>
+				</div>
+			{/if}
 		</div>
 	{/if}
 
@@ -574,6 +591,45 @@
 	.correction-card { border-color: #fde68a; }
 	.correction-btn { background: #d97706; }
 	.correction-btn:hover { background: #b45309; }
+
+	.confirm-box {
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		padding: 0.75rem 1rem;
+	}
+
+	.confirm-text {
+		font-size: 0.85rem;
+		color: #374151;
+		margin: 0 0 0.75rem;
+	}
+
+	.confirm-text strong {
+		color: #111827;
+	}
+
+	.confirm-actions {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.cancel-btn {
+		padding: 0.45rem 1rem;
+		background: #fff;
+		color: #6b7280;
+		border: 1px solid #d1d5db;
+		border-radius: 0.375rem;
+		font-size: 0.8rem;
+		font-weight: 500;
+		cursor: pointer;
+	}
+
+	.cancel-btn:hover {
+		background: #f3f4f6;
+		color: #374151;
+	}
 
 	/* Table */
 	.table-card {
