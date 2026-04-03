@@ -25,6 +25,7 @@ export const UIC_COORDINATES = {
 	display: '41.8708° N, 87.6505° W'
 };
 
+/** Fallback contact emails — used only when no contactEmail is set in club_info table */
 export const CONTACT_EMAILS = ['mwell8@uic.edu', 'uicastronomyclub@gmail.com'];
 
 export function canManageClub(role: Role | null, club: ClubType): boolean {

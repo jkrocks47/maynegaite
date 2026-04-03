@@ -1,20 +1,23 @@
 import { eq, and, sql, inArray, desc } from 'drizzle-orm';
 import { db } from './index';
-import { officers, events, eventRsvps, eventCheckins, members, eventAnnouncementLogs, interestOptions } from './schema';
+import { officers, events, eventRsvps, eventCheckins, members, eventAnnouncementLogs, interestOptions, clubInfo } from './schema';
 import { CONTACT_EMAILS } from '$lib/utils/constants';
 import type { ClubType } from '$lib/utils/constants';
 
 export async function getBoardEmails(clubType: ClubType): Promise<string[]> {
-	const boardOfficers = await db
-		.select({ email: officers.email })
-		.from(officers)
-		.where(eq(officers.clubType, clubType));
+	const [boardOfficers, clubInfoResult] = await Promise.all([
+		db.select({ email: officers.email }).from(officers).where(eq(officers.clubType, clubType)),
+		db.select({ contactEmail: clubInfo.contactEmail }).from(clubInfo).where(eq(clubInfo.clubType, clubType)).limit(1)
+	]);
 
 	const officerEmails = boardOfficers
 		.map((o) => o.email)
 		.filter((e): e is string => !!e);
 
-	return [...new Set([...CONTACT_EMAILS, ...officerEmails])];
+	const clubContactEmail = clubInfoResult[0]?.contactEmail;
+	const baseEmails = clubContactEmail ? [clubContactEmail] : CONTACT_EMAILS;
+
+	return [...new Set([...baseEmails, ...officerEmails])];
 }
 
 // --- Interest Options ---

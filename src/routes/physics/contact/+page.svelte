@@ -43,30 +43,43 @@
 				<div class="bg-white rounded-2xl border border-gray-100 p-6">
 					<h3 class="font-display text-lg font-bold text-physics-dark mb-4">Follow Us</h3>
 					<div class="flex gap-4">
-						<a
-							href="https://instagram.com"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="font-body text-sm text-physics-dark/50 hover:text-physics-blue transition-colors no-underline"
-						>
-							Instagram
-						</a>
-						<a
-							href="https://twitter.com"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="font-body text-sm text-physics-dark/50 hover:text-physics-blue transition-colors no-underline"
-						>
-							Twitter
-						</a>
-						<a
-							href="https://discord.gg"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="font-body text-sm text-physics-dark/50 hover:text-physics-blue transition-colors no-underline"
-						>
-							Discord
-						</a>
+						{#if data.clubInfo?.socialLinks && Object.keys(data.clubInfo.socialLinks).length > 0}
+							{#each Object.entries(data.clubInfo.socialLinks) as [platform, url]}
+								<a
+									href={url}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="font-body text-sm text-physics-dark/50 hover:text-physics-blue transition-colors no-underline"
+								>
+									{platform.charAt(0).toUpperCase() + platform.slice(1)}
+								</a>
+							{/each}
+						{:else}
+							<a
+								href="https://instagram.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="font-body text-sm text-physics-dark/50 hover:text-physics-blue transition-colors no-underline"
+							>
+								Instagram
+							</a>
+							<a
+								href="https://twitter.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="font-body text-sm text-physics-dark/50 hover:text-physics-blue transition-colors no-underline"
+							>
+								Twitter
+							</a>
+							<a
+								href="https://discord.gg"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="font-body text-sm text-physics-dark/50 hover:text-physics-blue transition-colors no-underline"
+							>
+								Discord
+							</a>
+						{/if}
 					</div>
 				</div>
 			</div>

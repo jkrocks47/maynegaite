@@ -223,6 +223,48 @@ export const clubDefaults: Record<string, Record<string, { defaultTitle?: string
 	'gallery|page-title': {
 		astronomy: { defaultBody: 'DEEP FIELD GALLERY' },
 		physics: { defaultBody: 'Gallery' }
+	},
+
+	// ── Footer ──
+	'footer|org-name': {
+		astronomy: { defaultBody: 'UIC ASTRONOMY CLUB' },
+		physics: { defaultBody: 'Society of Physics Students at UIC' }
+	},
+	'footer|tagline': {
+		astronomy: { defaultBody: '' },
+		physics: { defaultBody: 'Exploring the fundamental laws of the universe, one experiment at a time.' }
+	},
+	'footer|institution': {
+		astronomy: { defaultBody: '' },
+		physics: { defaultBody: 'University of Illinois at Chicago' }
+	},
+	'footer|bottom-left': {
+		astronomy: { defaultBody: '' },
+		physics: { defaultBody: 'Society of Physics Students at UIC' }
+	},
+	'footer|bottom-right': {
+		astronomy: { defaultBody: '' },
+		physics: { defaultBody: 'Physics Club' }
+	},
+	'footer|coordinates': {
+		astronomy: { defaultBody: '41.8708° N, 87.6505° W' },
+		physics: { defaultBody: '' }
+	},
+	'footer|address': {
+		astronomy: { defaultBody: 'CHICAGO, IL 60607' },
+		physics: { defaultBody: '' }
+	},
+	'footer|building': {
+		astronomy: { defaultBody: 'SCI & ENG OFFICES (SEO)' },
+		physics: { defaultBody: '' }
+	},
+	'footer|doc-ref': {
+		astronomy: { defaultBody: 'DOCUMENT REF: SPS-UIC-2024-001 // UNRESTRICTED' },
+		physics: { defaultBody: '' }
+	},
+	'footer|barcode-label': {
+		astronomy: { defaultBody: 'ADMIT ONE // ROOFTOP OBSERVATORY ACCESS' },
+		physics: { defaultBody: '' }
 	}
 };
 
@@ -629,6 +671,88 @@ export const contentEntries: ContentEntry[] = [
 		label: 'Page title',
 		fieldType: 'short',
 		page: 'Gallery Page',
+		clubSpecific: true
+	},
+
+	// ── Footer ──
+	{
+		slug: 'footer',
+		section: 'org-name',
+		label: 'Organization name in footer',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'tagline',
+		label: 'Footer tagline / description',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'institution',
+		label: 'Institution name',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'bottom-left',
+		label: 'Bottom-left footer text',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'bottom-right',
+		label: 'Bottom-right footer text',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'coordinates',
+		label: 'Location coordinates',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'address',
+		label: 'Address line',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'building',
+		label: 'Building name',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'doc-ref',
+		label: 'Document reference line',
+		fieldType: 'short',
+		page: 'Footer',
+		clubSpecific: true
+	},
+	{
+		slug: 'footer',
+		section: 'barcode-label',
+		label: 'Barcode label text',
+		fieldType: 'short',
+		page: 'Footer',
 		clubSpecific: true
 	}
 ];

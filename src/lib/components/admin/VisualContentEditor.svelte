@@ -10,6 +10,7 @@
 	import MockContactPage from './mock-pages/MockContactPage.svelte';
 	import MockSimplePage from './mock-pages/MockSimplePage.svelte';
 	import MockRootHomePage from './mock-pages/MockRootHomePage.svelte';
+	import MockFooterPage from './mock-pages/MockFooterPage.svelte';
 
 	interface Props {
 		contentBySlug: Record<string, Record<string, string>>;
@@ -38,14 +39,15 @@
 		'Contact Page': 'contact',
 		'Board Page': 'board',
 		'Events Page': 'events',
-		'Gallery Page': 'gallery'
+		'Gallery Page': 'gallery',
+		'Footer': 'footer'
 	};
 
 	// Map page group names to live URLs
 	function getLiveUrl(page: string): string {
 		const slug = pageToSlug[page];
 		if (!clubType) return '/';
-		if (slug === 'home') return `/${clubType}`;
+		if (slug === 'home' || slug === 'footer') return `/${clubType}`;
 		return `/${clubType}/${slug}`;
 	}
 
@@ -125,6 +127,8 @@
 				<MockContactPage content={activeContent} {clubType} />
 			{:else if activePage === 'Root Homepage'}
 				<MockRootHomePage content={activeContent} />
+			{:else if activePage === 'Footer'}
+				<MockFooterPage content={activeContent} {clubType} />
 			{:else if simplePageConfig[activePage]}
 				<MockSimplePage
 					content={activeContent}

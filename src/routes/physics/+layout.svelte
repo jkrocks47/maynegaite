@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 	import PhysicsNav from '$lib/components/physics/PhysicsNav.svelte';
 	import PhysicsFooter from '$lib/components/physics/PhysicsFooter.svelte';
 
 	interface Props {
+		data: LayoutData;
 		children: Snippet;
 	}
 
-	let { children }: Props = $props();
+	let { data, children }: Props = $props();
 
 	let dark = $state(false);
 
@@ -37,5 +39,5 @@
 		{@render children()}
 	</main>
 
-	<PhysicsFooter />
+	<PhysicsFooter clubInfo={data.clubInfo} content={data.footerContent} />
 </div>

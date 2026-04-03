@@ -3,16 +3,10 @@ import { fail } from '@sveltejs/kit';
 import { sendContactEmail } from '$lib/server/email';
 import { getBoardEmails } from '$lib/server/db/queries';
 import { getContentWithDefaults } from '$lib/server/content';
-import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { clubInfo } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async () => {
-	const [content, clubInfoResult] = await Promise.all([
-		getContentWithDefaults('physics', 'contact'),
-		db.select().from(clubInfo).where(eq(clubInfo.clubType, 'physics')).limit(1)
-	]);
-	return { content, clubInfo: clubInfoResult[0] ?? null };
+	const content = await getContentWithDefaults('physics', 'contact');
+	return { content };
 };
 
 export const actions: Actions = {

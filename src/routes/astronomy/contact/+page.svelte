@@ -47,30 +47,43 @@
 				<GlassPanel class="p-6">
 					<h3 class="font-display text-lg font-bold text-astro-cream mb-4">Follow Us</h3>
 					<div class="flex gap-4">
-						<a
-							href="https://instagram.com"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
-						>
-							INSTAGRAM
-						</a>
-						<a
-							href="https://twitter.com"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
-						>
-							TWITTER
-						</a>
-						<a
-							href="https://discord.gg"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
-						>
-							DISCORD
-						</a>
+						{#if data.clubInfo?.socialLinks && Object.keys(data.clubInfo.socialLinks).length > 0}
+							{#each Object.entries(data.clubInfo.socialLinks) as [platform, url]}
+								<a
+									href={url}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
+								>
+									{platform.toUpperCase()}
+								</a>
+							{/each}
+						{:else}
+							<a
+								href="https://instagram.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
+							>
+								INSTAGRAM
+							</a>
+							<a
+								href="https://twitter.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
+							>
+								TWITTER
+							</a>
+							<a
+								href="https://discord.gg"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="font-mono text-xs tracking-[0.15em] text-astro-cream/50 hover:text-astro-cream transition-colors no-underline"
+							>
+								DISCORD
+							</a>
+						{/if}
 					</div>
 				</GlassPanel>
 			</div>
