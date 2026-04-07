@@ -89,9 +89,9 @@ export const actions: Actions = {
 	uploadPhoto: async ({ request, locals }) => {
 		const member = locals.member!;
 		const formData = await request.formData();
-		const file = formData.get('photo') as File | null;
+		const file = formData.get('photo');
 
-		if (!file || file.size === 0) {
+		if (!file || !(file instanceof File) || file.size === 0) {
 			return fail(400, { photoError: 'Please select an image to upload.' });
 		}
 

@@ -103,8 +103,8 @@ export const actions: Actions = {
 		let imageUrl: string | null = null;
 		let imageGroupId: string | null = null;
 
-		const imageFile = formData.get('image') as File | null;
-		if (imageFile && imageFile.size > 0) {
+		const imageFile = formData.get('image');
+		if (imageFile instanceof File && imageFile.size > 0) {
 			try {
 				const result = await processAndStoreImage(imageFile);
 				imageUrl = result.url;
@@ -112,7 +112,7 @@ export const actions: Actions = {
 			} catch (err) {
 				const message = err instanceof Error ? err.message : 'Unknown error';
 				console.error('Event image upload failed:', message);
-				return fail(500, { error: `Failed to upload image: ${message}` });
+				return fail(400, { error: message });
 			}
 		}
 

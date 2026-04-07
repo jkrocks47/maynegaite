@@ -31,9 +31,9 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	upload: async ({ request, locals }) => {
 		const formData = await request.formData();
-		const imageFile = formData.get('image') as File | null;
+		const imageFile = formData.get('image');
 
-		if (!imageFile || imageFile.size === 0) {
+		if (!imageFile || !(imageFile instanceof File) || imageFile.size === 0) {
 			return fail(400, { error: 'Please select an image to upload.' });
 		}
 
@@ -52,7 +52,8 @@ export const actions: Actions = {
 
 		const parsed = galleryImageSchema.safeParse(data);
 		if (!parsed.success) {
-			return fail(400, { error: 'Invalid data.' });
+			const issues = parsed.error.issues.map((i) => i.message).join(', ');
+			return fail(400, { error: `Invalid data: ${issues}` });
 		}
 
 		let uploadResult;
@@ -61,7 +62,7 @@ export const actions: Actions = {
 		} catch (err) {
 			const message = err instanceof Error ? err.message : 'Unknown error';
 			console.error('Gallery upload failed:', message);
-			return fail(500, { error: `Failed to upload image: ${message}` });
+			return fail(400, { error: message });
 		}
 
 		await db.insert(galleryImages).values({

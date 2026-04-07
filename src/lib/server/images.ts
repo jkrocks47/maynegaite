@@ -13,35 +13,82 @@ export interface UploadResult {
 }
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/tiff'];
+const MAX_PIXEL_DIMENSION = 20000; // 20,000px per side
+const BLOCKED_TYPES = [
+	'application/pdf',
+	'application/x-',
+	'application/zip',
+	'application/octet-stream',
+	'text/',
+	'video/',
+	'audio/',
+	'image/svg+xml'
+];
 
 export async function processAndStoreImage(file: File): Promise<UploadResult> {
+	if (!(file instanceof File) || !file.name) {
+		throw new Error('No valid file provided. Please select an image to upload.');
+	}
+
+	if (file.size === 0) {
+		throw new Error('The selected file is empty. Please choose a different image.');
+	}
+
 	if (file.size > MAX_FILE_SIZE) {
 		throw new Error(
 			`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 25MB.`
 		);
 	}
 
-	if (file.type && !ALLOWED_TYPES.includes(file.type)) {
+	if (file.type && BLOCKED_TYPES.some((t) => file.type.startsWith(t))) {
 		throw new Error(
-			`Unsupported file type: ${file.type}. Allowed types: JPEG, PNG, WebP, GIF, TIFF.`
+			`"${file.name}" is not a supported image type (detected: ${file.type}). Please upload a JPEG, PNG, WebP, GIF, or TIFF file.`
 		);
 	}
 
 	const arrayBuffer = await file.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
 
-	// Process full-size version
-	const fullResult = await sharp(buffer)
-		.resize(2400, 2400, { fit: 'inside', withoutEnlargement: true })
-		.webp({ quality: 82, effort: 4 })
-		.toBuffer({ resolveWithObject: true });
+	// Validate file content is a real image sharp can process
+	let metadata;
+	try {
+		metadata = await sharp(buffer).metadata();
+	} catch {
+		throw new Error(
+			`"${file.name}" could not be read as an image. The file may be corrupted or in an unsupported format. Supported formats: JPEG, PNG, WebP, GIF, TIFF.`
+		);
+	}
 
-	// Process thumbnail version
-	const thumbResult = await sharp(buffer)
-		.resize(600, 600, { fit: 'inside', withoutEnlargement: true })
-		.webp({ quality: 72, effort: 4 })
-		.toBuffer({ resolveWithObject: true });
+	if (!metadata.width || !metadata.height) {
+		throw new Error(
+			`"${file.name}" does not appear to be a valid image (missing dimensions).`
+		);
+	}
+
+	if (metadata.width > MAX_PIXEL_DIMENSION || metadata.height > MAX_PIXEL_DIMENSION) {
+		throw new Error(
+			`"${file.name}" is too large (${metadata.width}x${metadata.height}px). Maximum dimension is ${MAX_PIXEL_DIMENSION}px per side. Please resize the image before uploading.`
+		);
+	}
+
+	// Process full-size version
+	let fullResult, thumbResult;
+	try {
+		fullResult = await sharp(buffer)
+			.resize(2400, 2400, { fit: 'inside', withoutEnlargement: true })
+			.webp({ quality: 82, effort: 4 })
+			.toBuffer({ resolveWithObject: true });
+
+		// Process thumbnail version
+		thumbResult = await sharp(buffer)
+			.resize(600, 600, { fit: 'inside', withoutEnlargement: true })
+			.webp({ quality: 72, effort: 4 })
+			.toBuffer({ resolveWithObject: true });
+	} catch {
+		throw new Error(
+			`"${file.name}" could not be processed. The image may be corrupted. Please try re-saving it as a PNG or JPEG and uploading again.`
+		);
+	}
 
 	const groupId = randomUUID();
 
