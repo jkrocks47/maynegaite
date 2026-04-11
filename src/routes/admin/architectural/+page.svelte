@@ -1,9 +1,21 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import SearchableSelect from '$lib/components/shared/SearchableSelect.svelte';
 
 	let { data, form } = $props();
 	let editingId = $state<string | null>(null);
 	let reviewingId = $state<string | null>(null);
+	let showingLogsId = $state<string | null>(null);
+
+	let memberSelectOptions = $derived([
+		{ value: '', label: 'Select member' },
+		...data.memberOptions.map(m => ({ value: m.id, label: `${m.label} (${m.email})` }))
+	]);
+
+	let propertySelectOptions = $derived([
+		{ value: '', label: 'Unspecified' },
+		...data.propertyOptions.map(p => ({ value: p.id, label: `Lot ${p.lotNumber}${p.address ? ` - ${p.address}` : ''}` }))
+	]);
 
 	const requestTypeLabels: Record<string, string> = {
 		modification: 'Modification',
@@ -97,21 +109,11 @@
 		<form method="POST" action="?/create" use:enhance class="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<div>
 				<label for="create-memberId" class="block text-sm font-medium text-mg-charcoal mb-1">Requester *</label>
-				<select id="create-memberId" name="memberId" class="input" required>
-					<option value="">Select member</option>
-					{#each data.memberOptions as member}
-						<option value={member.id}>{member.label} ({member.email})</option>
-					{/each}
-				</select>
+				<SearchableSelect id="create-memberId" name="memberId" required options={memberSelectOptions} />
 			</div>
 			<div>
 				<label for="create-propertyId" class="block text-sm font-medium text-mg-charcoal mb-1">Property (optional)</label>
-				<select id="create-propertyId" name="propertyId" class="input">
-					<option value="">Unspecified</option>
-					{#each data.propertyOptions as property}
-						<option value={property.id}>Lot {property.lotNumber}{property.address ? ` - ${property.address}` : ''}</option>
-					{/each}
-				</select>
+				<SearchableSelect id="create-propertyId" name="propertyId" options={propertySelectOptions} />
 			</div>
 			<div>
 				<label for="create-title" class="block text-sm font-medium text-mg-charcoal mb-1">Title *</label>
@@ -190,6 +192,7 @@
 										onclick={() => {
 											editingId = editingId === request.id ? null : request.id;
 											reviewingId = null;
+											showingLogsId = null;
 										}}
 									>Edit</button>
 									<button
@@ -198,8 +201,18 @@
 										onclick={() => {
 											reviewingId = reviewingId === request.id ? null : request.id;
 											editingId = null;
+											showingLogsId = null;
 										}}
 									>Review</button>
+									<button
+										type="button"
+										class="btn-secondary text-xs"
+										onclick={() => {
+											showingLogsId = showingLogsId === request.id ? null : request.id;
+											editingId = null;
+											reviewingId = null;
+										}}
+									>History</button>
 									<form method="POST" action="?/delete" use:enhance>
 										<input type="hidden" name="id" value={request.id} />
 										<button
@@ -248,20 +261,11 @@
 										<input type="hidden" name="id" value={request.id} />
 										<div>
 											<label for={`edit-member-${request.id}`} class="block text-sm font-medium text-mg-charcoal mb-1">Requester *</label>
-											<select id={`edit-member-${request.id}`} name="memberId" class="input" required>
-												{#each data.memberOptions as member}
-													<option value={member.id} selected={request.memberId === member.id}>{member.label} ({member.email})</option>
-												{/each}
-											</select>
+											<SearchableSelect id={`edit-member-${request.id}`} name="memberId" required value={request.memberId || ''} options={memberSelectOptions} />
 										</div>
 										<div>
 											<label for={`edit-property-${request.id}`} class="block text-sm font-medium text-mg-charcoal mb-1">Property</label>
-											<select id={`edit-property-${request.id}`} name="propertyId" class="input">
-												<option value="" selected={!request.propertyId}>Unspecified</option>
-												{#each data.propertyOptions as property}
-													<option value={property.id} selected={request.propertyId === property.id}>Lot {property.lotNumber}{property.address ? ` - ${property.address}` : ''}</option>
-												{/each}
-											</select>
+											<SearchableSelect id={`edit-property-${request.id}`} name="propertyId" value={request.propertyId || ''} options={propertySelectOptions} />
 										</div>
 										<div>
 											<label for={`edit-title-${request.id}`} class="block text-sm font-medium text-mg-charcoal mb-1">Title *</label>
@@ -288,6 +292,42 @@
 											<button type="button" class="btn-secondary text-sm" onclick={() => (editingId = null)}>Cancel</button>
 										</div>
 									</form>
+								</td>
+							</tr>
+						{/if}
+
+						{#if showingLogsId === request.id}
+							<tr class="border-b border-mg-stone/70">
+								<td colspan="8" class="px-3 py-4 bg-mg-parchment/40">
+									<h3 class="text-sm font-semibold text-mg-charcoal mb-3">Activity History</h3>
+									{#if request.logs && request.logs.length > 0}
+										<ul class="space-y-3">
+											{#each request.logs as log}
+												<li class="text-sm">
+													<span class="font-medium text-mg-charcoal">{log.actorName}</span>
+													<span class="text-mg-warmGray mx-1">•</span>
+													<span class="text-mg-charcoal capitalize">
+														{#if log.action === 'status_change'}
+															Status Change
+														{:else}
+															{log.action}
+														{/if}
+													</span>
+													{#if log.details}
+														<span class="text-mg-charcoal mx-1">-</span>
+														<span class="text-mg-charcoal">{log.details}</span>
+													{/if}
+													<span class="text-mg-warmGray mx-1">•</span>
+													<span class="text-xs text-mg-warmGray">{formatDate(log.createdAt)}</span>
+												</li>
+											{/each}
+										</ul>
+									{:else}
+										<p class="text-sm text-mg-warmGray">No activity recorded.</p>
+									{/if}
+									<div class="mt-4">
+										<button type="button" class="btn-secondary text-sm" onclick={() => (showingLogsId = null)}>Close Details</button>
+									</div>
 								</td>
 							</tr>
 						{/if}

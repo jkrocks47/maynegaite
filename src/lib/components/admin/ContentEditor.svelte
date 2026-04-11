@@ -57,6 +57,34 @@
 	function getPageCount(page: string): number {
 		return entries.filter((e) => e.page === page).length;
 	}
+
+	function handleListItemChange(sectionKey: string, index: number, field: string, value: string) {
+		const list = JSON.parse(editedContent[sectionKey] || '[]');
+		list[index][field] = value;
+		editedContent[sectionKey] = JSON.stringify(list);
+	}
+
+	function addListItem(sectionKey: string, schema: any) {
+		const list = JSON.parse(editedContent[sectionKey] || '[]');
+		const newItem: any = {};
+		schema.fields.forEach((f: any) => { newItem[f.key] = ''; });
+		list.push(newItem);
+		editedContent[sectionKey] = JSON.stringify(list);
+	}
+
+	function removeListItem(sectionKey: string, index: number) {
+		const list = JSON.parse(editedContent[sectionKey] || '[]');
+		list.splice(index, 1);
+		editedContent[sectionKey] = JSON.stringify(list);
+	}
+
+	function moveItem(sectionKey: string, from: number, to: number) {
+		const list = JSON.parse(editedContent[sectionKey] || '[]');
+		if (to < 0 || to >= list.length) return;
+		const [item] = list.splice(from, 1);
+		list.splice(to, 0, item);
+		editedContent[sectionKey] = JSON.stringify(list);
+	}
 </script>
 
 <div class="editor-root">
@@ -185,6 +213,58 @@
 									{@html renderMarkdown(editedContent[sectionKey] ?? '')}
 								</div>
 							{/if}
+						{:else if entry.fieldType === 'list' && entry.listSchema}
+							{@const listData = (() => {
+								try {
+									return JSON.parse(editedContent[sectionKey] || '[]');
+								} catch {
+									return [];
+								}
+							})()}
+							<div class="list-editor">
+								{#each listData as item, i}
+									<div class="list-item-card">
+										<div class="list-item-header">
+											<span class="list-item-number">Item #{i + 1}</span>
+											<div class="list-item-actions">
+												<button type="button" class="list-icon-btn" onclick={() => moveItem(sectionKey, i, i - 1)} disabled={i === 0}>↑</button>
+												<button type="button" class="list-icon-btn" onclick={() => moveItem(sectionKey, i, i + 1)} disabled={i === listData.length - 1}>↓</button>
+												<button type="button" class="list-icon-btn delete" onclick={() => removeListItem(sectionKey, i)}>✕</button>
+											</div>
+										</div>
+										<div class="list-item-fields">
+											{#each entry.listSchema.fields as field}
+												<div class="field-group">
+													<label class="field-label">{field.label}</label>
+													{#if field.type === 'textarea'}
+														<textarea
+															class="form-textarea text-xs"
+															value={item[field.key] || ''}
+															oninput={(e) => handleListItemChange(sectionKey, i, field.key, e.currentTarget.value)}
+														></textarea>
+													{:else}
+														<input
+															type="text"
+															class="form-input text-xs"
+															value={item[field.key] || ''}
+															oninput={(e) => handleListItemChange(sectionKey, i, field.key, e.currentTarget.value)}
+														/>
+													{/if}
+												</div>
+											{/each}
+										</div>
+									</div>
+								{/each}
+								<button
+									type="button"
+									class="add-item-btn"
+									onclick={() => addListItem(sectionKey, entry.listSchema)}
+								>
+									+ Add New Item
+								</button>
+								<!-- Hidden input to submit the actual JSON string -->
+								<input type="hidden" name="body" value={editedContent[sectionKey]} />
+							</div>
 						{/if}
 
 						<div class="form-actions">
@@ -481,5 +561,95 @@
 		10% { opacity: 1; transform: translateY(0); }
 		80% { opacity: 1; }
 		100% { opacity: 0; }
+	}
+
+	/* === List Editor === */
+	.list-editor {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-top: 0.5rem;
+	}
+	.list-item-card {
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		background: #fcfcfc;
+		overflow: hidden;
+	}
+	.list-item-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.4rem 0.75rem;
+		background: #f3f4f6;
+		border-bottom: 1px solid #e5e7eb;
+	}
+	.list-item-number {
+		font-size: 0.65rem;
+		font-weight: 700;
+		color: #6b7280;
+		text-transform: uppercase;
+	}
+	.list-item-actions {
+		display: flex;
+		gap: 0.25rem;
+	}
+	.list-icon-btn {
+		width: 20px;
+		height: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: white;
+		border: 1px solid #d1d5db;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		cursor: pointer;
+		color: #4b5563;
+	}
+	.list-icon-btn:hover:not(:disabled) {
+		background: #f9fafb;
+		border-color: #9ca3af;
+	}
+	.list-icon-btn:disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+	.list-icon-btn.delete:hover {
+		background: #fee2e2;
+		color: #dc2626;
+		border-color: #fca5a5;
+	}
+	.list-item-fields {
+		padding: 0.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+	.field-group {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+	.field-label {
+		font-size: 0.65rem;
+		font-weight: 600;
+		color: #4b5563;
+	}
+	.add-item-btn {
+		width: 100%;
+		padding: 0.5rem;
+		border: 1px dashed #d1d5db;
+		border-radius: 0.5rem;
+		background: #fff;
+		color: #1B4332;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.add-item-btn:hover {
+		border-color: #1B4332;
+		background: rgba(27, 67, 50, 0.05);
 	}
 </style>

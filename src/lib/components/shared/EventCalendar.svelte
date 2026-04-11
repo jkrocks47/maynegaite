@@ -17,12 +17,10 @@
 
 	let {
 		events = [],
-		isLoggedIn = false,
-		isVerified = false
+		isLoggedIn = false
 	}: {
 		events: CalendarEvent[];
 		isLoggedIn?: boolean;
-		isVerified?: boolean;
 	} = $props();
 
 	let now = new Date();
@@ -167,7 +165,7 @@
 							<p class="text-sm text-mg-warmGray mb-3">{truncate(event.description, 150)}</p>
 						{/if}
 						<div class="flex items-center justify-between flex-wrap gap-2">
-							<RSVPButtons eventId={event.id} currentStatus={null} {isLoggedIn} {isVerified} redirectTo="/" />
+							<RSVPButtons eventId={event.id} currentStatus={null} {isLoggedIn} redirectTo="/" />
 							<a href="/events/{event.id}" class="text-xs text-mg-warmGray hover:text-mg-forest transition-colors">View details &rarr;</a>
 						</div>
 					</div>

@@ -72,21 +72,13 @@
 
 			{#if !data.isPast}
 				<div class="border-t border-mg-stone pt-6">
-					{#if data.isLoggedIn && data.isVerified}
-						<div class="flex gap-4 mb-4 text-sm text-mg-warmGray">
-							<span><strong class="text-mg-forest">{data.rsvpCounts.going}</strong> going</span>
-							<span><strong class="text-mg-goldDark">{data.rsvpCounts.maybe}</strong> maybe</span>
-						</div>
+					{#if data.isLoggedIn}
 						<RSVPButtons
 							eventId={event.id}
 							currentStatus={data.memberRsvp}
 							isLoggedIn={data.isLoggedIn}
-							isVerified={data.isVerified}
 							redirectTo={redirectPath}
 						/>
-					{:else if data.isLoggedIn}
-						<p class="text-sm text-mg-warmGray mb-3">Please verify your email to RSVP.</p>
-						<a href="/verify-email" class="btn-primary">Verify Email</a>
 					{:else}
 						<p class="text-sm text-mg-warmGray mb-3">Sign in to RSVP for this event.</p>
 						<a href="/login?redirectTo={encodeURIComponent(redirectPath)}" class="btn-primary">Sign In</a>

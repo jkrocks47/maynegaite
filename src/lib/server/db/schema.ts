@@ -86,6 +86,14 @@ export const documentCategoryEnum = pgEnum('document_category', [
 	'other'
 ]);
 
+export const auditLogActionEnum = pgEnum('audit_log_action', [
+	'create',
+	'update',
+	'delete',
+	'status_change',
+	'review'
+]);
+
 // --- Members & Auth ---
 
 export const members = pgTable('members', {
@@ -397,3 +405,20 @@ export const images = pgTable(
 	},
 	(t) => [index('idx_images_group_id').on(t.groupId)]
 );
+
+// --- Audit Logs ---
+
+export const auditLogs = pgTable(
+	'audit_logs',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		entityType: text('entity_type').notNull(),
+		entityId: uuid('entity_id').notNull(),
+		actorId: uuid('actor_id').references(() => members.id, { onDelete: 'set null' }),
+		action: auditLogActionEnum('action').notNull(),
+		details: text('details'),
+		createdAt: timestamp('created_at').defaultNow()
+	},
+	(t) => [index('idx_audit_logs_entity').on(t.entityType, t.entityId)]
+);
+

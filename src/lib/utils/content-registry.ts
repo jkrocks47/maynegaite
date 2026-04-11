@@ -1,4 +1,4 @@
-export type FieldType = 'short' | 'long' | 'markdown';
+export type FieldType = 'short' | 'long' | 'markdown' | 'list';
 
 export interface ContentEntry {
 	slug: string;
@@ -8,6 +8,9 @@ export interface ContentEntry {
 	defaultTitle?: string;
 	defaultBody?: string;
 	page: string;
+	listSchema?: {
+		fields: { key: string; label: string; type: 'text' | 'textarea' | 'image' | 'link' }[];
+	};
 }
 
 export const contentEntries: ContentEntry[] = [
@@ -198,6 +201,115 @@ export const contentEntries: ContentEntry[] = [
 		fieldType: 'short',
 		defaultBody: 'Send a Message',
 		page: 'Contact Page'
+	},
+
+	// ── Owner Resources Page ──
+	{
+		slug: 'owner-resources',
+		section: 'page-title',
+		label: 'Page title',
+		fieldType: 'short',
+		defaultBody: 'Owner Resources',
+		page: 'Owner Resources Page'
+	},
+	{
+		slug: 'owner-resources',
+		section: 'page-description',
+		label: 'Description below title',
+		fieldType: 'long',
+		defaultBody: 'Essential tools, announcements, and information for Maynegaite homeowners.',
+		page: 'Owner Resources Page'
+	},
+	{
+		slug: 'owner-resources',
+		section: 'board-title',
+		label: 'Board section title',
+		fieldType: 'short',
+		defaultBody: 'MPOA Board — Newly Elected Officials',
+		page: 'Owner Resources Page'
+	},
+	{
+		slug: 'owner-resources',
+		section: 'board-description',
+		label: 'Board section description',
+		fieldType: 'long',
+		defaultBody: 'Meet your recently elected board directors.',
+		page: 'Owner Resources Page'
+	},
+	{
+		slug: 'owner-resources',
+		section: 'faq-title',
+		label: 'FAQ section title',
+		fieldType: 'short',
+		defaultBody: 'Frequently Asked Questions',
+		page: 'Owner Resources Page'
+	},
+	{
+		slug: 'owner-resources',
+		section: 'faq-description',
+		label: 'FAQ section description',
+		fieldType: 'long',
+		defaultBody: 'Common questions from Maynegaite homeowners.',
+		page: 'Owner Resources Page'
+	},
+	{
+		slug: 'owner-resources',
+		section: 'resource-grid',
+		label: 'Main Resource Grid Cards',
+		fieldType: 'list',
+		page: 'Owner Resources Page',
+		listSchema: {
+			fields: [
+				{ key: 'title', label: 'Item Title', type: 'text' },
+				{ key: 'description', label: 'Description', type: 'textarea' },
+				{ key: 'link', label: 'Link URL', type: 'text' },
+				{ key: 'linkText', label: 'Link CTA Text', type: 'text' },
+				{ key: 'icon', label: 'Icon (star, warning, doc, emergency, house)', type: 'text' }
+			]
+		}
+	},
+	{
+		slug: 'owner-resources',
+		section: 'faq-list',
+		label: 'FAQ Items',
+		fieldType: 'list',
+		page: 'Owner Resources Page',
+		listSchema: {
+			fields: [
+				{ key: 'q', label: 'Question', type: 'text' },
+				{ key: 'a', label: 'Answer (HTML supported)', type: 'textarea' }
+			]
+		}
+	},
+	{
+		slug: 'owner-resources',
+		section: 'village-resources',
+		label: 'Village Resources Links',
+		fieldType: 'list',
+		page: 'Owner Resources Page',
+		listSchema: {
+			fields: [
+				{ key: 'label', label: 'Resource Label', type: 'text' },
+				{ key: 'url', label: 'Resource URL', type: 'text' },
+				{ key: 'icon', label: 'Icon (globe, calendar, users, doc)', type: 'text' }
+			]
+		}
+	},
+	{
+		slug: 'owner-resources',
+		section: 'reminders',
+		label: 'Community Reminders (Bulleted list)',
+		fieldType: 'markdown',
+		page: 'Owner Resources Page',
+		defaultBody: '- "For Sale" signs are **not permitted** within the subdivision.\n- All exterior modifications require Architectural Committee approval.\n- The Village offers a **$2,000 annual grant**.\n- Keep your property maintained.'
+	},
+	{
+		slug: 'owner-resources',
+		section: 'additional-content',
+		label: 'Additional Content (Bottom of page)',
+		fieldType: 'markdown',
+		page: 'Owner Resources Page',
+		defaultBody: ''
 	},
 
 	// ── Footer ──

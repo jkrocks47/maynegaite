@@ -10,10 +10,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		error(401, 'You must be logged in to RSVP.');
 	}
 
-	if (!locals.member.emailVerified) {
-		error(403, 'Please verify your email before RSVPing.');
-	}
-
 	const body = await request.json();
 	const parsed = rsvpSchema.safeParse(body);
 

@@ -295,6 +295,96 @@
 			</div>
 		</div>
 
+	{:else if page === 'Owner Resources Page'}
+		<div class="band light">
+			<div class="band-inner pad-lg">
+				<button class="region" class:region-on={isActive('page-title')} onclick={() => select('page-title')} title={tip('page-title')}>
+					<span class="txt-page-title">{val('page-title')}</span>
+				</button>
+				<button class="region" class:region-on={isActive('page-description')} onclick={() => select('page-description')} title={tip('page-description')}>
+					<span class="txt-body-dark">{val('page-description')}</span>
+				</button>
+				
+				<div style="margin-top: 1rem;">
+					<button class="region" class:region-on={isActive('board-title')} onclick={() => select('board-title')} title={tip('board-title')}>
+						<span class="txt-section-heading">{val('board-title')}</span>
+					</button>
+					<button class="region" class:region-on={isActive('board-description')} onclick={() => select('board-description')} title={tip('board-description')}>
+						<span class="txt-body-dark">{val('board-description')}</span>
+					</button>
+					<div class="grid-2 gap-md" style="margin-top: 0.5rem;">
+						<div class="skel-officer">
+							<div class="skel-avatar"></div>
+							<div class="skel-lines">
+								<div class="skel-line w60"></div>
+								<div class="skel-line w40 gold"></div>
+							</div>
+						</div>
+						<div class="skel-officer">
+							<div class="skel-avatar"></div>
+							<div class="skel-lines">
+								<div class="skel-line w60"></div>
+								<div class="skel-line w40 gold"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div style="margin-top: 1rem;">
+					<button class="region" class:region-on={isActive('resource-grid')} onclick={() => select('resource-grid')} title={tip('resource-grid')}>
+						<span class="txt-section-heading">Main Resource Grid</span>
+						<div class="grid-3">
+							{#each Array(3) as _}
+								<div class="skel-card"></div>
+							{/each}
+						</div>
+					</button>
+				</div>
+
+				<div style="margin-top: 1rem;">
+					<button class="region" class:region-on={isActive('village-resources')} onclick={() => select('village-resources')} title={tip('village-resources')}>
+						<span class="txt-section-heading">Village Resources</span>
+						<div class="grid-2">
+							<div class="skel-line w70"></div>
+							<div class="skel-line w50"></div>
+						</div>
+					</button>
+				</div>
+
+				<div style="margin-top: 1rem;">
+					<button class="region" class:region-on={isActive('faq-title')} onclick={() => select('faq-title')} title={tip('faq-title')}>
+						<span class="txt-section-heading">{val('faq-title')}</span>
+					</button>
+					<button class="region" class:region-on={isActive('faq-description')} onclick={() => select('faq-description')} title={tip('faq-description')}>
+						<span class="txt-body-dark">{val('faq-description')}</span>
+					</button>
+					<button class="region" class:region-on={isActive('faq-list')} onclick={() => select('faq-list')} title={tip('faq-list')}>
+						<div class="skel-list">
+							<div class="skel-event-row"><div class="skel-line w70"></div></div>
+							<div class="skel-event-row"><div class="skel-line w50"></div></div>
+						</div>
+					</button>
+				</div>
+
+				<div style="margin-top: 1rem;">
+					<button class="region" class:region-on={isActive('reminders')} onclick={() => select('reminders')} title={tip('reminders')}>
+						<span class="txt-section-heading">Community Reminders</span>
+						<div class="txt-body-dark clamp-3" style="margin-top: 0.25rem;">
+							{val('reminders')}
+						</div>
+					</button>
+				</div>
+
+				<div style="margin-top: 1rem;">
+					<button class="region" class:region-on={isActive('additional-content')} onclick={() => select('additional-content')} title={tip('additional-content')}>
+						<span class="txt-section-heading">Additional Content</span>
+						<div class="skel-line w100" style="margin-top: 0.25rem;"></div>
+						<div class="skel-line w70" style="margin-top: 0.25rem;"></div>
+					</button>
+				</div>
+			</div>
+		</div>
+
 	{:else if page === 'Footer'}
 		<div class="band dark">
 			<div class="band-inner pad-md footer-grid">

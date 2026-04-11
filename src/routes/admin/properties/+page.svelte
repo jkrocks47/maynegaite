@@ -1,9 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { SECTION_LABELS } from '$lib/utils/constants';
+	import SearchableSelect from '$lib/components/shared/SearchableSelect.svelte';
 
 	let { data, form } = $props();
 	let editingId = $state<string | null>(null);
+
+	let ownerSelectOptions = $derived([
+		{ value: '', label: 'Unassigned' },
+		...data.ownerOptions.map(o => ({ value: o.id, label: `${o.lastName}, ${o.firstName} (${o.email})` }))
+	]);
 
 	const propertyTypeLabels: Record<string, string> = {
 		single_family: 'Single Family',
@@ -54,12 +60,7 @@
 			</div>
 			<div>
 				<label for="ownerId" class="block text-sm font-medium text-mg-charcoal mb-1">Owner</label>
-				<select id="ownerId" name="ownerId" class="input">
-					<option value="">Unassigned</option>
-					{#each data.ownerOptions as owner}
-						<option value={owner.id}>{owner.lastName}, {owner.firstName} ({owner.email})</option>
-					{/each}
-				</select>
+				<SearchableSelect id="ownerId" name="ownerId" options={ownerSelectOptions} />
 			</div>
 			<div class="md:col-span-3">
 				<button type="submit" class="btn-primary">Add Property</button>
@@ -130,12 +131,7 @@
 									</div>
 									<div>
 										<label class="block text-sm font-medium text-mg-charcoal mb-1">Owner</label>
-										<select name="ownerId" class="input">
-											<option value="" selected={!lot.ownerId}>Unassigned</option>
-											{#each data.ownerOptions as owner}
-												<option value={owner.id} selected={lot.ownerId === owner.id}>{owner.lastName}, {owner.firstName} ({owner.email})</option>
-											{/each}
-										</select>
+										<SearchableSelect name="ownerId" value={lot.ownerId || ''} options={ownerSelectOptions} />
 									</div>
 									<div class="md:col-span-3 flex gap-2">
 										<button type="submit" class="btn-primary text-sm">Save</button>

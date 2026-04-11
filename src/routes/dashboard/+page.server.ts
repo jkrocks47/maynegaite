@@ -60,6 +60,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const community = await db.select().from(communityInfo).limit(1);
 
 	return {
+		member,
 		eventsAttended,
 		upcomingRsvps,
 		recentCheckins,

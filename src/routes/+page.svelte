@@ -66,21 +66,19 @@
 			</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-				{#if data.communityInfo?.paymentUrl}
-					<a href={data.communityInfo.paymentUrl} target="_blank" rel="noopener noreferrer"
-						class="card-premium hover-lift flex items-start gap-4 no-underline group">
-						<div class="shrink-0 w-11 h-11 rounded-full bg-mg-forest flex items-center justify-center">
-							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
-								<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-								<line x1="1" y1="10" x2="23" y2="10"/>
-							</svg>
-						</div>
-						<div>
-							<h3 class="font-semibold text-mg-charcoal text-base group-hover:text-mg-forest transition-colors">Pay Dues</h3>
-							<p class="text-sm text-mg-warmGray mt-0.5">Make your HOA assessment payment</p>
-						</div>
-					</a>
-				{/if}
+				<a href={data.communityInfo?.paymentUrl || 'https://smartpay.profitstars.com/express/MAYNEGAITE'} target="_blank" rel="noopener noreferrer"
+					class="card-premium hover-lift flex items-start gap-4 no-underline group">
+					<div class="shrink-0 w-11 h-11 rounded-full bg-mg-forest flex items-center justify-center">
+						<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
+							<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+							<line x1="1" y1="10" x2="23" y2="10"/>
+						</svg>
+					</div>
+					<div>
+						<h3 class="font-semibold text-mg-charcoal text-base group-hover:text-mg-forest transition-colors">Pay Dues</h3>
+						<p class="text-sm text-mg-warmGray mt-0.5">Make your HOA assessment payment</p>
+					</div>
+				</a>
 
 				<a href="/events" class="card-elevated hover-lift flex items-start gap-4 no-underline group">
 					<div class="shrink-0 w-11 h-11 rounded-full bg-mg-forest/10 flex items-center justify-center">
@@ -199,7 +197,6 @@
 				<EventCalendar
 					events={data.upcomingEvents}
 					isLoggedIn={data.isLoggedIn}
-					isVerified={data.isVerified}
 				/>
 			</div>
 		</ScrollReveal>

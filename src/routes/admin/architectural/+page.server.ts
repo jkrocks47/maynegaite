@@ -1,7 +1,8 @@
 import { fail } from '@sveltejs/kit';
-import { asc, desc, eq } from 'drizzle-orm';
+import { asc, desc, eq, and, inArray } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { architecturalRequests, members, properties } from '$lib/server/db/schema';
+import { architecturalRequests, members, properties, auditLogs } from '$lib/server/db/schema';
+import { logAction } from '$lib/server/db/audit';
 import { architecturalRequestSchema } from '$lib/utils/validation';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -73,6 +74,41 @@ export const load: PageServerLoad = async () => {
 		.leftJoin(properties, eq(architecturalRequests.propertyId, properties.id))
 		.orderBy(desc(architecturalRequests.submittedAt));
 
+	const requestIds = requestRows.map(r => r.id);
+	const logsRows = requestIds.length > 0 ? await db
+		.select({
+			id: auditLogs.id,
+			entityId: auditLogs.entityId,
+			action: auditLogs.action,
+			details: auditLogs.details,
+			createdAt: auditLogs.createdAt,
+			actorFirstName: members.firstName,
+			actorLastName: members.lastName,
+			actorDisplayName: members.displayName,
+			actorEmail: members.email
+		})
+		.from(auditLogs)
+		.leftJoin(members, eq(auditLogs.actorId, members.id))
+		.where(
+			and(
+				eq(auditLogs.entityType, 'architectural_request'),
+				inArray(auditLogs.entityId, requestIds)
+			)
+		)
+		.orderBy(desc(auditLogs.createdAt)) : [];
+
+	const logsByEntityId = new Map<string, any[]>();
+	for (const log of logsRows) {
+		const logs = logsByEntityId.get(log.entityId) ?? [];
+		const actorName =
+			log.actorDisplayName ||
+			`${log.actorFirstName ?? ''} ${log.actorLastName ?? ''}`.trim() ||
+			log.actorEmail ||
+			'System / Unknown';
+		logs.push({ ...log, actorName });
+		logsByEntityId.set(log.entityId, logs);
+	}
+
 	const memberRows = await db
 		.select({
 			id: members.id,
@@ -110,7 +146,8 @@ export const load: PageServerLoad = async () => {
 		return {
 			...row,
 			requesterName,
-			reviewerName: row.reviewedBy ? memberNameById.get(row.reviewedBy) ?? 'Unknown reviewer' : null
+			reviewerName: row.reviewedBy ? memberNameById.get(row.reviewedBy) ?? 'Unknown reviewer' : null,
+			logs: logsByEntityId.get(row.id) ?? []
 		};
 	});
 
@@ -133,7 +170,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	create: async ({ request }) => {
+	create: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const memberId = parseOptionalUuid(formData.get('memberId'));
 		const propertyId = parseOptionalUuid(formData.get('propertyId'));
@@ -154,7 +191,7 @@ export const actions: Actions = {
 			});
 		}
 
-		await db.insert(architecturalRequests).values({
+		const inserted = await db.insert(architecturalRequests).values({
 			memberId,
 			propertyId,
 			title: parsed.data.title,
@@ -162,12 +199,16 @@ export const actions: Actions = {
 			requestType: parsed.data.requestType,
 			status: 'submitted',
 			attachments: parseAttachments(formData.get('attachments'))
-		});
+		}).returning({ id: architecturalRequests.id });
+
+		if (inserted[0]) {
+			await logAction('architectural_request', inserted[0].id, locals.member?.id ?? null, 'create', 'Request submitted');
+		}
 
 		return { success: true };
 	},
 
-	update: async ({ request }) => {
+	update: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const id = parseOptionalUuid(formData.get('id'));
 		const memberId = parseOptionalUuid(formData.get('memberId'));
@@ -204,6 +245,8 @@ export const actions: Actions = {
 			})
 			.where(eq(architecturalRequests.id, id));
 
+		await logAction('architectural_request', id, locals.member?.id ?? null, 'update', 'Request updated');
+
 		return { success: true };
 	},
 
@@ -224,6 +267,8 @@ export const actions: Actions = {
 		const reviewerId = shouldClearReview ? null : (locals.member?.id ?? null);
 		const reviewedAt = shouldClearReview ? null : new Date();
 
+		const existingRequest = await db.select({ status: architecturalRequests.status }).from(architecturalRequests).where(eq(architecturalRequests.id, id)).limit(1);
+
 		await db
 			.update(architecturalRequests)
 			.set({
@@ -234,10 +279,20 @@ export const actions: Actions = {
 			})
 			.where(eq(architecturalRequests.id, id));
 
+		let details = 'Review details updated';
+		if (existingRequest[0]?.status !== statusRaw) {
+			details = `Status changed to '${statusRaw}'`;
+		}
+		if (statusRaw === 'submitted') {
+			details = 'Review cleared / Sent back to submitted';
+		}
+		
+		await logAction('architectural_request', id, locals.member?.id ?? null, 'review', details);
+
 		return { success: true };
 	},
 
-	delete: async ({ request }) => {
+	delete: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const id = parseOptionalUuid(formData.get('id'));
 		if (!id) {
@@ -245,6 +300,8 @@ export const actions: Actions = {
 		}
 
 		await db.delete(architecturalRequests).where(eq(architecturalRequests.id, id));
+		// Note: Audit log for deletion might stick around as a tombstone record
+		await logAction('architectural_request', id, locals.member?.id ?? null, 'delete', 'Request deleted');
 		return { success: true };
 	}
 };

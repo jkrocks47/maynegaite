@@ -1,7 +1,8 @@
 import { fail } from '@sveltejs/kit';
-import { asc, desc, eq } from 'drizzle-orm';
+import { asc, desc, eq, and, inArray } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { members, properties, violations } from '$lib/server/db/schema';
+import { members, properties, violations, auditLogs } from '$lib/server/db/schema';
+import { logAction } from '$lib/server/db/audit';
 import { violationReportSchema } from '$lib/utils/validation';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -53,6 +54,41 @@ export const load: PageServerLoad = async () => {
 		.leftJoin(members, eq(violations.reportedBy, members.id))
 		.orderBy(desc(violations.reportedAt));
 
+	const recordIds = violationRows.map(r => r.id);
+	const logsRows = recordIds.length > 0 ? await db
+		.select({
+			id: auditLogs.id,
+			entityId: auditLogs.entityId,
+			action: auditLogs.action,
+			details: auditLogs.details,
+			createdAt: auditLogs.createdAt,
+			actorFirstName: members.firstName,
+			actorLastName: members.lastName,
+			actorDisplayName: members.displayName,
+			actorEmail: members.email
+		})
+		.from(auditLogs)
+		.leftJoin(members, eq(auditLogs.actorId, members.id))
+		.where(
+			and(
+				eq(auditLogs.entityType, 'violation'),
+				inArray(auditLogs.entityId, recordIds)
+			)
+		)
+		.orderBy(desc(auditLogs.createdAt)) : [];
+
+	const logsByEntityId = new Map<string, any[]>();
+	for (const log of logsRows) {
+		const logs = logsByEntityId.get(log.entityId) ?? [];
+		const actorName =
+			log.actorDisplayName ||
+			`${log.actorFirstName ?? ''} ${log.actorLastName ?? ''}`.trim() ||
+			log.actorEmail ||
+			'System / Unknown';
+		logs.push({ ...log, actorName });
+		logsByEntityId.set(log.entityId, logs);
+	}
+
 	const memberRows = await db
 		.select({
 			id: members.id,
@@ -90,7 +126,8 @@ export const load: PageServerLoad = async () => {
 		return {
 			...row,
 			reporterName,
-			resolverName: row.resolvedBy ? memberNameById.get(row.resolvedBy) ?? 'Unknown resolver' : null
+			resolverName: row.resolvedBy ? memberNameById.get(row.resolvedBy) ?? 'Unknown resolver' : null,
+			logs: logsByEntityId.get(row.id) ?? []
 		};
 	});
 
@@ -137,7 +174,7 @@ export const actions: Actions = {
 		const resolvedNow = shouldSetResolution(statusRaw);
 		const resolutionDate = resolvedNow ? new Date() : null;
 
-		await db.insert(violations).values({
+		const inserted = await db.insert(violations).values({
 			reportedBy,
 			propertyId,
 			description: parsed.data.description,
@@ -146,7 +183,11 @@ export const actions: Actions = {
 			notes,
 			resolvedAt: resolutionDate,
 			resolvedBy: resolvedNow ? (locals.member?.id ?? null) : null
-		});
+		}).returning({ id: violations.id });
+
+		if (inserted[0]) {
+			await logAction('violation', inserted[0].id, locals.member?.id ?? null, 'create', 'Violation reported');
+		}
 
 		return { success: true };
 	},
@@ -178,6 +219,8 @@ export const actions: Actions = {
 			});
 		}
 
+		const existingViolation = await db.select({ status: violations.status }).from(violations).where(eq(violations.id, id)).limit(1);
+
 		const resolvedNow = shouldSetResolution(statusRaw);
 		const resolutionDate = resolvedNow ? new Date() : null;
 
@@ -195,10 +238,18 @@ export const actions: Actions = {
 			})
 			.where(eq(violations.id, id));
 
+		let details = 'Violation updated';
+		let logActionType: 'update' | 'status_change' | 'review' = 'update';
+		if (existingViolation[0]?.status !== statusRaw) {
+			details = `Status changed to '${statusRaw}'`;
+			logActionType = 'status_change';
+		}
+		await logAction('violation', id, locals.member?.id ?? null, logActionType, details);
+
 		return { success: true };
 	},
 
-	delete: async ({ request }) => {
+	delete: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const id = parseOptionalUuid(formData.get('id'));
 		if (!id) {
@@ -206,6 +257,7 @@ export const actions: Actions = {
 		}
 
 		await db.delete(violations).where(eq(violations.id, id));
+		await logAction('violation', id, locals.member?.id ?? null, 'delete', 'Violation deleted');
 		return { success: true };
 	}
 };

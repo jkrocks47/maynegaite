@@ -1,6 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { pageContent } from '$lib/server/db/schema';
+import { logAction } from '$lib/server/db/audit';
 import { contentEntries, type ContentEntry } from '$lib/utils/content-registry';
 
 export interface ContentBlock {
@@ -64,7 +65,7 @@ export async function upsertContent(
 		updatedAt: new Date()
 	};
 
-	await db
+	const [upserted] = await db
 		.insert(pageContent)
 		.values(values)
 		.onConflictDoUpdate({
@@ -75,7 +76,19 @@ export async function upsertContent(
 				updatedBy: values.updatedBy,
 				updatedAt: values.updatedAt
 			}
-		});
+		})
+		.returning({ id: pageContent.id });
+
+	// Log the action to the community audit log
+	if (upserted?.id) {
+		await logAction(
+			'page_content',
+			upserted.id,
+			updatedBy,
+			'update',
+			`Updated ${section} for page /${slug === 'home' ? '' : slug}`
+		);
+	}
 }
 
 export function getAllEntries(): ContentEntry[] {

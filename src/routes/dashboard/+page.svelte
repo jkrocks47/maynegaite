@@ -55,9 +55,7 @@
 				{#if data.member.adminRole}
 					<a href="/admin" class="btn-secondary text-sm">Admin Panel</a>
 				{/if}
-				{#if data.communityInfo?.paymentUrl}
-					<a href={data.communityInfo.paymentUrl} target="_blank" rel="noopener noreferrer" class="btn-gold text-sm">Pay Dues</a>
-				{/if}
+				<a href={data.communityInfo?.paymentUrl || 'https://smartpay.profitstars.com/express/MAYNEGAITE'} target="_blank" rel="noopener noreferrer" class="btn-gold text-sm">Pay Dues</a>
 			</div>
 		</div>
 	</section>
@@ -74,6 +72,33 @@
 		<div class="card-elevated">
 			<p class="text-xs uppercase tracking-wider text-mg-warmGray mb-1">Events Attended</p>
 			<p class="text-xl font-semibold text-mg-charcoal">{data.eventsAttended}</p>
+		</div>
+	</section>
+
+	<section class="card-elevated">
+		<h2 class="font-display text-2xl text-mg-charcoal mb-3">Community Resources</h2>
+		<p class="text-sm text-mg-warmGray mb-5">Access essential tools, documents, and contact information for the HOA.</p>
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+			<a href="/owner-resources" class="border border-mg-stone rounded-lg p-4 bg-white hover:bg-mg-ivory/50 hover-lift transition-all no-underline overflow-hidden relative group">
+				<div class="absolute inset-y-0 left-0 w-1 bg-mg-gold"></div>
+				<div class="flex items-center gap-3 mb-2 ml-2">
+					<div class="shrink-0 w-8 h-8 rounded-full bg-mg-gold/15 flex items-center justify-center group-hover:bg-mg-gold/25 transition-colors">
+						<svg class="w-4 h-4 text-mg-gold" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+					</div>
+					<h3 class="font-semibold text-mg-charcoal m-0">Owner Resources Hub</h3>
+				</div>
+				<p class="text-sm text-mg-warmGray ml-2 m-0">View board members, FAQs, community rules, and meeting notes.</p>
+			</a>
+			<a href="/contact" class="border border-mg-stone rounded-lg p-4 bg-white hover:bg-mg-ivory/50 hover-lift transition-all no-underline overflow-hidden relative group">
+				<div class="absolute inset-y-0 left-0 w-1 bg-mg-forest"></div>
+				<div class="flex items-center gap-3 mb-2 ml-2">
+					<div class="shrink-0 w-8 h-8 rounded-full bg-mg-forest/10 flex items-center justify-center group-hover:bg-mg-forest/20 transition-colors">
+						<svg class="w-4 h-4 text-mg-forest" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+					</div>
+					<h3 class="font-semibold text-mg-charcoal m-0">Contact the Board</h3>
+				</div>
+				<p class="text-sm text-mg-warmGray ml-2 m-0">Need approval for structural work or have a question? Send a message.</p>
+			</a>
 		</div>
 	</section>
 
