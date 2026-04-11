@@ -47,7 +47,7 @@
 				<span class="text-mg-gold/30">·</span>
 				<span>Top 5% U.S. Income</span>
 				<span class="text-mg-gold/30">·</span>
-				<span>100% College Acceptance</span>
+				<span>100% College Acceptance (Southland College Prep HS)</span>
 			</div>
 		</div>
 		<!-- Spacer: holds the right half open for the absolute photo -->
