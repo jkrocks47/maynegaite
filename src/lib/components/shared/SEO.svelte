@@ -1,13 +1,10 @@
 <script lang="ts">
-	interface Props {
-		title?: string;
-		description?: string;
-		image?: string;
-	}
+	let {
+		title = 'Maynegaite POA',
+		description = "Maynegaite Property Owners' Association — Olympia Fields, Illinois"
+	}: { title?: string; description?: string } = $props();
 
-	let { title = 'UICSpacetime', description = 'Society of Physics Students at the University of Illinois Chicago', image = '' }: Props = $props();
-
-	const fullTitle = title === 'UICSpacetime' ? title : `${title} | UICSpacetime`;
+	const fullTitle = title === 'Maynegaite POA' ? title : `${title} | Maynegaite POA`;
 </script>
 
 <svelte:head>
@@ -15,11 +12,5 @@
 	<meta name="description" content={description} />
 	<meta property="og:title" content={fullTitle} />
 	<meta property="og:description" content={description} />
-	{#if image}
-		<meta property="og:image" content={image} />
-	{/if}
 	<meta property="og:type" content="website" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content={fullTitle} />
-	<meta name="twitter:description" content={description} />
 </svelte:head>

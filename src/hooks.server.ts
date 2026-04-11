@@ -1,7 +1,6 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { validateMemberSession } from '$lib/server/auth';
-import { canManageClub } from '$lib/utils/constants';
-import type { ClubType } from '$lib/utils/constants';
+import { canManageAdmin } from '$lib/utils/constants';
 import {
 	startReminderScheduler,
 	stopReminderScheduler
@@ -31,7 +30,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// Initialize locals
 	event.locals.member = null;
 
-	// Member session validation — always resolve if cookie exists so any page can check auth state
+	// Member session validation
 	const memberToken = event.cookies.get('member_session');
 
 	if (memberToken) {
@@ -55,17 +54,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 
 		// All other admin routes require auth + admin role
-		if (!event.locals.member?.adminRole) {
+		if (!event.locals.member?.adminRole || !canManageAdmin(event.locals.member.adminRole)) {
 			throw redirect(303, '/admin');
-		}
-
-		// Club-specific RBAC (skip for /admin/members and /admin/announcements)
-		const clubMatch = pathname.match(/^\/admin\/(astronomy|physics)/);
-		if (clubMatch) {
-			const club = clubMatch[1] as ClubType;
-			if (!canManageClub(event.locals.member.adminRole, club)) {
-				throw redirect(303, '/admin');
-			}
 		}
 	}
 

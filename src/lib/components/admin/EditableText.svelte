@@ -6,7 +6,6 @@
 		value: string;
 		slug: string;
 		section: string;
-		clubType: string | null;
 		fieldType?: 'short' | 'long' | 'markdown';
 		tag?: string;
 		class?: string;
@@ -18,7 +17,6 @@
 		value,
 		slug,
 		section,
-		clubType,
 		fieldType = 'short',
 		tag = 'span',
 		class: className = '',
@@ -133,9 +131,6 @@
 >
 	<input type="hidden" name="slug" value={slug} />
 	<input type="hidden" name="section" value={section} />
-	{#if clubType}
-		<input type="hidden" name="clubType" value={clubType} />
-	{/if}
 	<input type="hidden" name="body" value={editedValue} />
 </form>
 

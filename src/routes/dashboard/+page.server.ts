@@ -1,16 +1,14 @@
 import { eq, and, gte, desc, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { members, events, eventRsvps, eventCheckins } from '$lib/server/db/schema';
-import { ACTIVE_MEMBER_THRESHOLD } from '$lib/utils/constants';
+import { events, eventRsvps, eventCheckins, communityInfo } from '$lib/server/db/schema';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const member = locals.member!;
 	const now = new Date().toISOString().split('T')[0];
 
-	// Count events attended this semester (approximate: last 6 months)
-	const semesterStart = new Date();
-	semesterStart.setMonth(semesterStart.getMonth() - 6);
+	const sixMonthsAgo = new Date();
+	sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
 	const [attendedResult] = await db
 		.select({ count: sql<number>`count(*)` })
@@ -18,12 +16,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.where(
 			and(
 				eq(eventCheckins.memberId, member.id),
-				gte(eventCheckins.checkedInAt, semesterStart)
+				gte(eventCheckins.checkedInAt, sixMonthsAgo)
 			)
 		);
 	const eventsAttended = Number(attendedResult?.count ?? 0);
 
-	// Upcoming RSVP'd events
 	const upcomingRsvps = await db
 		.select({
 			eventId: events.id,
@@ -31,7 +28,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			date: events.date,
 			time: events.time,
 			location: events.location,
-			clubType: events.clubType,
+			eventCategory: events.eventCategory,
 			rsvpStatus: eventRsvps.status
 		})
 		.from(eventRsvps)
@@ -40,29 +37,18 @@ export const load: PageServerLoad = async ({ locals }) => {
 			and(
 				eq(eventRsvps.memberId, member.id),
 				gte(events.date, now),
-				eq(events.isPublished, true)
+				sql`${events.isPublished} = true`
 			)
 		)
 		.orderBy(events.date)
 		.limit(5);
 
-	// Member interests and review status
-	const [memberData] = await db
-		.select({
-			eventPreferences: members.eventPreferences,
-			preferencesReviewedAt: members.preferencesReviewedAt
-		})
-		.from(members)
-		.where(eq(members.id, member.id))
-		.limit(1);
-
-	// Recent check-ins
 	const recentCheckins = await db
 		.select({
 			eventId: events.id,
 			title: events.title,
 			date: events.date,
-			clubType: events.clubType,
+			eventCategory: events.eventCategory,
 			checkedInAt: eventCheckins.checkedInAt
 		})
 		.from(eventCheckins)
@@ -71,19 +57,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.orderBy(desc(eventCheckins.checkedInAt))
 		.limit(5);
 
-	// Check if preferences need review (>4 months since last review or never reviewed)
-	const fourMonthsAgo = new Date();
-	fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
-	const needsPreferenceReview = !memberData?.preferencesReviewedAt ||
-		memberData.preferencesReviewedAt < fourMonthsAgo;
+	const community = await db.select().from(communityInfo).limit(1);
 
 	return {
 		eventsAttended,
-		activeThreshold: ACTIVE_MEMBER_THRESHOLD,
 		upcomingRsvps,
 		recentCheckins,
-		eventPreferences: memberData?.eventPreferences ?? [],
-		needsPreferenceReview,
+		communityInfo: community[0] ?? null,
 		isVerified: member.emailVerified
 	};
 };

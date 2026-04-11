@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			date: events.date,
 			time: events.time,
 			location: events.location,
-			clubType: events.clubType,
+			eventCategory: events.eventCategory,
 			rsvpStatus: eventRsvps.status
 		})
 		.from(eventRsvps)
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			eventId: events.id,
 			title: events.title,
 			date: events.date,
-			clubType: events.clubType,
+			eventCategory: events.eventCategory,
 			checkedInAt: eventCheckins.checkedInAt
 		})
 		.from(eventCheckins)

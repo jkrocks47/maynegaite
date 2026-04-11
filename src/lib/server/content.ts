@@ -1,7 +1,7 @@
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { pageContent } from '$lib/server/db/schema';
-import { contentEntries, clubDefaults, type ContentEntry } from '$lib/utils/content-registry';
+import { contentEntries, type ContentEntry } from '$lib/utils/content-registry';
 
 export interface ContentBlock {
 	title?: string | null;
@@ -9,18 +9,9 @@ export interface ContentBlock {
 	metadata?: Record<string, unknown> | null;
 }
 
-/**
- * Load all pageContent rows for a given slug + clubType from the DB.
- * Returns a Map keyed by section name.
- */
 export async function getPageContent(
-	clubType: string | null,
 	slug: string
 ): Promise<Map<string, ContentBlock>> {
-	const condition = clubType
-		? and(eq(pageContent.slug, slug), eq(pageContent.clubType, clubType as 'astronomy' | 'physics'))
-		: and(eq(pageContent.slug, slug), isNull(pageContent.clubType));
-
 	const rows = await db
 		.select({
 			section: pageContent.section,
@@ -29,7 +20,7 @@ export async function getPageContent(
 			metadata: pageContent.metadata
 		})
 		.from(pageContent)
-		.where(condition);
+		.where(eq(pageContent.slug, slug));
 
 	const map = new Map<string, ContentBlock>();
 	for (const row of rows) {
@@ -38,18 +29,12 @@ export async function getPageContent(
 	return map;
 }
 
-/**
- * Load content for a page, merging DB values with defaults from the registry.
- * Returns a plain object keyed by section name with string body values.
- */
 export async function getContentWithDefaults(
-	clubType: string | null,
 	slug: string
 ): Promise<Record<string, string>> {
-	const dbContent = await getPageContent(clubType, slug);
+	const dbContent = await getPageContent(slug);
 	const result: Record<string, string> = {};
 
-	// Get all entries for this slug
 	const entries = contentEntries.filter((e) => e.slug === slug);
 
 	for (const entry of entries) {
@@ -57,29 +42,21 @@ export async function getContentWithDefaults(
 		if (dbBlock?.body) {
 			result[entry.section] = dbBlock.body;
 		} else {
-			// Fall back to club-specific defaults, then entry defaults
-			const key = `${slug}|${entry.section}`;
-			const clubDef = clubType ? clubDefaults[key]?.[clubType] : undefined;
-			result[entry.section] = clubDef?.defaultBody ?? entry.defaultBody ?? '';
+			result[entry.section] = entry.defaultBody ?? '';
 		}
 	}
 
 	return result;
 }
 
-/**
- * Upsert a pageContent row. Uses the unique constraint on (slug, clubType, section).
- */
 export async function upsertContent(
 	slug: string,
-	clubType: string | null,
 	section: string,
 	data: { title?: string; body?: string },
 	updatedBy: string
 ): Promise<void> {
 	const values = {
 		slug,
-		clubType: clubType as 'astronomy' | 'physics' | null,
 		section,
 		title: data.title ?? null,
 		body: data.body ?? null,
@@ -91,7 +68,7 @@ export async function upsertContent(
 		.insert(pageContent)
 		.values(values)
 		.onConflictDoUpdate({
-			target: [pageContent.slug, pageContent.clubType, pageContent.section],
+			target: [pageContent.slug, pageContent.section],
 			set: {
 				title: values.title,
 				body: values.body,
@@ -101,16 +78,6 @@ export async function upsertContent(
 		});
 }
 
-/**
- * Get all content entries relevant to a club (club-specific entries only).
- */
-export function getClubEntries(): ContentEntry[] {
-	return contentEntries.filter((e) => e.clubSpecific);
-}
-
-/**
- * Get all root homepage entries (not club-specific).
- */
-export function getRootEntries(): ContentEntry[] {
-	return contentEntries.filter((e) => !e.clubSpecific);
+export function getAllEntries(): ContentEntry[] {
+	return contentEntries;
 }

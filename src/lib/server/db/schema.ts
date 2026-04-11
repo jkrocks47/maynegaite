@@ -25,12 +25,67 @@ const bytea = customType<{ data: Buffer }>({
 	}
 });
 
-export const clubTypeEnum = pgEnum('club_type', ['astronomy', 'physics']);
+// --- Enums ---
+
 export const imageVariantEnum = pgEnum('image_variant', ['full', 'thumbnail']);
-export const roleEnum = pgEnum('role', ['super_admin', 'astronomy_admin', 'physics_admin']);
+export const adminRoleEnum = pgEnum('admin_role', [
+	'president',
+	'vice_president',
+	'treasurer',
+	'secretary',
+	'architectural_chair',
+	'board_member'
+]);
 export const memberRoleEnum = pgEnum('member_role', ['member', 'board']);
 export const rsvpStatusEnum = pgEnum('rsvp_status', ['going', 'maybe', 'not_going']);
 export const reminderTypeEnum = pgEnum('reminder_type', ['7_day', '1_day', 'day_of']);
+export const sectionEnum = pgEnum('section_type', ['woods', 'reserves']);
+export const propertyTypeEnum = pgEnum('property_type', ['single_family', 'townhome']);
+export const eventCategoryEnum = pgEnum('event_category', [
+	'community',
+	'board_meeting',
+	'village',
+	'social',
+	'maintenance'
+]);
+export const architecturalRequestTypeEnum = pgEnum('architectural_request_type', [
+	'modification',
+	'new_construction',
+	'fence',
+	'landscaping',
+	'paint',
+	'other'
+]);
+export const architecturalRequestStatusEnum = pgEnum('architectural_request_status', [
+	'submitted',
+	'under_review',
+	'approved',
+	'denied',
+	'revision_requested'
+]);
+export const violationTypeEnum = pgEnum('violation_type', [
+	'signage',
+	'architectural',
+	'maintenance',
+	'noise',
+	'other'
+]);
+export const violationStatusEnum = pgEnum('violation_status', [
+	'reported',
+	'investigating',
+	'resolved',
+	'dismissed'
+]);
+export const documentCategoryEnum = pgEnum('document_category', [
+	'bylaws',
+	'minutes',
+	'newsletter',
+	'financial',
+	'covenant',
+	'other'
+]);
+
+// --- Members & Auth ---
 
 export const members = pgTable('members', {
 	id: uuid('id').primaryKey().defaultRandom(),
@@ -40,15 +95,15 @@ export const members = pgTable('members', {
 	lastName: text('last_name').notNull(),
 	displayName: text('display_name').notNull(),
 	role: memberRoleEnum('role').notNull().default('member'),
-	adminRole: roleEnum('admin_role'),
+	adminRole: adminRoleEnum('admin_role'),
 	emailVerified: boolean('email_verified').notNull().default(false),
-	year: text('year'),
-	major: text('major'),
-	astronomyMember: boolean('astronomy_member').notNull().default(false),
-	physicsMember: boolean('physics_member').notNull().default(false),
-	eventPreferences: jsonb('event_preferences').$type<string[]>(),
-	preferencesReviewedAt: timestamp('preferences_reviewed_at'),
-	preferenceReminderSentAt: timestamp('preference_reminder_sent_at'),
+	phone: text('phone'),
+	address: text('address'),
+	lotNumber: integer('lot_number'),
+	section: sectionEnum('section'),
+	propertyType: propertyTypeEnum('property_type'),
+	directoryOptIn: boolean('directory_opt_in').notNull().default(false),
+	moveInDate: date('move_in_date'),
 	emailOptOut: boolean('email_opt_out').notNull().default(false),
 	unsubscribeToken: text('unsubscribe_token').notNull().unique(),
 	secondaryEmail: text('secondary_email'),
@@ -87,6 +142,8 @@ export const passwordResetTokens = pgTable('password_reset_tokens', {
 	createdAt: timestamp('created_at').defaultNow()
 });
 
+// --- Events & RSVPs ---
+
 export const events = pgTable('events', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	title: text('title').notNull(),
@@ -95,7 +152,7 @@ export const events = pgTable('events', {
 	time: text('time'),
 	location: text('location'),
 	locationUrl: text('location_url'),
-	clubType: clubTypeEnum('club_type').notNull(),
+	eventCategory: eventCategoryEnum('event_category').notNull().default('community'),
 	imageUrl: text('image_url'),
 	imageGroupId: text('image_public_id'),
 	isPublished: boolean('is_published').default(true),
@@ -173,11 +230,13 @@ export const reminderLogs = pgTable(
 	(t) => [unique().on(t.eventId, t.memberId, t.reminderType)]
 );
 
+// --- Announcements ---
+
 export const announcements = pgTable('announcements', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	title: text('title').notNull(),
 	body: text('body').notNull(),
-	clubType: clubTypeEnum('club_type'),
+	category: text('category'),
 	isPinned: boolean('is_pinned').notNull().default(false),
 	publishAt: timestamp('publish_at'),
 	expiresAt: timestamp('expires_at'),
@@ -186,33 +245,29 @@ export const announcements = pgTable('announcements', {
 	updatedAt: timestamp('updated_at').defaultNow()
 });
 
+// --- Gallery ---
+
 export const galleryImages = pgTable('gallery_images', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	url: text('url').notNull(),
 	thumbnailUrl: text('thumbnail_url'),
 	imageGroupId: text('public_id').notNull(),
 	caption: text('caption'),
-	clubType: clubTypeEnum('club_type').notNull(),
 	photographer: text('photographer'),
 	width: integer('width'),
 	height: integer('height'),
-	raCoord: text('ra_coord'),
-	decCoord: text('dec_coord'),
-	exposureTime: text('exposure_time'),
-	equipment: text('equipment'),
-	iso: text('iso'),
-	aperture: text('aperture'),
-	observationDate: text('observation_date'),
+	eventId: uuid('event_id').references(() => events.id, { onDelete: 'set null' }),
 	uploadedBy: uuid('uploaded_by').references(() => members.id),
 	uploadDate: timestamp('upload_date').defaultNow()
 });
+
+// --- Page Content ---
 
 export const pageContent = pgTable(
 	'page_content',
 	{
 		id: uuid('id').primaryKey().defaultRandom(),
 		slug: text('slug').notNull(),
-		clubType: clubTypeEnum('club_type'),
 		section: text('section').notNull(),
 		title: text('title'),
 		body: text('body'),
@@ -221,17 +276,97 @@ export const pageContent = pgTable(
 		updatedBy: uuid('updated_by').references(() => members.id),
 		updatedAt: timestamp('updated_at').defaultNow()
 	},
-	(t) => [unique().on(t.slug, t.clubType, t.section)]
+	(t) => [unique().on(t.slug, t.section)]
 );
 
-export const clubInfo = pgTable('club_info', {
+// --- Community Info ---
+
+export const communityInfo = pgTable('community_info', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	clubType: clubTypeEnum('club_type').notNull().unique(),
 	aboutText: text('about_text'),
 	meetingInfo: text('meeting_info'),
 	contactEmail: text('contact_email'),
 	socialLinks: jsonb('social_links').$type<Record<string, string>>(),
+	mailingAddress: text('mailing_address'),
+	phone: text('phone'),
+	emergencyContact: text('emergency_contact'),
+	paymentUrl: text('payment_url'),
 	updatedAt: timestamp('updated_at').defaultNow()
+});
+
+// --- Officers / Board Members ---
+
+export const officers = pgTable('officers', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	memberId: uuid('member_id').references(() => members.id, { onDelete: 'set null' }),
+	name: text('name').notNull(),
+	position: text('position').notNull(),
+	committeeType: text('committee_type').notNull().default('board'),
+	imageUrl: text('image_url'),
+	email: text('email'),
+	bio: text('bio'),
+	sortOrder: integer('sort_order').default(0)
+});
+
+// --- Properties ---
+
+export const properties = pgTable('properties', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	lotNumber: integer('lot_number').notNull().unique(),
+	address: text('address'),
+	section: sectionEnum('section'),
+	propertyType: propertyTypeEnum('property_type'),
+	ownerId: uuid('owner_id').references(() => members.id, { onDelete: 'set null' }),
+	createdAt: timestamp('created_at').defaultNow(),
+	updatedAt: timestamp('updated_at').defaultNow()
+});
+
+// --- Architectural Requests ---
+
+export const architecturalRequests = pgTable('architectural_requests', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	memberId: uuid('member_id')
+		.notNull()
+		.references(() => members.id, { onDelete: 'cascade' }),
+	propertyId: uuid('property_id').references(() => properties.id, { onDelete: 'set null' }),
+	title: text('title').notNull(),
+	description: text('description').notNull(),
+	requestType: architecturalRequestTypeEnum('request_type').notNull(),
+	status: architecturalRequestStatusEnum('status').notNull().default('submitted'),
+	submittedAt: timestamp('submitted_at').notNull().defaultNow(),
+	reviewedAt: timestamp('reviewed_at'),
+	reviewedBy: uuid('reviewed_by').references(() => members.id),
+	reviewNotes: text('review_notes'),
+	attachments: jsonb('attachments').$type<string[]>()
+});
+
+// --- Violations ---
+
+export const violations = pgTable('violations', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	reportedBy: uuid('reported_by').references(() => members.id, { onDelete: 'set null' }),
+	propertyId: uuid('property_id').references(() => properties.id, { onDelete: 'set null' }),
+	description: text('description').notNull(),
+	violationType: violationTypeEnum('violation_type').notNull(),
+	status: violationStatusEnum('status').notNull().default('reported'),
+	reportedAt: timestamp('reported_at').notNull().defaultNow(),
+	resolvedAt: timestamp('resolved_at'),
+	resolvedBy: uuid('resolved_by').references(() => members.id),
+	notes: text('notes')
+});
+
+// --- Documents ---
+
+export const documents = pgTable('documents', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	title: text('title').notNull(),
+	description: text('description'),
+	category: documentCategoryEnum('category').notNull(),
+	fileGroupId: text('file_group_id'),
+	fileUrl: text('file_url'),
+	publishedAt: timestamp('published_at').notNull().defaultNow(),
+	uploadedBy: uuid('uploaded_by').references(() => members.id),
+	createdAt: timestamp('created_at').defaultNow()
 });
 
 // --- Check-in Question Types ---
@@ -244,27 +379,7 @@ export interface CheckinQuestion {
 	required?: boolean;
 }
 
-// --- Interest Options ---
-
-export const interestOptions = pgTable('interest_options', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	name: text('name').notNull().unique(),
-	sortOrder: integer('sort_order').default(0),
-	createdAt: timestamp('created_at').defaultNow()
-});
-
-export const officers = pgTable('officers', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	clubType: clubTypeEnum('club_type').notNull(),
-	memberId: uuid('member_id').references(() => members.id, { onDelete: 'set null' }),
-	name: text('name').notNull(),
-	position: text('position').notNull(),
-	imageUrl: text('image_url'),
-	email: text('email'),
-	bio: text('bio'),
-	sortOrder: integer('sort_order').default(0),
-	academicYear: text('academic_year')
-});
+// --- Images (binary storage) ---
 
 export const images = pgTable(
 	'images',

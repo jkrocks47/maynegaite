@@ -8,7 +8,7 @@ import {
 	emailVerificationTokens,
 	passwordResetTokens
 } from './db/schema';
-import type { Role, MemberRole } from '$lib/utils/constants';
+import type { AdminRole, MemberRole } from '$lib/utils/constants';
 
 export interface MemberUser {
 	id: string;
@@ -17,10 +17,12 @@ export interface MemberUser {
 	lastName: string;
 	displayName: string;
 	role: MemberRole;
-	adminRole: Role | null;
+	adminRole: AdminRole | null;
 	emailVerified: boolean;
-	astronomyMember: boolean;
-	physicsMember: boolean;
+	section: string | null;
+	lotNumber: number | null;
+	propertyType: string | null;
+	phone: string | null;
 }
 
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -65,8 +67,10 @@ export async function validateMemberSession(token: string): Promise<MemberUser |
 			role: members.role,
 			adminRole: members.adminRole,
 			emailVerified: members.emailVerified,
-			astronomyMember: members.astronomyMember,
-			physicsMember: members.physicsMember
+			section: members.section,
+			lotNumber: members.lotNumber,
+			propertyType: members.propertyType,
+			phone: members.phone
 		})
 		.from(memberSessions)
 		.innerJoin(members, eq(memberSessions.memberId, members.id))
@@ -102,8 +106,10 @@ export async function validateMemberSession(token: string): Promise<MemberUser |
 		role: session.role,
 		adminRole: session.adminRole,
 		emailVerified: session.emailVerified,
-		astronomyMember: session.astronomyMember,
-		physicsMember: session.physicsMember
+		section: session.section,
+		lotNumber: session.lotNumber,
+		propertyType: session.propertyType,
+		phone: session.phone
 	};
 }
 
@@ -114,7 +120,6 @@ export async function destroyMemberSession(token: string): Promise<void> {
 // --- Email Verification Tokens ---
 
 export async function generateVerificationToken(memberId: string): Promise<string> {
-	// Delete any existing tokens for this member
 	await db
 		.delete(emailVerificationTokens)
 		.where(eq(emailVerificationTokens.memberId, memberId));
@@ -149,7 +154,6 @@ export async function checkVerificationToken(
 export async function validateVerificationToken(
 	token: string
 ): Promise<{ memberId: string } | null> {
-	// Atomic: delete the token and return it only if valid and unexpired
 	const deleted = await db
 		.delete(emailVerificationTokens)
 		.where(
@@ -161,7 +165,6 @@ export async function validateVerificationToken(
 
 	const { memberId } = deleted[0];
 
-	// Mark member as verified
 	await db.update(members).set({ emailVerified: true }).where(eq(members.id, memberId));
 
 	return { memberId };
@@ -170,7 +173,6 @@ export async function validateVerificationToken(
 // --- Password Reset Tokens ---
 
 export async function generatePasswordResetToken(memberId: string): Promise<string> {
-	// Delete any existing unused tokens for this member
 	await db
 		.delete(passwordResetTokens)
 		.where(and(eq(passwordResetTokens.memberId, memberId)));
@@ -190,7 +192,6 @@ export async function generatePasswordResetToken(memberId: string): Promise<stri
 export async function validatePasswordResetToken(
 	token: string
 ): Promise<{ memberId: string } | null> {
-	// Atomic: mark token as used only if it's valid, unexpired, and not yet used
 	const result = await db
 		.update(passwordResetTokens)
 		.set({ usedAt: new Date() })

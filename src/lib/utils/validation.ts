@@ -12,17 +12,13 @@ export const eventSchema = z.object({
 	time: z.string().optional(),
 	location: z.string().optional(),
 	locationUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-	clubType: z.enum(['astronomy', 'physics']),
+	eventCategory: z.enum(['community', 'board_meeting', 'village', 'social', 'maintenance']),
 	isPublished: z.boolean().default(true),
 	maxAttendees: z.number().int().positive().optional()
 });
 
-// Member registration (multi-step)
 export const registrationSchema = z.object({
-	email: z
-		.string()
-		.email('Invalid email address')
-		.refine((e) => e.endsWith('@uic.edu'), 'Must be a @uic.edu email address'),
+	email: z.string().email('Invalid email address'),
 	password: z
 		.string()
 		.min(8, 'Password must be at least 8 characters')
@@ -30,11 +26,10 @@ export const registrationSchema = z.object({
 		.regex(/[0-9]/, 'Password must contain at least one number'),
 	firstName: z.string().min(1, 'First name is required').max(100),
 	lastName: z.string().min(1, 'Last name is required').max(100),
-	year: z.enum(['Freshman', 'Sophomore', 'Junior', 'Senior', 'Graduate']).optional(),
-	major: z.string().max(200).optional(),
-	astronomyMember: z.boolean().default(false),
-	physicsMember: z.boolean().default(false),
-	eventPreferences: z.array(z.string()).optional()
+	phone: z.string().max(20).optional(),
+	address: z.string().max(300).optional(),
+	lotNumber: z.number().int().positive().max(197).optional(),
+	section: z.enum(['woods', 'reserves']).optional()
 });
 
 export const memberLoginSchema = z.object({
@@ -46,11 +41,11 @@ export const profileUpdateSchema = z.object({
 	firstName: z.string().min(1, 'First name is required').max(100),
 	lastName: z.string().min(1, 'Last name is required').max(100),
 	secondaryEmail: z.string().email('Invalid email address').max(254).optional().or(z.literal('')),
-	year: z.enum(['Freshman', 'Sophomore', 'Junior', 'Senior', 'Graduate']).optional(),
-	major: z.string().max(200).optional(),
-	astronomyMember: z.boolean().default(false),
-	physicsMember: z.boolean().default(false),
-	eventPreferences: z.array(z.string()).optional(),
+	phone: z.string().max(20).optional(),
+	address: z.string().max(300).optional(),
+	lotNumber: z.number().int().positive().max(197).optional(),
+	section: z.enum(['woods', 'reserves']).optional(),
+	directoryOptIn: z.boolean().default(false),
 	emailOptOut: z.boolean().default(false)
 });
 
@@ -62,7 +57,7 @@ export const rsvpSchema = z.object({
 export const announcementSchema = z.object({
 	title: z.string().min(1, 'Title is required').max(200),
 	body: z.string().min(1, 'Body is required'),
-	clubType: z.enum(['astronomy', 'physics']).optional(),
+	category: z.string().optional(),
 	isPinned: z.boolean().default(false),
 	publishAt: z.string().optional(),
 	expiresAt: z.string().optional()
@@ -83,15 +78,8 @@ export const passwordResetSchema = z.object({
 
 export const galleryImageSchema = z.object({
 	caption: z.string().optional(),
-	clubType: z.enum(['astronomy', 'physics']),
 	photographer: z.string().optional(),
-	raCoord: z.string().max(50).optional(),
-	decCoord: z.string().max(50).optional(),
-	exposureTime: z.string().max(50).optional(),
-	equipment: z.string().max(100).optional(),
-	iso: z.string().max(20).optional(),
-	aperture: z.string().max(20).optional(),
-	observationDate: z.string().max(50).optional()
+	eventId: z.string().uuid().optional().or(z.literal(''))
 });
 
 export const officerSchema = z.object({
@@ -99,9 +87,8 @@ export const officerSchema = z.object({
 	position: z.string().min(1, 'Position is required'),
 	email: z.string().email().optional().or(z.literal('')),
 	bio: z.string().optional(),
-	clubType: z.enum(['astronomy', 'physics']),
+	committeeType: z.enum(['board', 'architectural', 'social']).default('board'),
 	sortOrder: z.number().int().default(0),
-	academicYear: z.string().optional(),
 	memberId: z.string().uuid().optional().or(z.literal(''))
 });
 
@@ -117,9 +104,34 @@ export const checkinQuestionsArraySchema = z.array(checkinQuestionSchema).max(10
 
 export const contentSchema = z.object({
 	slug: z.string().min(1),
-	clubType: z.enum(['astronomy', 'physics']),
 	section: z.string().min(1),
 	title: z.string().optional(),
 	body: z.string().optional(),
 	sortOrder: z.number().int().default(0)
+});
+
+export const architecturalRequestSchema = z.object({
+	title: z.string().min(1, 'Title is required').max(200),
+	description: z.string().min(1, 'Description is required'),
+	requestType: z.enum([
+		'modification',
+		'new_construction',
+		'fence',
+		'landscaping',
+		'paint',
+		'other'
+	])
+});
+
+export const violationReportSchema = z.object({
+	description: z.string().min(1, 'Description is required'),
+	violationType: z.enum(['signage', 'architectural', 'maintenance', 'noise', 'other']),
+	lotNumber: z.number().int().positive().optional()
+});
+
+export const documentSchema = z.object({
+	title: z.string().min(1, 'Title is required').max(200),
+	description: z.string().optional(),
+	category: z.enum(['bylaws', 'minutes', 'newsletter', 'financial', 'covenant', 'other']),
+	fileUrl: z.string().url().optional().or(z.literal(''))
 });

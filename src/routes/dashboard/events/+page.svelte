@@ -1,29 +1,42 @@
 <script lang="ts">
+	import { EVENT_CATEGORY_LABELS } from '$lib/utils/constants';
+	import type { EventCategory } from '$lib/utils/constants';
+
 	let { data } = $props();
 </script>
 
 <svelte:head>
-	<title>My Events - UICSpacetime</title>
+	<title>My Events - Maynegaite POA</title>
 </svelte:head>
 
-<div class="events-page">
-	<h1 class="page-title">My Events</h1>
+<div class="max-w-4xl mx-auto space-y-6">
+	<h1 class="font-display text-3xl text-mg-charcoal">My Events</h1>
 
-	<section class="section">
-		<h2 class="section-title">Upcoming RSVPs</h2>
+	<section class="card-elevated">
+		<h2 class="font-display text-2xl text-mg-charcoal mb-3">Upcoming RSVPs</h2>
 		{#if data.upcoming.length === 0}
-			<p class="empty">No upcoming RSVPs. Browse events to RSVP!</p>
+			<p class="text-mg-warmGray">No upcoming RSVPs. Browse the <a href="/events" class="text-mg-forest hover:underline">community calendar</a> to join events.</p>
 		{:else}
-			<div class="event-list">
+			<div class="space-y-3">
 				{#each data.upcoming as rsvp}
-					<a href="/{rsvp.clubType}/events/{rsvp.eventId}" class="event-row">
-						<div class="event-info">
-							<span class="event-title">{rsvp.title}</span>
-							<span class="event-meta">{rsvp.date}{rsvp.time ? ` at ${rsvp.time}` : ''} &middot; {rsvp.location || 'TBD'}</span>
-						</div>
-						<div class="event-badges">
-							<span class="club-badge" class:astro={rsvp.clubType === 'astronomy'} class:phys={rsvp.clubType === 'physics'}>{rsvp.clubType}</span>
-							<span class="rsvp-badge" class:going={rsvp.rsvpStatus === 'going'} class:maybe={rsvp.rsvpStatus === 'maybe'}>{rsvp.rsvpStatus?.replace('_', ' ')}</span>
+					<a href="/events/{rsvp.eventId}" class="block border border-mg-stone rounded-lg p-4 bg-white no-underline hover:border-mg-forest/40 transition-colors">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div>
+								<p class="font-semibold text-mg-charcoal">{rsvp.title}</p>
+								<p class="text-sm text-mg-warmGray mt-1">{rsvp.date}{rsvp.time ? ` at ${rsvp.time}` : ''} {rsvp.location ? `· ${rsvp.location}` : ''}</p>
+							</div>
+							<div class="flex items-center gap-2 flex-wrap justify-end">
+								<span class="badge badge-green">{EVENT_CATEGORY_LABELS[rsvp.eventCategory as EventCategory]}</span>
+								<span
+									class="text-xs font-medium px-2 py-1 rounded-full capitalize"
+									class:bg-green-100={rsvp.rsvpStatus === 'going'}
+									class:text-green-700={rsvp.rsvpStatus === 'going'}
+									class:bg-yellow-100={rsvp.rsvpStatus === 'maybe'}
+									class:text-yellow-700={rsvp.rsvpStatus === 'maybe'}
+									class:bg-red-100={rsvp.rsvpStatus === 'not_going'}
+									class:text-red-700={rsvp.rsvpStatus === 'not_going'}
+								>{rsvp.rsvpStatus.replace('_', ' ')}</span>
+							</div>
 						</div>
 					</a>
 				{/each}
@@ -31,121 +44,24 @@
 		{/if}
 	</section>
 
-	<section class="section">
-		<h2 class="section-title">Events Attended ({data.attended.length})</h2>
+	<section class="card-elevated">
+		<h2 class="font-display text-2xl text-mg-charcoal mb-3">Events Attended ({data.attended.length})</h2>
 		{#if data.attended.length === 0}
-			<p class="empty">No events attended yet. Check in at events using the QR code!</p>
+			<p class="text-mg-warmGray">No events attended yet. Use event check-in QR codes when you attend.</p>
 		{:else}
-			<div class="event-list">
+			<div class="space-y-3">
 				{#each data.attended as event}
-					<div class="event-row">
-						<div class="event-info">
-							<span class="event-title">{event.title}</span>
-							<span class="event-meta">{event.date}</span>
+					<a href="/events/{event.eventId}" class="block border border-mg-stone rounded-lg p-4 bg-white no-underline hover:border-mg-forest/40 transition-colors">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div>
+								<p class="font-semibold text-mg-charcoal">{event.title}</p>
+								<p class="text-sm text-mg-warmGray mt-1">{event.date}</p>
+							</div>
+							<span class="badge badge-gray">{EVENT_CATEGORY_LABELS[event.eventCategory as EventCategory]}</span>
 						</div>
-						<span class="club-badge" class:astro={event.clubType === 'astronomy'} class:phys={event.clubType === 'physics'}>{event.clubType}</span>
-					</div>
+					</a>
 				{/each}
 			</div>
 		{/if}
 	</section>
 </div>
-
-<style>
-	.events-page {
-		max-width: 800px;
-	}
-
-	.page-title {
-		font-family: 'Space Grotesk', sans-serif;
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #fff;
-		margin-bottom: 1.5rem;
-	}
-
-	.section {
-		margin-bottom: 2rem;
-	}
-
-	.section-title {
-		font-family: 'Space Grotesk', sans-serif;
-		font-size: 1rem;
-		font-weight: 600;
-		color: #e5e7eb;
-		margin-bottom: 0.75rem;
-	}
-
-	.empty {
-		font-size: 0.85rem;
-		color: #6b7280;
-	}
-
-	.event-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.event-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		background: #191923;
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 0.5rem;
-		padding: 0.75rem 1rem;
-		text-decoration: none;
-		transition: background 0.15s;
-	}
-
-	a.event-row:hover {
-		background: rgba(79, 70, 229, 0.08);
-	}
-
-	.event-info {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15rem;
-	}
-
-	.event-title {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #e5e7eb;
-	}
-
-	.event-meta {
-		font-size: 0.75rem;
-		color: #6b7280;
-	}
-
-	.event-badges {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.club-badge {
-		font-size: 0.6rem;
-		font-weight: 600;
-		padding: 0.15rem 0.4rem;
-		border-radius: 9999px;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.club-badge.astro { background: rgba(79, 70, 229, 0.2); color: #a5b4fc; }
-	.club-badge.phys { background: rgba(14, 121, 178, 0.2); color: #7dd3fc; }
-
-	.rsvp-badge {
-		font-size: 0.65rem;
-		font-weight: 500;
-		padding: 0.15rem 0.45rem;
-		border-radius: 9999px;
-		text-transform: capitalize;
-	}
-
-	.rsvp-badge.going { background: rgba(34, 197, 94, 0.15); color: #86efac; }
-	.rsvp-badge.maybe { background: rgba(234, 179, 8, 0.15); color: #fde047; }
-</style>

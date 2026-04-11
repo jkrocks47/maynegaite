@@ -6,12 +6,12 @@
 </script>
 
 <svelte:head>
-	<title>Check In - {data.event.title} | UICSpacetime</title>
+	<title>Check In - {data.event.title} | Maynegaite POA</title>
 </svelte:head>
 
 <div class="checkin-container">
 	<div class="checkin-card">
-		<h1 class="checkin-title">UICSpacetime</h1>
+		<h1 class="checkin-title">Maynegaite POA</h1>
 		<p class="checkin-subtitle">Event Check-In</p>
 
 		{#if data.success || form?.success}
@@ -19,9 +19,6 @@
 			<h2>Checked In!</h2>
 			<p class="event-name">{data.event.title}</p>
 			<p class="event-date">{data.event.date}</p>
-			{#if data.joinedClub || form?.joinedClub}
-				<p class="joined-club">You've joined the {data.event.clubType === 'astronomy' ? 'Astronomy' : 'Physics'} Club!</p>
-			{/if}
 			<p class="message">You've been successfully checked in. Enjoy the event!</p>
 		{:else if data.alreadyCheckedIn}
 			<div class="icon info-icon">&#8505;</div>

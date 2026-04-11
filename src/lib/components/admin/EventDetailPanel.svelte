@@ -24,7 +24,6 @@
 		rsvpList: RsvpMemberDetail[];
 		stats: EventStats;
 		historicalRate: number | null;
-		clubType: 'astronomy' | 'physics';
 		backHref: string;
 		announcementRecipientCount: number;
 		announcementAlreadySent: boolean;
@@ -32,7 +31,7 @@
 		checkinResponses?: CheckinResponseRow[];
 	}
 
-	let { event, rsvpList, stats, historicalRate, clubType, backHref, announcementRecipientCount, announcementAlreadySent, checkinQuestions = [], checkinResponses = [] }: Props = $props();
+	let { event, rsvpList, stats, historicalRate, backHref, announcementRecipientCount, announcementAlreadySent, checkinQuestions = [], checkinResponses = [] }: Props = $props();
 
 	let showResponses = $state(false);
 
@@ -115,7 +114,7 @@
 		URL.revokeObjectURL(url);
 	}
 
-	const clubLabel = clubType === 'astronomy' ? 'Astronomy' : 'Physics';
+	const communityLabel = 'Maynegaite POA';
 </script>
 
 <div class="detail-page">
@@ -156,7 +155,7 @@
 
 	{#if historicalRate !== null}
 		<div class="historical-rate">
-			Historical turnout rate for {clubLabel} events: <strong>{historicalRate}%</strong>
+			Historical turnout rate for {communityLabel} events: <strong>{historicalRate}%</strong>
 		</div>
 	{/if}
 
@@ -179,7 +178,7 @@
 
 		<p class="announcement-info">
 			{#if announcementRecipientCount > 0}
-				Send announcement to <strong>{announcementRecipientCount}</strong> verified {clubLabel} member{announcementRecipientCount !== 1 ? 's' : ''}.
+				Send announcement to <strong>{announcementRecipientCount}</strong> verified {communityLabel} member{announcementRecipientCount !== 1 ? 's' : ''}.
 			{:else}
 				All eligible members have already been notified.
 			{/if}

@@ -4,7 +4,6 @@ import { db } from '$lib/server/db';
 import { members } from '$lib/server/db/schema';
 import { profileUpdateSchema } from '$lib/utils/validation';
 import { processAndStoreImage, deleteImage } from '$lib/server/images';
-import { getInterestOptions } from '$lib/server/db/queries';
 import type { Actions, PageServerLoad } from './$types';
 
 export const config = { body: { maxSize: '25mb' } };
@@ -18,11 +17,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 			lastName: members.lastName,
 			email: members.email,
 			secondaryEmail: members.secondaryEmail,
-			year: members.year,
-			major: members.major,
-			astronomyMember: members.astronomyMember,
-			physicsMember: members.physicsMember,
-			eventPreferences: members.eventPreferences,
+			phone: members.phone,
+			address: members.address,
+			lotNumber: members.lotNumber,
+			section: members.section,
+			directoryOptIn: members.directoryOptIn,
 			emailOptOut: members.emailOptOut,
 			profileImageUrl: members.profileImageUrl,
 			role: members.role
@@ -35,8 +34,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		error(404, 'Profile not found');
 	}
 
-	const interestOpts = await getInterestOptions();
-	return { profile: result[0], interestOptions: interestOpts };
+	return { profile: result[0] };
 };
 
 export const actions: Actions = {
@@ -44,25 +42,23 @@ export const actions: Actions = {
 		const member = locals.member!;
 		const formData = await request.formData();
 
+		const lotNumberRaw = formData.get('lotNumber') as string;
+
 		const data = {
 			firstName: (formData.get('firstName') as string)?.trim(),
 			lastName: (formData.get('lastName') as string)?.trim(),
 			secondaryEmail: (formData.get('secondaryEmail') as string)?.trim() || undefined,
-			year: (formData.get('year') as string) || undefined,
-			major: (formData.get('major') as string)?.trim() || undefined,
-			astronomyMember: formData.get('astronomyMember') === 'on',
-			physicsMember: formData.get('physicsMember') === 'on',
-			eventPreferences: formData.getAll('eventPreferences') as string[],
+			phone: (formData.get('phone') as string)?.trim() || undefined,
+			address: (formData.get('address') as string)?.trim() || undefined,
+			lotNumber: lotNumberRaw ? parseInt(lotNumberRaw) : undefined,
+			section: (formData.get('section') as string) || undefined,
+			directoryOptIn: formData.get('directoryOptIn') === 'on',
 			emailOptOut: formData.get('emailOptOut') === 'on'
 		};
 
 		const parsed = profileUpdateSchema.safeParse(data);
 		if (!parsed.success) {
 			return fail(400, { error: parsed.error.issues[0]?.message || 'Invalid input' });
-		}
-
-		if (!parsed.data.astronomyMember && !parsed.data.physicsMember) {
-			return fail(400, { error: 'Please select at least one club.' });
 		}
 
 		await db
@@ -72,13 +68,12 @@ export const actions: Actions = {
 				lastName: parsed.data.lastName,
 				displayName: `${parsed.data.firstName} ${parsed.data.lastName}`,
 				secondaryEmail: parsed.data.secondaryEmail || null,
-				year: parsed.data.year || null,
-				major: parsed.data.major || null,
-				astronomyMember: parsed.data.astronomyMember,
-				physicsMember: parsed.data.physicsMember,
-				eventPreferences: parsed.data.eventPreferences || [],
+				phone: parsed.data.phone || null,
+				address: parsed.data.address || null,
+				lotNumber: parsed.data.lotNumber || null,
+				section: (parsed.data.section as 'woods' | 'reserves') || null,
+				directoryOptIn: parsed.data.directoryOptIn ?? false,
 				emailOptOut: parsed.data.emailOptOut ?? false,
-				preferencesReviewedAt: new Date(),
 				updatedAt: new Date()
 			})
 			.where(eq(members.id, member.id));
@@ -96,7 +91,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			// Delete old profile image if one exists
 			const current = await db
 				.select({ profileImageUrl: members.profileImageUrl })
 				.from(members)

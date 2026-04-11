@@ -10,7 +10,6 @@ import {
 } from '$lib/server/auth';
 import { sendVerificationEmail } from '$lib/server/email';
 import { registrationSchema } from '$lib/utils/validation';
-import { getInterestOptions } from '$lib/server/db/queries';
 import { checkHoneypot, checkRateLimit, checkSubmissionTiming, generateChallenge, checkProofOfWork } from '$lib/server/security';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -26,9 +25,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	if (locals.member) {
 		throw redirect(303, safeRedirect(redirectTo));
 	}
-	const interestOpts = await getInterestOptions();
 	const pow = generateChallenge();
-	return { redirectTo, interestOptions: interestOpts, challenge: pow.challenge, difficulty: pow.difficulty };
+	return { redirectTo, challenge: pow.challenge, difficulty: pow.difficulty };
 };
 
 export const actions: Actions = {
@@ -50,16 +48,17 @@ export const actions: Actions = {
 
 		const redirectTo = formData.get('redirectTo') as string | null;
 
+		const lotNumberRaw = formData.get('lotNumber') as string;
+
 		const data = {
 			email: (formData.get('email') as string)?.toLowerCase().trim(),
 			password: formData.get('password') as string,
 			firstName: (formData.get('firstName') as string)?.trim(),
 			lastName: (formData.get('lastName') as string)?.trim(),
-			year: (formData.get('year') as string) || undefined,
-			major: (formData.get('major') as string)?.trim() || undefined,
-			astronomyMember: formData.get('astronomyMember') === 'on',
-			physicsMember: formData.get('physicsMember') === 'on',
-			eventPreferences: formData.getAll('eventPreferences') as string[]
+			phone: (formData.get('phone') as string)?.trim() || undefined,
+			address: (formData.get('address') as string)?.trim() || undefined,
+			lotNumber: lotNumberRaw ? parseInt(lotNumberRaw) : undefined,
+			section: (formData.get('section') as string) || undefined
 		};
 
 		const parsed = registrationSchema.safeParse(data);
@@ -68,11 +67,6 @@ export const actions: Actions = {
 			return fail(400, { error: firstError, email: data.email, firstName: data.firstName, lastName: data.lastName });
 		}
 
-		if (!parsed.data.astronomyMember && !parsed.data.physicsMember) {
-			return fail(400, { error: 'Please select at least one club to join.', email: data.email, firstName: data.firstName, lastName: data.lastName });
-		}
-
-		// Check if email already exists
 		const existing = await db
 			.select({ id: members.id })
 			.from(members)
@@ -96,11 +90,10 @@ export const actions: Actions = {
 					firstName: parsed.data.firstName,
 					lastName: parsed.data.lastName,
 					displayName,
-					year: parsed.data.year || null,
-					major: parsed.data.major || null,
-					astronomyMember: parsed.data.astronomyMember,
-					physicsMember: parsed.data.physicsMember,
-					eventPreferences: parsed.data.eventPreferences || [],
+					phone: parsed.data.phone || null,
+					address: parsed.data.address || null,
+					lotNumber: parsed.data.lotNumber || null,
+					section: (parsed.data.section as 'woods' | 'reserves') || null,
 					unsubscribeToken: randomBytes(32).toString('hex')
 				})
 				.returning({ id: members.id });
@@ -114,15 +107,13 @@ export const actions: Actions = {
 			return fail(500, { error: 'Registration failed. Please try again.', email: data.email, firstName: data.firstName, lastName: data.lastName });
 		}
 
-		// Generate verification token and send email
 		const token = await generateVerificationToken(member.id);
 		try {
 			await sendVerificationEmail(parsed.data.email, token, parsed.data.firstName);
 		} catch {
-			// Don't fail registration if email fails — they can request a new one
+			// Don't fail registration if email fails
 		}
 
-		// Create session
 		const sessionToken = await createMemberSession(member.id);
 		cookies.set('member_session', sessionToken, {
 			path: '/',

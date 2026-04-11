@@ -1,158 +1,52 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import BotProtection from '$lib/components/shared/BotProtection.svelte';
+	import SEO from '$lib/components/shared/SEO.svelte';
 
 	let { form, data } = $props();
 </script>
 
-<svelte:head>
-	<title>Sign In - UICSpacetime</title>
-</svelte:head>
+<SEO title="Sign In" />
 
-<div class="login-container">
-	<div class="login-card">
-		<div class="login-header">
-			<h1 class="login-title">UICSpacetime</h1>
-			<p class="login-subtitle">Member Sign In</p>
-		</div>
+<div class="min-h-[70vh] flex items-center justify-center py-16 px-4">
+	<div class="w-full max-w-md">
+		<div class="card-elevated">
+			<div class="text-center mb-8">
+				<h1 class="font-display text-3xl font-bold text-mg-forest">Maynegaite POA</h1>
+				<p class="text-sm text-mg-warmGray mt-1">Sign in to your account</p>
+			</div>
 
-		{#if form?.error}
-			<div class="error-message">{form.error}</div>
-		{/if}
-
-		<form method="POST" action="?/login" use:enhance>
-			<BotProtection />
-			{#if data.redirectTo}
-				<input type="hidden" name="redirectTo" value={data.redirectTo} />
+			{#if form?.error}
+				<div class="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">{form.error}</div>
 			{/if}
-			<div class="form-group">
-				<label for="email">Email</label>
-				<input type="email" id="email" name="email" required autocomplete="email" placeholder="netid@uic.edu" value={form?.email ?? ''} />
+
+			<form method="POST" action="?/login" use:enhance>
+				{#if data.redirectTo}
+					<input type="hidden" name="redirectTo" value={data.redirectTo} />
+				{/if}
+
+				<div class="space-y-4">
+					<div>
+						<label for="email" class="block text-sm font-medium text-mg-charcoal mb-1">Email</label>
+						<input id="email" name="email" type="email" required autocomplete="email" class="input" placeholder="your@email.com" value={(form as any)?.email ?? ''} />
+					</div>
+					<div>
+						<label for="password" class="block text-sm font-medium text-mg-charcoal mb-1">Password</label>
+						<input id="password" name="password" type="password" required autocomplete="current-password" class="input" />
+					</div>
+
+					<BotProtection />
+
+					<button type="submit" class="btn-primary w-full">Sign In</button>
+				</div>
+			</form>
+
+			<div class="mt-6 text-center space-y-2">
+				<a href="/forgot-password" class="text-sm text-mg-forest hover:underline block">Forgot your password?</a>
+				<p class="text-sm text-mg-warmGray">
+					Don't have an account? <a href="/register" class="text-mg-forest hover:underline">Register</a>
+				</p>
 			</div>
-
-			<div class="form-group">
-				<label for="password">Password</label>
-				<input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter password" />
-			</div>
-
-			<button type="submit" class="submit-btn">Sign In</button>
-		</form>
-
-		<div class="links">
-			<a href="/forgot-password">Forgot password?</a>
-			<a href="/register{data.redirectTo ? `?redirectTo=${encodeURIComponent(data.redirectTo)}` : ''}">Create an account</a>
 		</div>
 	</div>
 </div>
-
-<style>
-	.login-container {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 100vh;
-		background: #0a0a0f;
-		padding: 2rem 1rem;
-	}
-
-	.login-card {
-		background: #191923;
-		border-radius: 0.75rem;
-		padding: 2.5rem;
-		width: 100%;
-		max-width: 400px;
-		border: 1px solid rgba(79, 70, 229, 0.2);
-	}
-
-	.login-header {
-		text-align: center;
-		margin-bottom: 2rem;
-	}
-
-	.login-title {
-		font-family: 'Space Grotesk', sans-serif;
-		font-size: 1.75rem;
-		font-weight: 700;
-		color: #fff;
-	}
-
-	.login-subtitle {
-		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.4);
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		margin-top: 0.25rem;
-	}
-
-	.error-message {
-		background: rgba(220, 38, 38, 0.1);
-		border: 1px solid rgba(220, 38, 38, 0.3);
-		color: #fca5a5;
-		padding: 0.75rem 1rem;
-		border-radius: 0.5rem;
-		font-size: 0.85rem;
-		margin-bottom: 1rem;
-	}
-
-	.form-group {
-		margin-bottom: 1.25rem;
-	}
-
-	.form-group label {
-		display: block;
-		font-size: 0.8rem;
-		font-weight: 500;
-		color: #d1d5db;
-		margin-bottom: 0.35rem;
-	}
-
-	.form-group input {
-		width: 100%;
-		padding: 0.6rem 0.75rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		color: #e5e7eb;
-		transition: border-color 0.15s;
-	}
-
-	.form-group input:focus {
-		outline: none;
-		border-color: #4f46e5;
-		box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-	}
-
-	.submit-btn {
-		width: 100%;
-		padding: 0.65rem;
-		background: #4f46e5;
-		color: #fff;
-		border: none;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: background 0.15s;
-	}
-
-	.submit-btn:hover {
-		background: #4338ca;
-	}
-
-	.links {
-		display: flex;
-		justify-content: space-between;
-		margin-top: 1.25rem;
-	}
-
-	.links a {
-		font-size: 0.8rem;
-		color: #818cf8;
-		text-decoration: none;
-	}
-
-	.links a:hover {
-		text-decoration: underline;
-	}
-</style>

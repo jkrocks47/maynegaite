@@ -1,1 +1,0 @@
-ALTER TABLE "members" ADD COLUMN "preferences_reviewed_at" timestamp;

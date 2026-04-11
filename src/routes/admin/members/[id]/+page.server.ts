@@ -2,7 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { members, eventCheckins, eventRsvps, events } from '$lib/server/db/schema';
-import { ROLES } from '$lib/utils/constants';
+import { ADMIN_ROLES } from '$lib/utils/constants';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -14,13 +14,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const member = result[0];
 
-	// Events attended
 	const attended = await db
 		.select({
 			eventId: events.id,
 			title: events.title,
 			date: events.date,
-			clubType: events.clubType,
+			eventCategory: events.eventCategory,
 			checkedInAt: eventCheckins.checkedInAt
 		})
 		.from(eventCheckins)
@@ -28,13 +27,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		.where(eq(eventCheckins.memberId, member.id))
 		.orderBy(desc(eventCheckins.checkedInAt));
 
-	// RSVPs
 	const rsvps = await db
 		.select({
 			eventId: events.id,
 			title: events.title,
 			date: events.date,
-			clubType: events.clubType,
+			eventCategory: events.eventCategory,
 			status: eventRsvps.status
 		})
 		.from(eventRsvps)
@@ -47,54 +45,39 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
 	updateAdminRole: async ({ request, params, locals }) => {
-		if (locals.member?.adminRole !== 'super_admin') {
-			return fail(403, { error: 'Only super admins can manage admin roles.' });
+		if (!locals.member?.adminRole || locals.member.adminRole !== 'president') {
+			return fail(403, { error: 'Only the president can manage admin roles.' });
 		}
 
 		const formData = await request.formData();
-		const adminRole = formData.get('adminRole') as string;
+		const adminRoleRaw = formData.get('adminRole') as string;
 
-		if (adminRole && !ROLES.includes(adminRole as any)) {
+		if (adminRoleRaw && !ADMIN_ROLES.includes(adminRoleRaw as any)) {
 			return fail(400, { error: 'Invalid admin role.' });
 		}
 
-		// Prevent removing your own super_admin role
-		if (params.id === locals.member.id && adminRole !== 'super_admin') {
-			return fail(400, { error: 'You cannot remove your own super admin role.' });
+		if (params.id === locals.member.id && adminRoleRaw !== 'president') {
+			return fail(400, { error: 'You cannot remove your own president role.' });
 		}
+
+		const adminRole = adminRoleRaw
+			? (adminRoleRaw as (typeof ADMIN_ROLES)[number])
+			: null;
 
 		await db
 			.update(members)
-			.set({ adminRole: adminRole || null, updatedAt: new Date() })
+			.set({ adminRole, updatedAt: new Date() })
 			.where(eq(members.id, params.id));
 
 		return { success: true };
 	},
 
-	updateRole: async ({ request, params, locals }) => {
-		const adminRole = locals.member?.adminRole;
-		if (!adminRole) {
-			return fail(403, { error: 'Unauthorized.' });
-		}
-
+	updateRole: async ({ request, params }) => {
 		const formData = await request.formData();
 		const role = formData.get('role') as 'member' | 'board';
 
 		if (!['member', 'board'].includes(role)) {
 			return fail(400, { error: 'Invalid role.' });
-		}
-
-		// Club-scoped admins can only update members in their club
-		if (adminRole !== 'super_admin') {
-			const target = await db.select({ astronomyMember: members.astronomyMember, physicsMember: members.physicsMember }).from(members).where(eq(members.id, params.id)).limit(1);
-			if (target.length === 0) return fail(404, { error: 'Member not found.' });
-			const m = target[0];
-			if (adminRole === 'astronomy_admin' && !m.astronomyMember) {
-				return fail(403, { error: 'You can only manage members in your club.' });
-			}
-			if (adminRole === 'physics_admin' && !m.physicsMember) {
-				return fail(403, { error: 'You can only manage members in your club.' });
-			}
 		}
 
 		await db
@@ -106,8 +89,8 @@ export const actions: Actions = {
 	},
 
 	deleteMember: async ({ params, locals }) => {
-		if (locals.member?.adminRole !== 'super_admin') {
-			return fail(403, { error: 'Only super admins can delete members.' });
+		if (!locals.member?.adminRole || locals.member.adminRole !== 'president') {
+			return fail(403, { error: 'Only the president can delete members.' });
 		}
 
 		if (params.id === locals.member.id) {

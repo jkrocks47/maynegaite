@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 
 	let { children } = $props();
 
@@ -10,9 +10,9 @@
 	let member = $derived($page.data.member);
 
 	const navLinks = [
-		{ href: '/dashboard', label: 'Overview', icon: '&#9632;' },
-		{ href: '/dashboard/events', label: 'My Events', icon: '&#9733;' },
-		{ href: '/dashboard/profile', label: 'Profile', icon: '&#9881;' }
+		{ href: '/dashboard', label: 'Overview' },
+		{ href: '/dashboard/events', label: 'My Events' },
+		{ href: '/dashboard/profile', label: 'Profile' }
 	];
 
 	$effect(() => {
@@ -25,13 +25,14 @@
 			isMobile = e.matches;
 			if (e.matches) sidebarOpen = false;
 		};
+
 		mql.addEventListener('change', handler);
 		return () => mql.removeEventListener('change', handler);
 	});
 
 	$effect(() => {
 		if (!browser) return;
-		document.body.style.overflow = (isMobile && sidebarOpen) ? 'hidden' : '';
+		document.body.style.overflow = isMobile && sidebarOpen ? 'hidden' : '';
 	});
 
 	function handleNavClick() {
@@ -39,262 +40,78 @@
 	}
 </script>
 
-<svelte:window onkeydown={(e) => {
-	if (e.key === 'Escape' && isMobile && sidebarOpen) sidebarOpen = false;
-}} />
+<svelte:window
+	onkeydown={(e) => {
+		if (e.key === 'Escape' && isMobile && sidebarOpen) {
+			sidebarOpen = false;
+		}
+	}}
+/>
 
-<div class="dashboard-layout">
+<div class="min-h-screen bg-mg-ivory md:flex">
 	{#if isMobile && sidebarOpen}
-		<div
-			class="sidebar-backdrop"
-			onclick={() => sidebarOpen = false}
-			role="button"
-			tabindex="-1"
+		<button
+			type="button"
+			class="fixed inset-0 z-40 bg-black/30"
+			onclick={() => (sidebarOpen = false)}
 			aria-label="Close sidebar"
-		></div>
+		></button>
 	{/if}
 
-	<aside class="sidebar" class:collapsed={!sidebarOpen}>
-		<div class="sidebar-header">
-			<a href="/" class="sidebar-logo">
-				<span class="logo-text">UICSpacetime</span>
-				<span class="logo-sub">Member</span>
+	<aside
+		class="fixed md:static z-50 top-0 left-0 h-screen md:h-auto w-64 bg-mg-forest text-white border-r border-mg-forestDark/30 transform transition-transform duration-200 md:translate-x-0"
+		class:-translate-x-full={!sidebarOpen}
+	>
+		<div class="p-5 border-b border-white/10">
+			<a href="/" class="block no-underline" onclick={handleNavClick}>
+				<p class="font-display text-2xl font-bold text-white">Maynegaite</p>
+				<p class="text-xs tracking-[0.18em] uppercase text-white/60 mt-1">Owner Portal</p>
 			</a>
 		</div>
 
-		<nav class="sidebar-nav">
-			{#each navLinks as link}
-				<a href={link.href} class="nav-item" class:active={currentPath === link.href} onclick={handleNavClick}>
-					<span class="nav-icon">{@html link.icon}</span>
-					{link.label}
-				</a>
+			<nav class="py-3">
+				{#each navLinks as link}
+					<a
+						href={link.href}
+						class={`block px-5 py-3 text-sm no-underline transition-colors ${
+							currentPath === link.href
+								? 'text-mg-gold bg-white/5'
+								: 'text-white/75 hover:text-white'
+						}`}
+						onclick={handleNavClick}
+					>
+						{link.label}
+					</a>
 			{/each}
 		</nav>
 	</aside>
 
-	<div class="main-area">
-		<header class="top-bar">
-			<button class="toggle-btn" onclick={() => sidebarOpen = !sidebarOpen}>&#9776;</button>
-			<div class="top-bar-right">
-				<span class="user-name">{member.displayName}</span>
-				<div class="member-clubs">
-					{#if member.astronomyMember}<span class="club-badge astro">Astro</span>{/if}
-					{#if member.physicsMember}<span class="club-badge phys">Physics</span>{/if}
+	<div class="flex-1 min-w-0 md:ml-0">
+		<header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-mg-stone px-4 md:px-6 py-3 flex items-center justify-between">
+			<button
+				type="button"
+				class="md:hidden border border-mg-stone rounded px-3 py-1 text-mg-charcoal"
+				onclick={() => (sidebarOpen = !sidebarOpen)}
+				aria-label="Toggle navigation"
+			>
+				&#9776;
+			</button>
+			<div class="hidden md:block text-sm text-mg-warmGray">Maynegaite Homeowner Dashboard</div>
+			<div class="flex items-center gap-3">
+				<div class="text-right">
+					<p class="text-sm font-medium text-mg-charcoal">{member.displayName}</p>
+					{#if member.section}
+						<p class="text-xs text-mg-warmGray capitalize">{member.section}</p>
+					{/if}
 				</div>
 				<form method="POST" action="/api/member/logout">
-					<button type="submit" class="logout-btn">Logout</button>
+					<button type="submit" class="btn-secondary text-xs">Logout</button>
 				</form>
 			</div>
 		</header>
 
-		<main class="content">
+		<main class="p-4 md:p-6">
 			{@render children()}
 		</main>
 	</div>
 </div>
-
-<style>
-	.dashboard-layout {
-		display: flex;
-		min-height: 100vh;
-		background: #0a0a0f;
-	}
-
-	.sidebar-backdrop {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.5);
-		z-index: 40;
-	}
-
-	.sidebar {
-		width: 240px;
-		background: #191923;
-		display: flex;
-		flex-direction: column;
-		flex-shrink: 0;
-		transition: width 0.3s ease;
-		overflow: hidden;
-		border-right: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.sidebar.collapsed {
-		width: 0;
-	}
-
-	.sidebar-header {
-		padding: 1.25rem 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.sidebar-logo {
-		text-decoration: none;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.logo-text {
-		font-family: 'Space Grotesk', sans-serif;
-		font-size: 1.2rem;
-		font-weight: 700;
-		color: #fff;
-	}
-
-	.logo-sub {
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.35);
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-	}
-
-	.sidebar-nav {
-		flex: 1;
-		padding: 0.75rem 0;
-	}
-
-	.nav-item {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		padding: 0.65rem 1.25rem;
-		color: rgba(255, 255, 255, 0.6);
-		text-decoration: none;
-		font-size: 0.875rem;
-		transition: background 0.15s, color 0.15s;
-	}
-
-	.nav-item:hover {
-		background: rgba(255, 255, 255, 0.04);
-		color: #fff;
-	}
-
-	.nav-item.active {
-		background: rgba(79, 70, 229, 0.2);
-		color: #c4b5fd;
-		border-right: 2px solid #4f46e5;
-	}
-
-	.nav-icon {
-		font-size: 0.6rem;
-	}
-
-	.main-area {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		min-width: 0;
-	}
-
-	.top-bar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0.75rem 1.5rem;
-		background: #191923;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.toggle-btn {
-		background: none;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 0.375rem;
-		padding: 0.4rem 0.6rem;
-		cursor: pointer;
-		font-size: 1rem;
-		color: #d1d5db;
-	}
-
-	.top-bar-right {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.user-name {
-		font-size: 0.85rem;
-		font-weight: 500;
-		color: #e5e7eb;
-	}
-
-	.member-clubs {
-		display: flex;
-		gap: 0.35rem;
-	}
-
-	.club-badge {
-		font-size: 0.65rem;
-		font-weight: 600;
-		padding: 0.15rem 0.45rem;
-		border-radius: 9999px;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.club-badge.astro {
-		background: rgba(79, 70, 229, 0.2);
-		color: #a5b4fc;
-	}
-
-	.club-badge.phys {
-		background: rgba(14, 121, 178, 0.2);
-		color: #7dd3fc;
-	}
-
-	.logout-btn {
-		background: none;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 0.375rem;
-		padding: 0.3rem 0.65rem;
-		font-size: 0.75rem;
-		color: #9ca3af;
-		cursor: pointer;
-		transition: all 0.15s;
-	}
-
-	.logout-btn:hover {
-		background: rgba(220, 38, 38, 0.15);
-		border-color: rgba(220, 38, 38, 0.4);
-		color: #fca5a5;
-	}
-
-	.content {
-		flex: 1;
-		padding: 1.5rem;
-		overflow-y: auto;
-	}
-
-	@media (max-width: 768px) {
-		.sidebar {
-			position: fixed;
-			top: 0;
-			left: 0;
-			z-index: 50;
-			height: 100vh;
-			width: 240px;
-			transition: transform 0.3s ease;
-		}
-
-		.sidebar.collapsed {
-			width: 240px;
-			transform: translateX(-100%);
-		}
-	}
-
-	@media (max-width: 480px) {
-		.user-name {
-			display: none;
-		}
-
-		.top-bar-right {
-			gap: 0.4rem;
-		}
-
-		.top-bar {
-			padding: 0.75rem 0.75rem;
-		}
-
-		.content {
-			padding: 1rem;
-		}
-	}
-</style>

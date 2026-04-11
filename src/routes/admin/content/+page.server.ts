@@ -1,29 +1,25 @@
-import { fail, redirect } from '@sveltejs/kit';
-import { getContentWithDefaults, upsertContent, getRootEntries } from '$lib/server/content';
+import { fail } from '@sveltejs/kit';
+import { getContentWithDefaults, upsertContent, getAllEntries } from '$lib/server/content';
 import { getPageGroups } from '$lib/utils/content-registry';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	// Only super_admin can edit root homepage content
-	if (locals.member?.adminRole !== 'super_admin') {
-		throw redirect(302, '/admin');
+export const load: PageServerLoad = async () => {
+	const slugs = [...new Set(getAllEntries().map((e) => e.slug))];
+	const contentBySlug: Record<string, Record<string, string>> = {};
+
+	for (const slug of slugs) {
+		contentBySlug[slug] = await getContentWithDefaults(slug);
 	}
 
-	const content = await getContentWithDefaults(null, 'root-home');
-
 	return {
-		contentBySlug: { 'root-home': content },
-		entries: getRootEntries(),
-		pageGroups: getPageGroups(false)
+		contentBySlug,
+		entries: getAllEntries(),
+		pageGroups: getPageGroups()
 	};
 };
 
 export const actions: Actions = {
 	update: async ({ request, locals }) => {
-		if (locals.member?.adminRole !== 'super_admin') {
-			return fail(403, { error: 'Unauthorized.' });
-		}
-
 		const formData = await request.formData();
 		const slug = formData.get('slug') as string;
 		const section = formData.get('section') as string;
@@ -33,7 +29,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'Slug and section are required.' });
 		}
 
-		await upsertContent(slug, null, section, { body }, locals.member!.id);
+		await upsertContent(slug, section, { body }, locals.member!.id);
 		return { success: true };
 	}
 };

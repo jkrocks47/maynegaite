@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { ADMIN_ROLES, ADMIN_ROLE_LABELS, SECTION_LABELS } from '$lib/utils/constants';
+	import type { AdminRole } from '$lib/utils/constants';
 
 	let { data, form } = $props();
 	const member = $derived(data.member);
@@ -10,80 +12,80 @@
 	<title>{member.firstName} {member.lastName} - Members - Admin</title>
 </svelte:head>
 
-<div class="member-detail">
-	<a href="/admin/members" class="back-link">&larr; All Members</a>
+<div class="max-w-3xl">
+	<a href="/admin/members" class="text-sm text-mg-forest hover:underline no-underline mb-4 inline-block">&larr; All Members</a>
 
 	{#if form?.success}
-		<div class="success-message">Member updated.</div>
+		<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm mb-4">Member updated.</div>
 	{/if}
-
 	{#if form?.error}
-		<div class="error-message">{form.error}</div>
+		<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{form.error}</div>
 	{/if}
 
 	<!-- Profile card -->
-	<div class="card profile-card">
-		<div class="profile-header">
+	<div class="card-elevated mb-4">
+		<div class="flex justify-between items-start flex-wrap gap-3 mb-4">
 			<div>
-				<h1 class="member-name">{member.firstName} {member.lastName}</h1>
-				<p class="member-email">{member.email}</p>
+				<h1 class="text-xl font-bold text-mg-charcoal">{member.firstName} {member.lastName}</h1>
+				<p class="text-sm text-mg-warmGray">{member.email}</p>
 			</div>
-			<div class="profile-badges">
-				{#if member.astronomyMember}<span class="club-badge astro">Astronomy</span>{/if}
-				{#if member.physicsMember}<span class="club-badge phys">Physics</span>{/if}
-				<span class="verify-badge" class:verified={member.emailVerified} class:unverified={!member.emailVerified}>
+			<div class="flex gap-2 flex-wrap">
+				{#if member.section}
+					<span class="badge badge-green">{SECTION_LABELS[member.section as keyof typeof SECTION_LABELS] ?? member.section}</span>
+				{/if}
+				<span class="text-xs font-medium px-2 py-0.5 rounded-full {member.emailVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
 					{member.emailVerified ? 'Verified' : 'Unverified'}
 				</span>
 			</div>
 		</div>
 
-		<div class="profile-grid">
-			<div><span class="label">Year</span><span class="value">{member.year || '--'}</span></div>
-			<div><span class="label">Major</span><span class="value">{member.major || '--'}</span></div>
-			<div><span class="label">Joined</span><span class="value">{member.createdAt?.toISOString().split('T')[0] || '--'}</span></div>
+		<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+			<div><span class="block text-xs font-semibold text-mg-warmGray uppercase mb-1">Lot</span><span class="text-sm">{member.lotNumber ?? '--'}</span></div>
+			<div><span class="block text-xs font-semibold text-mg-warmGray uppercase mb-1">Phone</span><span class="text-sm">{member.phone ?? '--'}</span></div>
+			<div><span class="block text-xs font-semibold text-mg-warmGray uppercase mb-1">Joined</span><span class="text-sm">{member.createdAt?.toISOString().split('T')[0] || '--'}</span></div>
 			<div>
-				<span class="label">Role</span>
-				<form method="POST" action="?/updateRole" use:enhance class="inline-form">
-					<select name="role" onchange={(e) => e.currentTarget.form?.requestSubmit()} class="role-select">
+				<span class="block text-xs font-semibold text-mg-warmGray uppercase mb-1">Role</span>
+				<form method="POST" action="?/updateRole" use:enhance class="inline">
+					<select name="role" onchange={(e) => e.currentTarget.form?.requestSubmit()} class="text-xs px-1 py-0.5 border border-gray-300 rounded">
 						<option value="member" selected={member.role === 'member'}>Member</option>
 						<option value="board" selected={member.role === 'board'}>Board</option>
 					</select>
 				</form>
 			</div>
 			<div>
-				<span class="label">Admin Role</span>
-				{#if data.currentUserRole === 'super_admin'}
-					<form method="POST" action="?/updateAdminRole" use:enhance class="inline-form">
-						<select name="adminRole" onchange={(e) => e.currentTarget.form?.requestSubmit()} class="role-select">
+				<span class="block text-xs font-semibold text-mg-warmGray uppercase mb-1">Admin Role</span>
+				{#if data.currentUserRole === 'president'}
+					<form method="POST" action="?/updateAdminRole" use:enhance class="inline">
+						<select name="adminRole" onchange={(e) => e.currentTarget.form?.requestSubmit()} class="text-xs px-1 py-0.5 border border-gray-300 rounded">
 							<option value="" selected={!member.adminRole}>None</option>
-							<option value="super_admin" selected={member.adminRole === 'super_admin'}>Super Admin</option>
-							<option value="astronomy_admin" selected={member.adminRole === 'astronomy_admin'}>Astronomy Admin</option>
-							<option value="physics_admin" selected={member.adminRole === 'physics_admin'}>Physics Admin</option>
+							{#each ADMIN_ROLES as role}
+								<option value={role} selected={member.adminRole === role}>{ADMIN_ROLE_LABELS[role]}</option>
+							{/each}
 						</select>
 					</form>
 				{:else if member.adminRole}
-					<span class="admin-badge">{member.adminRole.replace('_', ' ')}</span>
+					<span class="badge badge-gold">{ADMIN_ROLE_LABELS[member.adminRole as AdminRole] ?? member.adminRole}</span>
 				{:else}
-					<span class="value">--</span>
+					<span class="text-sm text-gray-300">--</span>
 				{/if}
 			</div>
 		</div>
 	</div>
 
 	<!-- Events Attended -->
-	<div class="card">
-		<h2 class="card-title">Events Attended ({data.attended.length})</h2>
+	<div class="card-elevated mb-4">
+		<h2 class="text-base font-semibold text-mg-charcoal mb-3">Events Attended ({data.attended.length})</h2>
 		{#if data.attended.length === 0}
-			<p class="empty">No events attended.</p>
+			<p class="text-sm text-mg-warmGray">No events attended.</p>
 		{:else}
-			<table class="mini-table">
-				<thead><tr><th>Event</th><th>Date</th><th>Club</th></tr></thead>
+			<table class="w-full border-collapse text-sm">
+				<thead><tr><th class="text-left text-xs font-semibold text-mg-warmGray uppercase py-2 border-b">Event</th><th class="text-left text-xs font-semibold text-mg-warmGray uppercase py-2 border-b">Date</th><th class="text-left text-xs font-semibold text-mg-warmGray uppercase py-2 border-b">Category</th></tr></thead>
 				<tbody>
 					{#each data.attended as event}
-						<tr>
-							<td><a href="/admin/{event.clubType}/events/{event.eventId}" class="event-link">{event.title}</a></td>
-							<td>{event.date}</td>
-							<td><span class="club-mini" class:astro={event.clubType === 'astronomy'} class:phys={event.clubType === 'physics'}>{event.clubType}</span></td>
+						<tr class="border-b border-gray-100">
+							<td class="py-2"><a href="/admin/events/{event.eventId}" class="text-mg-forest hover:underline no-underline">{event.title}</a></td>
+							<td class="py-2 text-mg-warmGray">{event.date}</td>
+							<td class="py-2"><span class="badge badge-green">{event.eventCategory}</span></td>
 						</tr>
 					{/each}
 				</tbody>
@@ -92,20 +94,21 @@
 	</div>
 
 	<!-- RSVPs -->
-	<div class="card">
-		<h2 class="card-title">RSVPs ({data.rsvps.length})</h2>
+	<div class="card-elevated mb-4">
+		<h2 class="text-base font-semibold text-mg-charcoal mb-3">RSVPs ({data.rsvps.length})</h2>
 		{#if data.rsvps.length === 0}
-			<p class="empty">No RSVPs.</p>
+			<p class="text-sm text-mg-warmGray">No RSVPs.</p>
 		{:else}
-			<table class="mini-table">
-				<thead><tr><th>Event</th><th>Date</th><th>Status</th></tr></thead>
+			<table class="w-full border-collapse text-sm">
+				<thead><tr><th class="text-left text-xs font-semibold text-mg-warmGray uppercase py-2 border-b">Event</th><th class="text-left text-xs font-semibold text-mg-warmGray uppercase py-2 border-b">Date</th><th class="text-left text-xs font-semibold text-mg-warmGray uppercase py-2 border-b">Status</th></tr></thead>
 				<tbody>
 					{#each data.rsvps as rsvp}
-						<tr>
-							<td><a href="/admin/{rsvp.clubType}/events/{rsvp.eventId}" class="event-link">{rsvp.title}</a></td>
-							<td>{rsvp.date}</td>
-							<td>
-								<span class="rsvp-badge" class:going={rsvp.status === 'going'} class:maybe={rsvp.status === 'maybe'} class:not-going={rsvp.status === 'not_going'}>
+						<tr class="border-b border-gray-100">
+							<td class="py-2"><a href="/admin/events/{rsvp.eventId}" class="text-mg-forest hover:underline no-underline">{rsvp.title}</a></td>
+							<td class="py-2 text-mg-warmGray">{rsvp.date}</td>
+							<td class="py-2">
+								<span class="text-xs font-medium px-2 py-0.5 rounded-full
+									{rsvp.status === 'going' ? 'bg-green-100 text-green-700' : rsvp.status === 'maybe' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}">
 									{rsvp.status.replace('_', ' ')}
 								</span>
 							</td>
@@ -117,85 +120,21 @@
 	</div>
 
 	<!-- Delete Member -->
-	{#if data.currentUserRole === 'super_admin'}
-		<div class="card danger-card">
-			<h2 class="card-title danger-title">Danger Zone</h2>
+	{#if data.currentUserRole === 'president'}
+		<div class="card-elevated border-red-200">
+			<h2 class="text-base font-semibold text-red-600 mb-2">Danger Zone</h2>
 			{#if !showDeleteConfirm}
-				<p class="danger-text">Permanently delete this member and all their associated data (sessions, RSVPs, check-ins, etc.).</p>
-				<button class="btn-danger" onclick={() => showDeleteConfirm = true}>Delete Member</button>
+				<p class="text-sm text-mg-warmGray mb-3">Permanently delete this member and all their associated data.</p>
+				<button class="px-4 py-2 bg-white text-red-600 border border-red-600 rounded-md text-sm font-semibold cursor-pointer hover:bg-red-50" onclick={() => (showDeleteConfirm = true)}>Delete Member</button>
 			{:else}
-				<p class="danger-text">Are you sure you want to delete <strong>{member.firstName} {member.lastName}</strong>? This action cannot be undone.</p>
-				<div class="danger-actions">
+				<p class="text-sm text-mg-warmGray mb-3">Are you sure? This cannot be undone.</p>
+				<div class="flex gap-2">
 					<form method="POST" action="?/deleteMember" use:enhance>
-						<button type="submit" class="btn-danger-confirm">Yes, Delete</button>
+						<button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-semibold cursor-pointer hover:bg-red-700">Yes, Delete</button>
 					</form>
-					<button class="btn-cancel" onclick={() => showDeleteConfirm = false}>Cancel</button>
+					<button class="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm cursor-pointer hover:bg-gray-200" onclick={() => (showDeleteConfirm = false)}>Cancel</button>
 				</div>
 			{/if}
 		</div>
 	{/if}
 </div>
-
-<style>
-	.member-detail { max-width: 800px; }
-
-	.back-link { font-size: 0.8rem; color: #4f46e5; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
-	.back-link:hover { text-decoration: underline; }
-
-	.success-message { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem; }
-
-	.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1rem; }
-
-	.profile-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem; }
-	.member-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: #191923; }
-	.member-email { font-size: 0.85rem; color: #6b7280; }
-
-	.profile-badges { display: flex; gap: 0.35rem; flex-wrap: wrap; }
-	.club-badge { font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 9999px; }
-	.club-badge.astro { background: #eef2ff; color: #4f46e5; }
-	.club-badge.phys { background: #e0f2fe; color: #0e79b2; }
-	.verify-badge { font-size: 0.65rem; font-weight: 500; padding: 0.15rem 0.5rem; border-radius: 9999px; }
-	.verify-badge.verified { background: #dcfce7; color: #16a34a; }
-	.verify-badge.unverified { background: #fef3c7; color: #d97706; }
-
-	.profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
-	.label { display: block; font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
-	.value { font-size: 0.9rem; color: #374151; }
-
-	.inline-form { display: inline; }
-	.role-select { padding: 0.25rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.8rem; }
-
-	.card-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem; }
-	.empty { font-size: 0.85rem; color: #9ca3af; }
-
-	.mini-table { width: 100%; border-collapse: collapse; }
-	.mini-table th { font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; }
-	.mini-table td { font-size: 0.825rem; color: #374151; padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
-
-	.event-link { color: #4f46e5; text-decoration: none; }
-	.event-link:hover { text-decoration: underline; }
-
-	.club-mini { font-size: 0.6rem; font-weight: 600; padding: 0.1rem 0.35rem; border-radius: 9999px; text-transform: capitalize; }
-	.club-mini.astro { background: #eef2ff; color: #4f46e5; }
-	.club-mini.phys { background: #e0f2fe; color: #0e79b2; }
-
-	.rsvp-badge { font-size: 0.65rem; font-weight: 500; padding: 0.1rem 0.4rem; border-radius: 9999px; text-transform: capitalize; }
-	.rsvp-badge.going { background: #dcfce7; color: #16a34a; }
-	.rsvp-badge.maybe { background: #fef3c7; color: #d97706; }
-	.rsvp-badge.not-going { background: #fef2f2; color: #dc2626; }
-
-	.admin-badge { font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 9999px; background: #fef3c7; color: #d97706; text-transform: capitalize; }
-
-	.error-message { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem; }
-
-	.danger-card { border-color: #fecaca; }
-	.danger-title { color: #dc2626; }
-	.danger-text { font-size: 0.85rem; color: #6b7280; margin-bottom: 0.75rem; }
-	.btn-danger { padding: 0.4rem 1rem; background: #fff; color: #dc2626; border: 1px solid #dc2626; border-radius: 0.375rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
-	.btn-danger:hover { background: #fef2f2; }
-	.danger-actions { display: flex; gap: 0.5rem; }
-	.btn-danger-confirm { padding: 0.4rem 1rem; background: #dc2626; color: #fff; border: none; border-radius: 0.375rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
-	.btn-danger-confirm:hover { background: #b91c1c; }
-	.btn-cancel { padding: 0.4rem 1rem; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer; }
-	.btn-cancel:hover { background: #e5e7eb; }
-</style>
