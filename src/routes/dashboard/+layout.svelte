@@ -12,7 +12,8 @@
 	const navLinks = [
 		{ href: '/dashboard', label: 'Overview' },
 		{ href: '/dashboard/events', label: 'My Events' },
-		{ href: '/dashboard/profile', label: 'Profile' }
+		{ href: '/dashboard/profile', label: 'Profile' },
+		{ href: '/owner-resources', label: 'Owner Resources' }
 	];
 
 	$effect(() => {

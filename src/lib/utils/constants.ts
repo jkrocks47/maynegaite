@@ -1,4 +1,5 @@
 export const ADMIN_ROLES = [
+	'tech_admin',
 	'president',
 	'vice_president',
 	'treasurer',
@@ -57,6 +58,7 @@ export const SECTION_LABELS: Record<Section, string> = {
 };
 
 export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
+	tech_admin: 'Tech Administrator',
 	president: 'President',
 	vice_president: 'Vice President',
 	treasurer: 'Treasurer',
@@ -70,17 +72,64 @@ export function canManageAdmin(role: AdminRole | null): boolean {
 	return true;
 }
 
+/** Roles that can assign/remove admin roles. */
+export function canAssignAdminRoles(role: AdminRole | null): boolean {
+	return role === 'tech_admin' || role === 'president';
+}
+
+/** Roles that can delete members. */
+export function canDeleteMembers(role: AdminRole | null): boolean {
+	return role === 'tech_admin' || role === 'president';
+}
+
+/** Whether the actor can modify the target member's admin role. */
+export function canModifyTarget(
+	actorRole: AdminRole | null,
+	targetCurrentRole: AdminRole | null
+): boolean {
+	if (!actorRole) return false;
+	if (targetCurrentRole === 'tech_admin') return actorRole === 'tech_admin';
+	return actorRole === 'tech_admin' || actorRole === 'president';
+}
+
+/** Whether the actor can assign the specified new role to a target. */
+export function canAssignRole(
+	actorRole: AdminRole | null,
+	newRole: AdminRole | null
+): boolean {
+	if (!actorRole) return false;
+	if (newRole === 'tech_admin') return actorRole === 'tech_admin';
+	return actorRole === 'tech_admin' || actorRole === 'president';
+}
+
+/** Whether the actor can delete the target member. */
+export function canDeleteTarget(
+	actorRole: AdminRole | null,
+	targetRole: AdminRole | null
+): boolean {
+	if (!actorRole) return false;
+	if (targetRole === 'tech_admin') return actorRole === 'tech_admin';
+	return actorRole === 'tech_admin' || actorRole === 'president';
+}
+
+/** Get admin roles that the actor is allowed to assign. */
+export function getAssignableRoles(actorRole: AdminRole | null): AdminRole[] {
+	if (actorRole === 'tech_admin') return [...ADMIN_ROLES];
+	if (actorRole === 'president') return ADMIN_ROLES.filter((r) => r !== 'tech_admin');
+	return [];
+}
+
 export function isExecutiveRole(role: AdminRole | null): boolean {
 	if (!role) return false;
-	return role === 'president' || role === 'vice_president';
+	return role === 'tech_admin' || role === 'president' || role === 'vice_president';
 }
 
 export function canManageArchitectural(role: AdminRole | null): boolean {
 	if (!role) return false;
-	return role === 'president' || role === 'architectural_chair';
+	return role === 'tech_admin' || role === 'president' || role === 'architectural_chair';
 }
 
 export function canManageFinances(role: AdminRole | null): boolean {
 	if (!role) return false;
-	return role === 'president' || role === 'treasurer';
+	return role === 'tech_admin' || role === 'president' || role === 'treasurer';
 }

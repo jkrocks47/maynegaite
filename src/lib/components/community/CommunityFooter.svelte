@@ -7,7 +7,14 @@
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 			<!-- Branding -->
 			<div>
-				<h3 class="font-display text-xl font-bold text-white mb-2">Maynegaite POA</h3>
+				<a href="/" class="no-underline inline-block mb-3" aria-label="Maynegaite home">
+					<img
+						src="/logo.webp"
+						alt="Maynegaite of Olympia Fields"
+						class="h-14 w-auto"
+						style="filter: invert(1) brightness(2); mix-blend-mode: screen;"
+					/>
+				</a>
 				<p class="text-sm text-white/60">Where neighbors become family.</p>
 				<p class="text-sm text-white/50 mt-3">P.O. Box 214<br />Olympia Fields, IL 60461</p>
 			</div>

@@ -3,12 +3,26 @@ import { db } from '$lib/server/db';
 import { communityInfo } from '$lib/server/db/schema';
 import { sendContactEmail } from '$lib/server/email';
 import { getBoardEmails } from '$lib/server/db/queries';
-import { checkHoneypot, checkRateLimit, checkSubmissionTiming } from '$lib/server/security';
+import {
+	checkHoneypot,
+	checkRateLimit,
+	checkSubmissionTiming,
+	checkProofOfWork,
+	checkSpamContent,
+	generateChallenge
+} from '$lib/server/security';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
-	const community = await db.select().from(communityInfo).limit(1);
-	return { communityInfo: community[0] ?? null };
+	const [community, pow] = await Promise.all([
+		db.select().from(communityInfo).limit(1),
+		Promise.resolve(generateChallenge())
+	]);
+	return {
+		communityInfo: community[0] ?? null,
+		challenge: pow.challenge,
+		difficulty: pow.difficulty
+	};
 };
 
 export const actions: Actions = {
@@ -19,11 +33,18 @@ export const actions: Actions = {
 		const { request } = event;
 		const formData = await request.formData();
 
+		// Bot/spam defence — ordered cheapest-to-most-expensive
 		const honeypotFail = checkHoneypot(formData);
 		if (honeypotFail) return honeypotFail;
 
 		const timingFail = checkSubmissionTiming(formData);
 		if (timingFail) return timingFail;
+
+		const powFail = await checkProofOfWork(formData);
+		if (powFail) return powFail;
+
+		const spamFail = checkSpamContent(formData);
+		if (spamFail) return spamFail;
 
 		const name = (formData.get('name') as string)?.trim();
 		const email = (formData.get('email') as string)?.trim();

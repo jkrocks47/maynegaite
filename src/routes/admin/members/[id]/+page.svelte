@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { ADMIN_ROLES, ADMIN_ROLE_LABELS, SECTION_LABELS } from '$lib/utils/constants';
+	import { ADMIN_ROLE_LABELS, SECTION_LABELS, getAssignableRoles } from '$lib/utils/constants';
 	import type { AdminRole } from '$lib/utils/constants';
 
 	let { data, form } = $props();
 	const member = $derived(data.member);
 	let showDeleteConfirm = $state(false);
+	const assignableRoles = $derived(getAssignableRoles(data.currentUserRole as AdminRole | null));
 </script>
 
 <svelte:head>
@@ -54,11 +55,11 @@
 			</div>
 			<div>
 				<span class="block text-xs font-semibold text-mg-warmGray uppercase mb-1">Admin Role</span>
-				{#if data.currentUserRole === 'president'}
+				{#if assignableRoles.length > 0 && (data.currentUserRole === 'tech_admin' || member.adminRole !== 'tech_admin')}
 					<form method="POST" action="?/updateAdminRole" use:enhance class="inline">
 						<select name="adminRole" onchange={(e) => e.currentTarget.form?.requestSubmit()} class="text-xs px-1 py-0.5 border border-gray-300 rounded">
 							<option value="" selected={!member.adminRole}>None</option>
-							{#each ADMIN_ROLES as role}
+							{#each assignableRoles as role}
 								<option value={role} selected={member.adminRole === role}>{ADMIN_ROLE_LABELS[role]}</option>
 							{/each}
 						</select>
@@ -120,7 +121,7 @@
 	</div>
 
 	<!-- Delete Member -->
-	{#if data.currentUserRole === 'president'}
+	{#if (data.currentUserRole === 'tech_admin' || data.currentUserRole === 'president') && (data.currentUserRole === 'tech_admin' || member.adminRole !== 'tech_admin')}
 		<div class="card-elevated border-red-200">
 			<h2 class="text-base font-semibold text-red-600 mb-2">Danger Zone</h2>
 			{#if !showDeleteConfirm}

@@ -18,7 +18,7 @@ interface BoardAccountSeed {
 	lastName: string;
 	email: string;
 	password: string;
-	adminRole: 'president' | 'vice_president' | 'treasurer' | 'secretary' | 'architectural_chair';
+	adminRole: 'tech_admin' | 'president' | 'vice_president' | 'treasurer' | 'secretary' | 'architectural_chair';
 	position: string;
 	committeeType: 'board' | 'architectural';
 	bio: string;

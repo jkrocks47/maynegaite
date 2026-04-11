@@ -29,6 +29,7 @@ const bytea = customType<{ data: Buffer }>({
 
 export const imageVariantEnum = pgEnum('image_variant', ['full', 'thumbnail']);
 export const adminRoleEnum = pgEnum('admin_role', [
+	'tech_admin',
 	'president',
 	'vice_president',
 	'treasurer',

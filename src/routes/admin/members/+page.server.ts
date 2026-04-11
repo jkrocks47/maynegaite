@@ -73,8 +73,10 @@ export const actions: Actions = {
 	},
 
 	updateAdminRole: async ({ request, locals }) => {
-		if (!locals.member?.adminRole || locals.member.adminRole !== 'president') {
-			return fail(403, { error: 'Only the president can manage admin roles.' });
+		const actorRole = locals.member?.adminRole ?? null;
+
+		if (!actorRole || (actorRole !== 'tech_admin' && actorRole !== 'president')) {
+			return fail(403, { error: 'Only the president or tech admin can manage admin roles.' });
 		}
 
 		const formData = await request.formData();
@@ -89,17 +91,42 @@ export const actions: Actions = {
 			return fail(400, { error: 'Invalid admin role.' });
 		}
 
-		if (id === locals.member.id && adminRoleRaw !== 'president') {
-			return fail(400, { error: 'You cannot remove your own president role.' });
+		const newRole = adminRoleRaw ? (adminRoleRaw as (typeof ADMIN_ROLES)[number]) : null;
+
+		// Self-protection: can't remove your own privileged role
+		if (id === locals.member!.id) {
+			if (actorRole === 'tech_admin' && newRole !== 'tech_admin') {
+				return fail(400, { error: 'You cannot remove your own tech admin role.' });
+			}
+			if (actorRole === 'president' && newRole !== 'president') {
+				return fail(400, { error: 'You cannot remove your own president role.' });
+			}
 		}
 
-		const adminRole = adminRoleRaw
-			? (adminRoleRaw as (typeof ADMIN_ROLES)[number])
-			: null;
+		// Fetch target's current role to enforce protection
+		const [target] = await db
+			.select({ adminRole: members.adminRole })
+			.from(members)
+			.where(eq(members.id, id))
+			.limit(1);
+
+		if (!target) {
+			return fail(404, { error: 'Member not found.' });
+		}
+
+		// President cannot touch tech_admin accounts
+		if (target.adminRole === 'tech_admin' && actorRole !== 'tech_admin') {
+			return fail(403, { error: 'Only a tech admin can modify tech admin accounts.' });
+		}
+
+		// Only tech_admin can assign the tech_admin role
+		if (newRole === 'tech_admin' && actorRole !== 'tech_admin') {
+			return fail(403, { error: 'Only a tech admin can assign the tech admin role.' });
+		}
 
 		await db
 			.update(members)
-			.set({ adminRole, updatedAt: new Date() })
+			.set({ adminRole: newRole, updatedAt: new Date() })
 			.where(eq(members.id, id));
 
 		return { success: true };

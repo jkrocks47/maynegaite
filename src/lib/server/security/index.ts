@@ -3,3 +3,4 @@ export { checkRateLimit, startRateLimitCleanup, stopRateLimitCleanup } from './r
 export type { RateLimitTier } from './rate-limit';
 export { checkSubmissionTiming } from './timing';
 export { generateChallenge, checkProofOfWork } from './proof-of-work';
+export { checkSpamContent } from './spam-filter';

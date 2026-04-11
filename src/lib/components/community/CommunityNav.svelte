@@ -31,8 +31,12 @@
 >
 	<div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
 		<!-- Wordmark -->
-		<a href="/" class="font-display text-2xl font-bold text-mg-forest tracking-tight no-underline">
-			Maynegaite
+		<a href="/" class="no-underline flex items-center" aria-label="Maynegaite home">
+			<img
+				src="/logo.webp"
+				alt="Maynegaite of Olympia Fields"
+				class="h-11 w-auto"
+			/>
 		</a>
 
 		<!-- Desktop links -->

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { ADMIN_ROLES, ADMIN_ROLE_LABELS } from '$lib/utils/constants';
+	import { ADMIN_ROLE_LABELS, getAssignableRoles } from '$lib/utils/constants';
 	import type { AdminRole } from '$lib/utils/constants';
 
 	let { data, form } = $props();
 
 	let search = $state(data.search);
+	const assignableRoles = $derived(getAssignableRoles(data.currentUserRole as AdminRole | null));
 
 	function handleSearch() {
 		const params = new URLSearchParams();
@@ -109,12 +110,12 @@
 									</form>
 								</td>
 								<td class="px-3 py-2">
-									{#if data.currentUserRole === 'president'}
+									{#if assignableRoles.length > 0 && (data.currentUserRole === 'tech_admin' || member.adminRole !== 'tech_admin')}
 										<form method="POST" action="?/updateAdminRole" use:enhance class="inline">
 											<input type="hidden" name="id" value={member.id} />
 											<select name="adminRole" onchange={(e) => e.currentTarget.form?.requestSubmit()} class="text-xs px-1 py-0.5 border border-gray-300 rounded">
 												<option value="" selected={!member.adminRole}>None</option>
-												{#each ADMIN_ROLES as role}
+												{#each assignableRoles as role}
 													<option value={role} selected={member.adminRole === role}>{ADMIN_ROLE_LABELS[role]}</option>
 												{/each}
 											</select>

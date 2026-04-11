@@ -41,7 +41,7 @@
 								<textarea id="message" name="message" rows="5" required class="input" placeholder="How can we help?"></textarea>
 							</div>
 
-							<BotProtection />
+							<BotProtection challenge={data.challenge} difficulty={data.difficulty} />
 
 							<button type="submit" class="btn-primary w-full">Send Message</button>
 						</div>
