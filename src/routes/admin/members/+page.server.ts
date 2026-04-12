@@ -26,7 +26,6 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
 	let filtered = allMembers;
 	if (sectionFilter === 'woods') filtered = filtered.filter((m) => m.section === 'woods');
-	if (sectionFilter === 'reserves') filtered = filtered.filter((m) => m.section === 'reserves');
 	if (roleFilter) filtered = filtered.filter((m) => m.role === roleFilter);
 
 	const checkinCounts = await db

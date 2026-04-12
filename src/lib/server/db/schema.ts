@@ -40,7 +40,7 @@ export const adminRoleEnum = pgEnum('admin_role', [
 export const memberRoleEnum = pgEnum('member_role', ['member', 'board']);
 export const rsvpStatusEnum = pgEnum('rsvp_status', ['going', 'maybe', 'not_going']);
 export const reminderTypeEnum = pgEnum('reminder_type', ['7_day', '1_day', 'day_of']);
-export const sectionEnum = pgEnum('section_type', ['woods', 'reserves']);
+export const sectionEnum = pgEnum('section_type', ['woods']);
 export const propertyTypeEnum = pgEnum('property_type', ['single_family', 'townhome']);
 export const eventCategoryEnum = pgEnum('event_category', [
 	'community',

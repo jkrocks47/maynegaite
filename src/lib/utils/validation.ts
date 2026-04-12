@@ -29,7 +29,7 @@ export const registrationSchema = z.object({
 	phone: z.string().max(20).optional(),
 	address: z.string().max(300).optional(),
 	lotNumber: z.number().int().positive().max(197).optional(),
-	section: z.enum(['woods', 'reserves']).optional()
+	section: z.enum(['woods']).optional()
 });
 
 export const memberLoginSchema = z.object({
@@ -44,7 +44,7 @@ export const profileUpdateSchema = z.object({
 	phone: z.string().max(20).optional(),
 	address: z.string().max(300).optional(),
 	lotNumber: z.number().int().positive().max(197).optional(),
-	section: z.enum(['woods', 'reserves']).optional(),
+	section: z.enum(['woods']).optional(),
 	directoryOptIn: z.boolean().default(false),
 	emailOptOut: z.boolean().default(false)
 });

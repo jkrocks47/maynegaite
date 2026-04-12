@@ -43,7 +43,6 @@
 				<select id="section" name="section" class="input">
 					<option value="">Unknown</option>
 					<option value="woods">{SECTION_LABELS.woods}</option>
-					<option value="reserves">{SECTION_LABELS.reserves}</option>
 				</select>
 			</div>
 			<div>
@@ -114,7 +113,6 @@
 										<select name="section" class="input">
 											<option value="" selected={!lot.section}>Unknown</option>
 											<option value="woods" selected={lot.section === 'woods'}>{SECTION_LABELS.woods}</option>
-											<option value="reserves" selected={lot.section === 'reserves'}>{SECTION_LABELS.reserves}</option>
 										</select>
 									</div>
 									<div>

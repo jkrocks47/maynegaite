@@ -93,7 +93,7 @@ export const actions: Actions = {
 					phone: parsed.data.phone || null,
 					address: parsed.data.address || null,
 					lotNumber: parsed.data.lotNumber || null,
-					section: (parsed.data.section as 'woods' | 'reserves') || null,
+					section: (parsed.data.section as 'woods') || null,
 					unsubscribeToken: randomBytes(32).toString('hex')
 				})
 				.returning({ id: members.id });

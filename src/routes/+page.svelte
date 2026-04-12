@@ -213,7 +213,7 @@
 				One of the most distinguished communities in Illinois.
 			</h2>
 			<p class="text-white/70 mt-4 leading-relaxed">
-				{data.communityInfo?.aboutText ?? "Maynegaite encompasses 197 residential lots across Maynegaite Woods and The Reserves — a blend of spacious single-family estates and modern luxury townhomes, anchored by five decades of homeownership pride."}
+				{data.communityInfo?.aboutText ?? "Maynegaite encompasses 197 residential lots within Maynegaite Woods — spacious single-family estates anchored by five decades of homeownership pride."}
 			</p>
 		</div>
 		<div class="flex flex-col gap-4 md:items-start">

@@ -15,7 +15,7 @@ export type MemberRole = (typeof MEMBER_ROLES)[number];
 export const RSVP_STATUSES = ['going', 'maybe', 'not_going'] as const;
 export type RsvpStatus = (typeof RSVP_STATUSES)[number];
 
-export const SECTIONS = ['woods', 'reserves'] as const;
+export const SECTIONS = ['woods'] as const;
 export type Section = (typeof SECTIONS)[number];
 
 export const PROPERTY_TYPES = ['single_family', 'townhome'] as const;
@@ -53,8 +53,7 @@ export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
-	woods: 'Maynegaite Woods',
-	reserves: 'The Reserves'
+	woods: 'Maynegaite Woods'
 };
 
 export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {

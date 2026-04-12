@@ -261,7 +261,6 @@ export async function getBatchEstimatedTurnout(
 export interface MembershipStats {
 	totalMembers: number;
 	woodsMembers: number;
-	reservesMembers: number;
 	verifiedMembers: number;
 }
 
@@ -270,7 +269,6 @@ export async function getMembershipStats(): Promise<MembershipStats> {
 		.select({
 			totalMembers: sql<number>`count(*)::int`,
 			woodsMembers: sql<number>`count(*) FILTER (WHERE ${members.section} = 'woods')::int`,
-			reservesMembers: sql<number>`count(*) FILTER (WHERE ${members.section} = 'reserves')::int`,
 			verifiedMembers: sql<number>`count(*) FILTER (WHERE ${members.emailVerified} = true)::int`
 		})
 		.from(members);
@@ -279,7 +277,6 @@ export async function getMembershipStats(): Promise<MembershipStats> {
 	return {
 		totalMembers: r.totalMembers,
 		woodsMembers: r.woodsMembers,
-		reservesMembers: r.reservesMembers,
 		verifiedMembers: r.verifiedMembers
 	};
 }

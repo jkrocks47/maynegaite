@@ -70,8 +70,8 @@
 					</p>
 					<p>
 						Over five decades, that founding vision has deepened. The community encompasses
-						Maynegaite Woods — with its established single-family estates — and The Reserves, luxury
-						townhomes added in 2007, while Olympia Fields has continued to rank among the nation's
+						197 residential lots within Maynegaite Woods — with its established single-family estates,
+						while Olympia Fields has continued to rank among the nation's
 						top communities for income, education, and quality of life.
 					</p>
 				</div>
@@ -87,20 +87,18 @@
 	</ScrollReveal>
 </section>
 
-<!-- Section 4: The Two Neighborhoods -->
+<!-- Section 4: The Neighborhood -->
 <section class="bg-mg-parchment py-20 px-4">
 	<ScrollReveal>
 		<div class="max-w-4xl mx-auto">
 			<p class="text-mg-gold text-xs uppercase tracking-[0.2em] font-medium text-center">Where You'll Live</p>
 			<h2 class="font-display text-3xl font-bold text-mg-charcoal text-center mt-2">
-				Two Distinct Neighborhoods
+				Maynegaite Woods
 			</h2>
 			<p class="text-mg-warmGray mt-3 mb-10 max-w-2xl mx-auto text-center">
-				Maynegaite offers two complementary ways of living — grand single-family estates with room
-				for generations, and refined townhomes designed for those who want the community without
-				the upkeep.
+				A distinguished neighborhood of spacious single-family estates with room for generations.
 			</p>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div class="max-w-lg mx-auto">
 				<div class="card-premium hover-lift">
 					<span class="badge badge-gold mb-3">Single-Family Estates</span>
 					<h3 class="font-display text-xl font-bold text-mg-charcoal mb-3">Maynegaite Woods</h3>
@@ -109,24 +107,10 @@
 						from the late 1970s through the early 1990s.
 					</p>
 					<ul class="text-sm text-mg-warmGray space-y-1 mt-3">
-						<li>165 single-family lots</li>
+						<li>197 residential lots</li>
 						<li>2,500 to 7,200+ square feet</li>
 						<li>Generous lots of 0.4 to 0.7+ acres</li>
 						<li>Brick construction, traditional styling</li>
-					</ul>
-				</div>
-				<div class="card-premium hover-lift">
-					<span class="badge badge-gold mb-3">Luxury Townhomes</span>
-					<h3 class="font-display text-xl font-bold text-mg-charcoal mb-3">The Reserves</h3>
-					<p class="text-mg-charcoal leading-relaxed mb-2">
-						Modern luxury townhomes developed around 2007, offering low-maintenance, high-amenity
-						living for empty-nesters and busy professionals.
-					</p>
-					<ul class="text-sm text-mg-warmGray space-y-1 mt-3">
-						<li>32 townhome units</li>
-						<li>Approximately 2,453 square feet</li>
-						<li>Vaulted ceilings, granite countertops</li>
-						<li>2-car attached garages</li>
 					</ul>
 				</div>
 			</div>

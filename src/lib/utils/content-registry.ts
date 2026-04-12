@@ -62,7 +62,7 @@ export const contentEntries: ContentEntry[] = [
 		label: 'About section body text',
 		fieldType: 'long',
 		defaultBody:
-			'Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners\' Association (MPOA). Our community encompasses 197 residential lots across Maynegaite Woods and The Reserves, offering a blend of spacious single-family estates and modern luxury townhomes.',
+			'Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners\' Association (MPOA). Our community encompasses 197 residential lots within Maynegaite Woods, offering spacious single-family estates.',
 		page: 'Homepage'
 	},
 	{
@@ -98,7 +98,7 @@ export const contentEntries: ContentEntry[] = [
 		label: 'History section text',
 		fieldType: 'markdown',
 		defaultBody:
-			'The Maynegaite subdivision was developed in the late 1970s by Concord Homes, situated within the prestigious Village of Olympia Fields — one of the wealthiest and most highly educated majority African-American communities in the United States. Over the decades, Maynegaite has evolved from its original tract of single-family homes into a diverse residential matrix, adding The Reserves townhome community to serve a broader range of homeowners.',
+			'The Maynegaite subdivision was developed in the late 1970s by Concord Homes, situated within the prestigious Village of Olympia Fields — one of the wealthiest and most highly educated majority African-American communities in the United States. Over the decades, Maynegaite has grown into a distinguished residential community of 197 single-family homes, serving homeowners who value excellence, pride, and neighborhood life.',
 		page: 'About Page'
 	},
 	{

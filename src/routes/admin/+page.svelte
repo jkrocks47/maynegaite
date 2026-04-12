@@ -49,7 +49,7 @@
 		<h1 class="text-2xl font-bold text-gray-800 mb-8">Dashboard</h1>
 
 		{#if stats}
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
 				<div class="card-elevated text-center py-6">
 					<p class="text-3xl font-bold text-mg-forest">{stats.totalMembers}</p>
 					<p class="text-sm text-mg-warmGray mt-1">Total Members</p>
@@ -57,10 +57,6 @@
 				<div class="card-elevated text-center py-6">
 					<p class="text-3xl font-bold text-mg-forest">{stats.woodsMembers}</p>
 					<p class="text-sm text-mg-warmGray mt-1">Maynegaite Woods</p>
-				</div>
-				<div class="card-elevated text-center py-6">
-					<p class="text-3xl font-bold text-mg-forest">{stats.reservesMembers}</p>
-					<p class="text-sm text-mg-warmGray mt-1">The Reserves</p>
 				</div>
 				<div class="card-elevated text-center py-6">
 					<p class="text-3xl font-bold text-mg-forest">{stats.verifiedMembers}</p>

@@ -23,7 +23,7 @@ interface BoardAccountSeed {
 	committeeType: 'board' | 'architectural';
 	bio: string;
 	sortOrder: number;
-	section: 'woods' | 'reserves' | null;
+	section: 'woods' | null;
 }
 
 function resolveEnv(primary: string, aliases: string[] = []): string | undefined {
@@ -108,7 +108,7 @@ async function seed() {
 			committeeType: 'board',
 			bio: 'A longtime resident and active steward of community finances.',
 			sortOrder: 3,
-			section: 'reserves'
+			section: 'woods'
 		},
 		{
 			firstName: 'Debbie',
@@ -132,7 +132,7 @@ async function seed() {
 			committeeType: 'architectural',
 			bio: 'Retired railroad conductor bringing practical review experience.',
 			sortOrder: 5,
-			section: 'reserves'
+			section: 'woods'
 		}
 	];
 
@@ -175,7 +175,7 @@ async function seed() {
 		if (existingCommunity.length === 0) {
 			await db.insert(communityInfo).values({
 				aboutText:
-					"Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners' Association (MPOA). Our community encompasses 197 residential lots across Maynegaite Woods and The Reserves.",
+					"Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners' Association (MPOA). Our community encompasses 197 residential lots within Maynegaite Woods.",
 				meetingInfo:
 					'Board meetings are typically held monthly. Check the events calendar for date and location updates.',
 				contactEmail: 'info@maynegaite.com',
@@ -205,7 +205,7 @@ async function seed() {
 
 		const propertyRows: {
 			lotNumber: number;
-			section: 'woods' | 'reserves';
+			section: 'woods';
 			propertyType: 'single_family' | 'townhome';
 		}[] = [];
 
@@ -220,7 +220,7 @@ async function seed() {
 		for (let lot = 166; lot <= 197; lot++) {
 			propertyRows.push({
 				lotNumber: lot,
-				section: 'reserves',
+				section: 'woods',
 				propertyType: 'townhome'
 			});
 		}

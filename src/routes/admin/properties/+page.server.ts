@@ -8,7 +8,7 @@ import type { Actions, PageServerLoad } from './$types';
 interface ParsedPropertyInput {
 	lotNumber: number;
 	address: string | null;
-	section: 'woods' | 'reserves' | null;
+	section: 'woods' | null;
 	propertyType: 'single_family' | 'townhome' | null;
 	ownerId: string | null;
 }
@@ -22,7 +22,7 @@ function parsePropertyInput(formData: FormData): { data?: ParsedPropertyInput; e
 
 	const sectionRaw = ((formData.get('section') as string) || '').trim();
 	const section = sectionRaw === '' ? null : sectionRaw;
-	if (section && section !== 'woods' && section !== 'reserves') {
+	if (section && section !== 'woods') {
 		return { error: 'Invalid section.' };
 	}
 
@@ -38,7 +38,7 @@ function parsePropertyInput(formData: FormData): { data?: ParsedPropertyInput; e
 		data: {
 			lotNumber,
 			address: ((formData.get('address') as string) || '').trim() || null,
-			section: section as 'woods' | 'reserves' | null,
+			section: section as 'woods' | null,
 			propertyType: propertyType as 'single_family' | 'townhome' | null,
 			ownerId: ownerIdRaw || null
 		}
