@@ -22,6 +22,13 @@
       "when": 1775927141651,
       "tag": "0002_clear_archangel",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775961109037,
+      "tag": "0003_low_plazm",
+      "breakpoints": true
     }
   ]
 }

@@ -64,11 +64,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (!event.locals.member) {
 			throw redirect(303, '/login');
 		}
-
-		// Require email verification for dashboard access
-		if (!event.locals.member.emailVerified) {
-			throw redirect(303, '/verify-email');
-		}
 	}
 
 	return resolve(event);
