@@ -2,7 +2,7 @@ import { randomBytes, createHash } from 'crypto';
 import { fail } from '@sveltejs/kit';
 
 const CHALLENGE_EXPIRY_SECONDS = 5 * 60; // 5 minutes
-const DEFAULT_DIFFICULTY = 16; // 16 leading zero bits ≈ 65,536 expected iterations ≈ 50-200ms
+const DEFAULT_DIFFICULTY = 10; // 10 leading zero bits ≈ 1,024 expected iterations ≈ 1-5ms
 
 /**
  * Generate a proof-of-work challenge for the client.

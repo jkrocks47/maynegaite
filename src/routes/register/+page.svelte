@@ -52,8 +52,8 @@
 				{#if data.redirectTo}
 					<input type="hidden" name="redirectTo" value={data.redirectTo} />
 				{/if}
-				<input type="hidden" name="challenge" value={data.challenge} />
-				<input type="hidden" name="difficulty" value={data.difficulty} />
+
+				<BotProtection challenge={data.challenge} difficulty={data.difficulty} />
 
 				{#if step === 1}
 					<!-- Step 1: Account Info -->
@@ -113,7 +113,7 @@
 							</div>
 						</div>
 
-						<BotProtection />
+
 
 						<div class="flex gap-3">
 							<button type="button" class="btn-secondary flex-1" onclick={() => (step = 1)}>Back</button>
