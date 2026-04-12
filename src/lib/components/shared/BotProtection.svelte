@@ -1,7 +1,7 @@
 <script lang="ts">
 	let { challenge = '', difficulty = 16 }: { challenge?: string; difficulty?: number } = $props();
 
-	let tsValue = $state('');
+	let tsValue = $state(Date.now().toString());
 	let powNonce = $state('');
 
 	$effect(() => {
@@ -61,8 +61,8 @@
 <!-- Honeypot fields: positioned off-screen, invisible to real users, attractive to bots -->
 <!-- Using position/opacity instead of display:none because some bots skip display:none fields -->
 <div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
-	<input type="text" name="_name" tabindex="-1" autocomplete="off" />
-	<input type="email" name="_email_confirm" tabindex="-1" autocomplete="off" />
+	<input type="text" name="_hp_n" tabindex="-1" autocomplete="off" />
+	<input type="email" name="_hp_ec" tabindex="-1" autocomplete="off" />
 </div>
 
 <!-- Timestamp: set on mount to measure form fill duration -->

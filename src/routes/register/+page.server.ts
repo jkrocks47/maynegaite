@@ -17,7 +17,7 @@ function safeRedirect(redirectTo: string | null): string {
 	if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
 		return redirectTo;
 	}
-	return '/verify-email';
+	return '/dashboard';
 }
 
 export const load: PageServerLoad = async ({ locals, url }) => {

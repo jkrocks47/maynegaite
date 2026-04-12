@@ -6,8 +6,8 @@ import { fail } from '@sveltejs/kit';
  * Returns fail(400) if bot detected, null if clean.
  */
 export function checkHoneypot(formData: FormData) {
-	const name = formData.get('_name');
-	const emailConfirm = formData.get('_email_confirm');
+	const name = formData.get('_hp_n');
+	const emailConfirm = formData.get('_hp_ec');
 
 	if ((name && String(name).length > 0) || (emailConfirm && String(emailConfirm).length > 0)) {
 		return fail(400, { error: 'Something went wrong. Please try again.' });
