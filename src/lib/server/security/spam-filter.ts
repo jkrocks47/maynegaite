@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 
 /**
- * Spam keywords that have no legitimate place in an HOA contact form.
+ * Spam keywords that have no legitimate place in a POA contact form.
  * Grouped by category for maintainability.
  */
 const SPAM_KEYWORDS: string[] = [

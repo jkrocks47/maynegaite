@@ -56,7 +56,7 @@
 				</div>
 				<div class="card-elevated text-center py-6">
 					<p class="text-3xl font-bold text-mg-forest">{stats.woodsMembers}</p>
-					<p class="text-sm text-mg-warmGray mt-1">Maynegaite Woods</p>
+					<p class="text-sm text-mg-warmGray mt-1">Maynegaite</p>
 				</div>
 				<div class="card-elevated text-center py-6">
 					<p class="text-3xl font-bold text-mg-forest">{stats.verifiedMembers}</p>

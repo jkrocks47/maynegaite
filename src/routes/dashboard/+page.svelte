@@ -77,7 +77,7 @@
 
 	<section class="card-elevated">
 		<h2 class="font-display text-2xl text-mg-charcoal mb-3">Community Resources</h2>
-		<p class="text-sm text-mg-warmGray mb-5">Access essential tools, documents, and contact information for the HOA.</p>
+		<p class="text-sm text-mg-warmGray mb-5">Access essential tools, documents, and contact information for the POA.</p>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<a href="/owner-resources" class="border border-mg-stone rounded-lg p-4 bg-white hover:bg-mg-ivory/50 hover-lift transition-all no-underline overflow-hidden relative group">
 				<div class="absolute inset-y-0 left-0 w-1 bg-mg-gold"></div>

@@ -53,7 +53,7 @@ export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
-	woods: 'Maynegaite Woods'
+	woods: 'Maynegaite'
 };
 
 export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {

@@ -76,7 +76,7 @@
 					</div>
 					<div>
 						<h3 class="font-semibold text-mg-charcoal text-base group-hover:text-mg-forest transition-colors">Pay Dues</h3>
-						<p class="text-sm text-mg-warmGray mt-0.5">Make your HOA assessment payment</p>
+						<p class="text-sm text-mg-warmGray mt-0.5">Make your POA assessment payment</p>
 					</div>
 				</a>
 
@@ -213,7 +213,7 @@
 				One of the most distinguished communities in Illinois.
 			</h2>
 			<p class="text-white/70 mt-4 leading-relaxed">
-				{data.communityInfo?.aboutText ?? "Maynegaite encompasses 197 residential lots within Maynegaite Woods — spacious single-family estates anchored by five decades of homeownership pride."}
+				{data.communityInfo?.aboutText ?? "Maynegaite encompasses 197 residential lots — spacious single-family estates anchored by five decades of homeownership pride."}
 			</p>
 		</div>
 		<div class="flex flex-col gap-4 md:items-start">

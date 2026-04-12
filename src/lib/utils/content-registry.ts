@@ -62,7 +62,7 @@ export const contentEntries: ContentEntry[] = [
 		label: 'About section body text',
 		fieldType: 'long',
 		defaultBody:
-			'Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners\' Association (MPOA). Our community encompasses 197 residential lots within Maynegaite Woods, offering spacious single-family estates.',
+			'Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners\' Association (MPOA). Our community encompasses 197 residential lots, offering spacious single-family estates.',
 		page: 'Homepage'
 	},
 	{

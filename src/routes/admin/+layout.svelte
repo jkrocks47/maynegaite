@@ -20,7 +20,8 @@
 		{ href: '/admin/documents', label: 'Documents', section: 'Community' },
 		{ href: '/admin/properties', label: 'Properties' },
 		{ href: '/admin/architectural', label: 'Architectural Requests' },
-		{ href: '/admin/violations', label: 'Violations' }
+		{ href: '/admin/violations', label: 'Violations' },
+		{ href: '/admin/changelog', label: 'Changelog', section: 'Records' }
 	];
 
 	let currentPath = $derived($page.url.pathname);

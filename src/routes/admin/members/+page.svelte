@@ -58,7 +58,7 @@
 		</form>
 		<div class="flex gap-2">
 			<a href="/admin/members" class="text-xs px-3 py-1.5 rounded-full border transition-colors {!data.sectionFilter && !data.roleFilter ? 'bg-mg-forest text-white border-mg-forest' : 'bg-white text-mg-warmGray border-mg-stone hover:border-mg-forest'} no-underline">All</a>
-			<a href="/admin/members?section=woods" class="text-xs px-3 py-1.5 rounded-full border transition-colors {data.sectionFilter === 'woods' ? 'bg-mg-forest text-white border-mg-forest' : 'bg-white text-mg-warmGray border-mg-stone hover:border-mg-forest'} no-underline">Woods</a>
+			<a href="/admin/members?section=woods" class="text-xs px-3 py-1.5 rounded-full border transition-colors {data.sectionFilter === 'woods' ? 'bg-mg-forest text-white border-mg-forest' : 'bg-white text-mg-warmGray border-mg-stone hover:border-mg-forest'} no-underline">Maynegaite</a>
 			<a href="/admin/members?role=board" class="text-xs px-3 py-1.5 rounded-full border transition-colors {data.roleFilter === 'board' ? 'bg-mg-forest text-white border-mg-forest' : 'bg-white text-mg-warmGray border-mg-stone hover:border-mg-forest'} no-underline">Board</a>
 		</div>
 	</div>
@@ -92,7 +92,7 @@
 								<td class="px-3 py-2 text-sm text-gray-500">{member.email}</td>
 								<td class="px-3 py-2">
 									{#if member.section}
-										<span class="badge badge-green">Woods</span>
+										<span class="badge badge-green">Maynegaite</span>
 									{:else}
 										<span class="text-xs text-gray-300">--</span>
 									{/if}

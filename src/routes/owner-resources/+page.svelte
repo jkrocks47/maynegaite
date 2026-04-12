@@ -24,8 +24,8 @@
 
 	const faqs = $derived(parseList('faq-list', [
 		{
-			q: 'How do I pay my annual HOA assessment?',
-			a: 'You can pay your annual HOA assessment securely online through our payment portal: <a href="https://smartpay.profitstars.com/express/MAYNEGAITE" target="_blank" rel="noopener noreferrer" class="text-mg-forest hover:underline font-medium">Pay Dues Here</a>. If you prefer to pay by mail, please contact the Treasurer, Joan Archie.'
+			q: 'How do I pay my annual POA assessment?',
+			a: 'You can pay your annual POA assessment securely online through our payment portal: <a href="https://smartpay.profitstars.com/express/MAYNEGAITE" target="_blank" rel="noopener noreferrer" class="text-mg-forest hover:underline font-medium">Pay Dues Here</a>. If you prefer to pay by mail, please contact the Treasurer, Joan Archie.'
 		},
 		{
 			q: 'What exterior modifications require approval?',
@@ -196,7 +196,7 @@
 				</div>
 				<div class="bg-mg-stone/10 border border-mg-stone/50 rounded-lg p-4 mb-4">
 					<p class="text-sm text-mg-charcoal mb-4">
-						Pay your annual HOA assessments securely online using our payment portal.
+						Pay your annual POA assessments securely online using our payment portal.
 					</p>
 					<a href="https://smartpay.profitstars.com/express/MAYNEGAITE" target="_blank" rel="noopener noreferrer" class="btn-primary w-full justify-center">
 						Pay Dues Online

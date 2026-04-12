@@ -175,7 +175,7 @@ async function seed() {
 		if (existingCommunity.length === 0) {
 			await db.insert(communityInfo).values({
 				aboutText:
-					"Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners' Association (MPOA). Our community encompasses 197 residential lots within Maynegaite Woods.",
+					"Maynegaite is a premier residential subdivision in Olympia Fields, Illinois, governed by the Maynegaite Property Owners' Association (MPOA). Our community encompasses 197 residential lots.",
 				meetingInfo:
 					'Board meetings are typically held monthly. Check the events calendar for date and location updates.',
 				contactEmail: 'info@maynegaite.com',

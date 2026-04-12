@@ -1,8 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import SearchableSelect from '$lib/components/shared/SearchableSelect.svelte';
 
 	let { data, form } = $props();
 	let editingId = $state<string | null>(null);
+
+	const memberSelectOptions = $derived([
+		{ value: '', label: 'None' },
+		...data.memberOptions.map(m => ({ value: m.id, label: `${m.lastName}, ${m.firstName} (${m.email})` }))
+	]);
 
 	const committeeLabels: Record<string, string> = {
 		board: 'Board',
@@ -54,12 +60,7 @@
 			</div>
 			<div>
 				<label for="memberId" class="block text-sm font-medium text-mg-charcoal mb-1">Linked Member</label>
-				<select id="memberId" name="memberId" class="input">
-					<option value="">None</option>
-					{#each data.memberOptions as member}
-						<option value={member.id}>{member.lastName}, {member.firstName} ({member.email})</option>
-					{/each}
-				</select>
+				<SearchableSelect id="memberId" name="memberId" options={memberSelectOptions} placeholder="Search member..." />
 			</div>
 			<div class="md:col-span-2">
 				<label for="imageUrl" class="block text-sm font-medium text-mg-charcoal mb-1">Image URL (optional)</label>
@@ -113,7 +114,10 @@
 						{#if editingId === officer.id}
 							<tr class="border-b border-mg-stone/70">
 								<td colspan="6" class="px-3 py-4 bg-mg-parchment/40">
-									<form method="POST" action="?/update" use:enhance class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<form method="POST" action="?/update" use:enhance={() => async ({ result, update }) => {
+								await update({ reset: false });
+								if (result.type === 'success') editingId = null;
+							}} class="grid grid-cols-1 md:grid-cols-2 gap-4">
 										<input type="hidden" name="id" value={officer.id} />
 										<div>
 											<label class="block text-sm font-medium text-mg-charcoal mb-1">Name *</label>
@@ -141,12 +145,7 @@
 										</div>
 										<div>
 											<label class="block text-sm font-medium text-mg-charcoal mb-1">Linked Member</label>
-											<select name="memberId" class="input">
-												<option value="">None</option>
-												{#each data.memberOptions as member}
-													<option value={member.id} selected={officer.memberId === member.id}>{member.lastName}, {member.firstName} ({member.email})</option>
-												{/each}
-											</select>
+											<SearchableSelect name="memberId" value={officer.memberId || ''} options={memberSelectOptions} placeholder="Search member..." />
 										</div>
 										<div class="md:col-span-2">
 											<label class="block text-sm font-medium text-mg-charcoal mb-1">Image URL</label>
