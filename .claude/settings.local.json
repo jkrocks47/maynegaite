@@ -18,7 +18,11 @@
       "Bash(npx svelte-kit:*)",
       "Bash(DATABASE_URL=\"postgresql://postgres:EsQUXoNPOVOfzqEdyCYPZPbaUZTgaEeg@mainline.proxy.rlwy.net:14680/railway\" npx tsx scripts/create-admin.ts)",
       "Bash(grep -E \"\\\\.\\(svelte|ts\\)$\")",
-      "Bash(xargs -I {} ls -la {})"
+      "Bash(xargs -I {} ls -la {})",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
     ]
   }
 }
