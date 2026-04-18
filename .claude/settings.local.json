@@ -25,7 +25,12 @@
       "Bash(git push:*)",
       "Bash(xargs basename *)",
       "Bash(node --env-file=.env --import tsx scripts/import-board-2026.ts)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(npx prettier *)",
+      "Bash(curl -s -o /dev/null -w \"board: %{http_code}\\\\n\" http://localhost:5174/board)",
+      "Bash(curl -s -o /dev/null -w \"detail \\(Shiree\\): %{http_code}\\\\n\" http://localhost:5174/board/b49d0a22-a09c-41f9-828c-5a9b9fc35a1d)",
+      "Bash(curl -s -o /dev/null -w \"detail \\(bad uuid\\): %{http_code}\\\\n\" http://localhost:5174/board/00000000-0000-0000-0000-000000000000)",
+      "Bash(curl -s -o /dev/null -w \"detail \\(non-uuid\\): %{http_code}\\\\n\" http://localhost:5174/board/not-a-uuid)"
     ]
   }
 }

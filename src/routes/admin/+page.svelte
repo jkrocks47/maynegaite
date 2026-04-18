@@ -14,26 +14,30 @@
 
 {#if !member?.adminRole}
 	<!-- Admin Login -->
-	<div class="min-h-[70vh] flex items-center justify-center py-16 px-4">
+	<div class="flex min-h-[70vh] items-center justify-center px-4 py-16">
 		<div class="w-full max-w-md">
 			<div class="card-elevated">
-				<div class="text-center mb-8">
+				<div class="mb-8 text-center">
 					<h1 class="font-display text-3xl font-bold text-mg-forest">Admin Login</h1>
-					<p class="text-sm text-mg-warmGray mt-1">Maynegaite POA Administration</p>
+					<p class="mt-1 text-sm text-mg-warmGray">Maynegaite POA Administration</p>
 				</div>
 
 				{#if form?.error}
-					<div class="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">{form.error}</div>
+					<div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{form.error}</div>
 				{/if}
 
 				<form method="POST" action="?/login" use:enhance>
 					<div class="space-y-4">
 						<div>
-							<label for="email" class="block text-sm font-medium text-mg-charcoal mb-1">Email</label>
+							<label for="email" class="mb-1 block text-sm font-medium text-mg-charcoal"
+								>Email</label
+							>
 							<input id="email" name="email" type="email" required class="input" />
 						</div>
 						<div>
-							<label for="password" class="block text-sm font-medium text-mg-charcoal mb-1">Password</label>
+							<label for="password" class="mb-1 block text-sm font-medium text-mg-charcoal"
+								>Password</label
+							>
 							<input id="password" name="password" type="password" required class="input" />
 						</div>
 						<BotProtection />
@@ -45,67 +49,76 @@
 	</div>
 {:else}
 	<!-- Admin Dashboard -->
-		<div class="max-w-6xl mx-auto">
-		<h1 class="text-2xl font-bold text-gray-800 mb-8">Dashboard</h1>
+	<div class="mx-auto max-w-6xl">
+		<h1 class="mb-8 text-2xl font-bold text-gray-800">Dashboard</h1>
 
 		{#if stats}
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-				<div class="card-elevated text-center py-6">
+			<div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+				<div class="card-elevated py-6 text-center">
 					<p class="text-3xl font-bold text-mg-forest">{stats.totalMembers}</p>
-					<p class="text-sm text-mg-warmGray mt-1">Total Members</p>
+					<p class="mt-1 text-sm text-mg-warmGray">Total Members</p>
 				</div>
-				<div class="card-elevated text-center py-6">
+				<div class="card-elevated py-6 text-center">
 					<p class="text-3xl font-bold text-mg-forest">{stats.woodsMembers}</p>
-					<p class="text-sm text-mg-warmGray mt-1">Maynegaite</p>
+					<p class="mt-1 text-sm text-mg-warmGray">Maynegaite</p>
 				</div>
-				<div class="card-elevated text-center py-6">
+				<div class="card-elevated py-6 text-center">
 					<p class="text-3xl font-bold text-mg-forest">{stats.verifiedMembers}</p>
-					<p class="text-sm text-mg-warmGray mt-1">Verified</p>
+					<p class="mt-1 text-sm text-mg-warmGray">Verified</p>
 				</div>
 			</div>
 		{/if}
 
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-				<a href="/admin/members" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">👥</p>
-					<p class="font-semibold text-mg-charcoal">Members</p>
-				</a>
-				<a href="/admin/events" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">📅</p>
-					<p class="font-semibold text-mg-charcoal">Events</p>
-				</a>
-				<a href="/admin/gallery" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">🖼️</p>
-					<p class="font-semibold text-mg-charcoal">Gallery</p>
-				</a>
-				<a href="/admin/officers" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">🧑‍💼</p>
-					<p class="font-semibold text-mg-charcoal">Officers</p>
-				</a>
-				<a href="/admin/announcements" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">📢</p>
-					<p class="font-semibold text-mg-charcoal">Announcements</p>
-				</a>
-				<a href="/admin/properties" class="card-elevated hover-lift text-center py-8 no-underline">
-				<p class="text-2xl mb-2">🏠</p>
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<a href="/admin/members" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">👥</p>
+				<p class="font-semibold text-mg-charcoal">Members</p>
+			</a>
+			<a href="/admin/events" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">📅</p>
+				<p class="font-semibold text-mg-charcoal">Events</p>
+			</a>
+			<a href="/admin/gallery" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">🖼️</p>
+				<p class="font-semibold text-mg-charcoal">Gallery</p>
+			</a>
+			<a href="/admin/officers" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">🧑‍💼</p>
+				<p class="font-semibold text-mg-charcoal">Officers</p>
+			</a>
+			<a href="/admin/announcements" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">📢</p>
+				<p class="font-semibold text-mg-charcoal">Announcements</p>
+			</a>
+			<a href="/admin/properties" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">🏠</p>
 				<p class="font-semibold text-mg-charcoal">Properties</p>
 			</a>
-				<a href="/admin/documents" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">📄</p>
-					<p class="font-semibold text-mg-charcoal">Documents</p>
-				</a>
-				<a href="/admin/architectural" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">📐</p>
-					<p class="font-semibold text-mg-charcoal">Architectural</p>
-				</a>
-				<a href="/admin/violations" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">⚖️</p>
-					<p class="font-semibold text-mg-charcoal">Violations</p>
-				</a>
-				<a href="/admin/content" class="card-elevated hover-lift text-center py-8 no-underline">
-					<p class="text-2xl mb-2">✏️</p>
-					<p class="font-semibold text-mg-charcoal">Site Content</p>
-				</a>
-			</div>
+			<a href="/admin/documents" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">📄</p>
+				<p class="font-semibold text-mg-charcoal">Documents</p>
+			</a>
+			<a href="/admin/architectural" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">📐</p>
+				<p class="font-semibold text-mg-charcoal">Architectural</p>
+			</a>
+			<a href="/admin/violations" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">⚖️</p>
+				<p class="font-semibold text-mg-charcoal">Violations</p>
+			</a>
+			<a href="/admin/content" class="card-elevated hover-lift py-8 text-center no-underline">
+				<p class="mb-2 text-2xl">✏️</p>
+				<p class="font-semibold text-mg-charcoal">Site Content</p>
+			</a>
+			<a
+				href="/admin/handbook"
+				target="_blank"
+				rel="noopener"
+				class="card-elevated hover-lift py-8 text-center no-underline"
+			>
+				<p class="mb-2 text-2xl">📘</p>
+				<p class="font-semibold text-mg-charcoal">Board Handbook</p>
+			</a>
+		</div>
 	</div>
 {/if}

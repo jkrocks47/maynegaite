@@ -3,46 +3,63 @@
 	let { data } = $props();
 </script>
 
-<SEO title="Board of Directors" description="Meet the dedicated professionals who govern the Maynegaite Property Owners' Association." />
+<SEO
+	title="Board of Directors"
+	description="Meet the dedicated professionals who govern the Maynegaite Property Owners' Association."
+/>
 
-<div class="py-16 px-4">
-	<div class="max-w-4xl mx-auto">
-		<h1 class="font-display text-4xl font-bold text-mg-charcoal mb-4">Board of Directors</h1>
-		<p class="text-lg text-mg-warmGray mb-12">Meet the dedicated professionals who govern the Maynegaite Property Owners' Association.</p>
+<div class="px-4 py-16">
+	<div class="mx-auto max-w-4xl">
+		<h1 class="mb-4 font-display text-4xl font-bold text-mg-charcoal">Board of Directors</h1>
+		<p class="mb-12 text-lg text-mg-warmGray">
+			Meet the dedicated professionals who govern the Maynegaite Property Owners' Association.
+		</p>
 
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+		<div class="mb-12 grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-2">
 			{#each data.officers as officer}
-				<div class="card-premium hover-lift">
+				<a
+					href="/board/{officer.id}"
+					class="card-premium hover-lift flex h-full flex-col text-inherit no-underline"
+				>
 					<div class="flex items-start gap-4">
 						{#if officer.imageUrl}
-							<img src={officer.imageUrl} alt={officer.name} class="w-20 h-20 rounded-full object-cover flex-shrink-0" />
+							<img
+								src={officer.imageUrl.startsWith('/api/images/')
+									? `${officer.imageUrl}?variant=thumbnail`
+									: officer.imageUrl}
+								alt={officer.name}
+								class="h-20 w-20 flex-shrink-0 rounded-full object-cover"
+							/>
 						{:else}
-							<div class="w-20 h-20 rounded-full bg-mg-forest/10 flex items-center justify-center flex-shrink-0">
+							<div
+								class="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-mg-forest/10"
+							>
 								<span class="font-display text-2xl font-bold text-mg-forest">
-									{officer.name.split(' ').map((n: string) => n[0]).join('')}
+									{officer.name
+										.split(' ')
+										.map((n: string) => n[0])
+										.join('')}
 								</span>
 							</div>
 						{/if}
-						<div>
-							<h3 class="font-semibold text-mg-charcoal text-lg">{officer.name}</h3>
-							<p class="text-sm text-mg-gold font-medium mb-2">{officer.position}</p>
-							{#if officer.bio}
-								<p class="text-sm text-mg-warmGray leading-relaxed">{officer.bio}</p>
-							{/if}
-							{#if officer.email}
-								<a href="mailto:{officer.email}" class="text-sm text-mg-forest hover:underline mt-2 inline-block">{officer.email}</a>
-							{/if}
+						<div class="min-w-0">
+							<h3 class="text-lg font-semibold text-mg-charcoal">{officer.name}</h3>
+							<p class="text-sm font-medium text-mg-gold">{officer.position}</p>
 						</div>
 					</div>
-				</div>
+					{#if officer.bio}
+						<p class="mt-3 line-clamp-2 text-sm leading-relaxed text-mg-warmGray">{officer.bio}</p>
+					{/if}
+					<span class="mt-auto pt-3 text-sm font-medium text-mg-forest">Read bio &rarr;</span>
+				</a>
 			{/each}
 		</div>
 
 		<!-- Meeting Info -->
 		{#if data.communityInfo?.meetingInfo}
 			<section class="card-elevated">
-				<h2 class="font-display text-2xl font-bold text-mg-charcoal mb-3">Board Meetings</h2>
-				<p class="text-mg-charcoal leading-relaxed">{data.communityInfo.meetingInfo}</p>
+				<h2 class="mb-3 font-display text-2xl font-bold text-mg-charcoal">Board Meetings</h2>
+				<p class="leading-relaxed text-mg-charcoal">{data.communityInfo.meetingInfo}</p>
 			</section>
 		{/if}
 	</div>
