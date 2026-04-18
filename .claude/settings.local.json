@@ -22,7 +22,10 @@
       "Bash(npx tsc:*)",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(xargs basename *)",
+      "Bash(node --env-file=.env --import tsx scripts/import-board-2026.ts)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

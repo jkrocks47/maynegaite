@@ -1,309 +1,390 @@
-# UICSpacetime
+# Maynegaite POA Community Portal
 
-**The official web platform for the Society of Physics Students (SPS) at the University of Illinois Chicago**, serving the dual Astronomy and Physics clubs with event management, membership tracking, galleries, announcements, and administrative tools.
+**The official web platform for the Maynegaite Property Owners Association** — a 197-lot community in Olympia Fields, Illinois. The portal brings residents, the board, committees, and community operations into a single, secure website.
 
-Built with SvelteKit 5, TypeScript, Tailwind CSS, PostgreSQL, and Drizzle ORM.
+This README is written for **board members and committee leadership**. Its goal is to prepare you to use every area of the site confidently — from publishing an event to reviewing an architectural request to sending a community-wide announcement.
 
 ---
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Site Features Guide](#site-features-guide)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Scripts](#scripts)
+1. [What the Portal Is](#1-what-the-portal-is)
+2. [Roles & Permissions](#2-roles--permissions)
+3. [Public Site — What Every Visitor Sees](#3-public-site--what-every-visitor-sees)
+4. [Resident Member Experience](#4-resident-member-experience)
+5. [Board & Admin Panel](#5-board--admin-panel)
+6. [Governance Tools (Architectural + Violations)](#6-governance-tools-architectural--violations)
+7. [Events, RSVPs & Check-In](#7-events-rsvps--check-in)
+8. [Communications — Email, Announcements, Contact](#8-communications--email-announcements-contact)
+9. [Documents, Gallery & Site Content](#9-documents-gallery--site-content)
+10. [Property Database](#10-property-database)
+11. [Security & Audit Trail](#11-security--audit-trail)
+12. [Technology Summary](#12-technology-summary)
+13. [Getting Started (Board Onboarding)](#13-getting-started-board-onboarding)
+14. [Quick Reference](#14-quick-reference)
 
 ---
 
-## Overview
+## 1. What the Portal Is
 
-UICSpacetime is a full-stack web application designed for two university science clubs — **Astronomy** and **Physics** — operating under the Society of Physics Students at UIC. The platform provides:
+A full-featured community platform that handles:
 
-- **Public-facing pages** for each club with unique visual identities (dark cosmic theme for Astronomy, clean light theme for Physics)
-- **Member registration and dashboards** with email verification, RSVP tracking, and event check-in
-- **Admin panels** with role-based access control for managing events, galleries, announcements, officers, and page content
-- **Shared infrastructure** including an event calendar, RSVP system, QR-based check-in, and image hosting. 
+- **Public outreach** — board information, community history, events, photo gallery, and contact
+- **Resident engagement** — member accounts, RSVPs, event check-in, profile and directory preferences
+- **Board operations** — events, announcements, documents, officer profiles, editable site content
+- **Governance** — architectural review workflow, violation reporting, full audit history
+- **Community data** — 197-lot property database with owner mapping
 
----
-
-## Features
-
-### Member Management
-- **Registration** with `@uic.edu` email validation
-- **Email verification** via token-based flow (24-hour expiration)
-- **Password reset** with secure one-time-use tokens (1-hour expiration)
-- **Member profiles** with club memberships, academic year, major, and event preferences
-- **Secondary email** — optional non-UIC backup email for alternative contact
-- **Event interest preferences** — select from Stargazing, Lectures, Workshops, Social Events, Field Trips, Study Groups, Research, and Outreach during registration or on profile
-- **Email opt-out** — members can opt out of event reminders and announcements while still receiving account security emails
-- **Token-based unsubscribe** — one-click unsubscribe via unique per-member tokens in all event emails, with resubscribe option
-- **Session management** with 30-day sliding window sessions
-
-### Event System
-- **Dual-club events** tagged as Astronomy or Physics
-- **RSVP system** with going / maybe / not going statuses
-- **QR code-based event check-in** with auto-generated 6-digit hex codes
-- **Event capacity tracking** with max attendee limits
-- **Draft/published states** for controlling event visibility
-- **Interactive event calendar** with date filtering and club color coding
-- **Predicted attendance** with reliability-weighted estimated turnout per event
-- **Member reliability scores** — calculated from check-in history (check-ins / "going" RSVPs), color-coded green (>75%), orange (50-75%), red (<50%), gray (new members)
-- **Historical turnout rate** per club averaged across past events
-- **Email event announcements** — admins send targeted emails to eligible club members with duplicate prevention via announcement logs
-- **Automated event reminders** — background scheduler sends 7-day and 1-day reminders to RSVP'd members with context-aware messaging
-
-### Gallery
-- **Image uploads** via Cloudinary integration
-- **Club-specific galleries** with captions, photographer credits, and dimensions
-- **Admin management** for uploading, editing, and deleting images
-
-### Announcements
-- **Global or club-specific** announcements
-- **Scheduling** with publish and expiration dates
-- **Pinned announcements** displayed prominently
-- **Automatic display** on member dashboards and club pages
-
-### Admin Panel
-- **Role-based access control** (super admin, astronomy admin, physics admin)
-- **Member management** with search, filtering, role editing, and CSV export
-- **Event CRUD** with image upload, RSVP/attendance statistics, estimated turnout, reliability scores, sortable RSVP lists, and CSV export
-- **Email announcement delivery** — send event announcements to eligible members with duplicate tracking; "Send to New Members" button for follow-up sends
-- **Interest analytics** — bar charts of member event preferences with per-club breakdown and actionable insights
-- **Member filtering by interest** — filter the member list by specific event interest preferences
-- **Gallery management** with Cloudinary integration
-- **Officer profiles** with bios, photos, and sort ordering
-- **Page content editor** for club-specific sections
-- **Announcement management** with create, delete, and pin toggle
-
-### Visual Design
-- **Astronomy theme**: Dark cosmic design with animated starfields, nebula backgrounds, parallax effects, HUD overlays, film grain, lunar phase visualizations, glassmorphism panels, and scanline effects
-- **Physics theme**: Clean, bright design with geometric elements, atomic nucleus visualization, and minimal animations
-- **Responsive design** with mobile-first approach and reduced motion support
-- **Canvas-based animations** with intersection observer performance optimization
+Everything runs from one application, one database, and one set of logins. Content you change on the admin panel appears on the public site immediately.
 
 ---
 
-## Site Features Guide
+## 2. Roles & Permissions
 
-### For Visitors (No Account Needed)
+Access is controlled by two things: **whether someone is logged in** and **what admin role they hold**.
 
-#### Landing Page (`/`)
-The main entry point to the site. Features animated portal cards for both the Astronomy and Physics clubs, a shared event calendar showing upcoming events from both clubs, SPS mission and officer information, and contact links. Click a club portal card to enter that club's section of the site.
+### User Types
 
-#### Astronomy Club Pages (`/astronomy/...`)
-A dark, cosmic-themed section for the Astronomy Club with immersive visual effects (starfields, nebula backgrounds, parallax scrolling, HUD overlays).
+| Type | Who | What They Can Do |
+|------|-----|------------------|
+| **Visitor** | No account | Read-only: homepage, about, events, gallery, board, documents, contact form |
+| **Member** | Registered residents | Everything above + dashboard, RSVP, event check-in, profile |
+| **Board** | Member flagged as board | Same as Member; marks them as board for internal views |
+| **Admin** | Member assigned an admin role | Access to admin panel at `/admin` |
 
-- **Homepage** (`/astronomy`) — Overview of the club with a hero banner, announcement bar, event timeline, and gallery preview. Scroll down to explore upcoming events and recent photos.
-- **About** (`/astronomy/about`) — Learn about the club's mission, meeting schedule, current officers (with photos and bios), and history.
-- **Events** (`/astronomy/events`) — Browse all upcoming and past Astronomy events. Click any event to view full details including date, time, location, and description.
-- **Gallery** (`/astronomy/gallery`) — View club photos in a masonry layout. Click any image to open a lightbox with the full-size photo, caption, photographer credit, and astronomical metadata (coordinates, exposure time, equipment used).
-- **Board** (`/astronomy/board`) — Meet the current board members with their photos, positions, bios, and contact emails.
-- **Contact** (`/astronomy/contact`) — Reach out to the club via the contact form.
-- **Join** (`/astronomy/join`) — Information on how to become a member of the Astronomy Club.
+### Admin Roles
 
-#### Physics Club Pages (`/physics/...`)
-A clean, light-themed section for the Physics Club with a bright design, geometric elements, and atomic visualizations. The page structure mirrors the Astronomy section:
+When a member is promoted, they get one of seven admin roles. Each role unlocks the admin panel; practical scope of duties is listed below. (Technically, most admin areas are open to any admin — the role signals responsibility, and the audit log records which admin acted.)
 
-- **Homepage** (`/physics`) — Club overview with hero, events preview grid, gallery preview, and about snippet.
-- **About** (`/physics/about`) — Club mission, meetings, officers, and history.
-- **Events** (`/physics/events`) — Browse all Physics events. Click any event for full details.
-- **Gallery** (`/physics/gallery`) — View Physics club photos with lightbox.
-- **Board** (`/physics/board`) — Current board member profiles.
-- **Contact** (`/physics/contact`) — Contact form for the Physics Club.
-- **Join** (`/physics/join`) — Membership information.
+| Role | Typical Responsibilities |
+|------|--------------------------|
+| **Tech Admin** | System-wide: can assign any role, including other Tech Admins |
+| **President** | Full operational access; can assign roles (cannot remove own role) |
+| **Vice President** | Executive-level operational access |
+| **Treasurer** | Financial documents, dues-related content |
+| **Secretary** | Minutes, announcements, document uploads |
+| **Architectural Chair** | Architectural review queue |
+| **Board Member** | General board admin — events, announcements, members |
 
-#### Shared Event Calendar
-Located on the landing page, the interactive calendar displays events from both clubs with color-coded dots. Use the filter pills (All / Astronomy / Physics) to narrow results. Click a date to see events on that day, then click an event to view its detail page.
+> **Rule of thumb:** Only Tech Admins and the President should be granting roles. Everyone else operates within their area.
 
----
-
-### For Members (Requires Registration)
-
-#### Registration (`/register`)
-Create an account in three steps:
-1. Choose whether you are a new or returning member.
-2. Enter your name, `@uic.edu` email address, and a password (minimum 8 characters).
-3. Fill in your profile details — academic year, major, which clubs to join (Astronomy and/or Physics), and your event interest preferences (Stargazing, Lectures, Workshops, Social Events, Field Trips, Study Groups, Research, Outreach).
-
-After registering, you will receive a verification email. You must verify your email before you can RSVP to events.
-
-#### Email Verification (`/verify-email`)
-After registration, check your UIC email inbox for a verification link. Click the link to verify your account. The link expires after 24 hours — if it expires, you can request a new one from the verification page.
-
-#### Login & Password Reset
-- **Login** (`/login`) — Enter your email and password to sign in. You will stay logged in for 30 days.
-- **Forgot Password** (`/forgot-password`) — Enter your email to receive a password reset link. For security, a success message is always shown regardless of whether the email exists.
-- **Reset Password** (`/reset-password`) — Click the link in your reset email to set a new password. The link expires after 1 hour and can only be used once.
-
-#### Dashboard (`/dashboard`)
-Your personal hub after logging in. The dashboard shows:
-- A welcome greeting and quick links to your clubs.
-- **Stats cards** — your club memberships, total events attended, and active member progress.
-- **Upcoming RSVP'd events** — events you have RSVPed to, with the ability to change your RSVP status (going / maybe / not going) directly from the dashboard.
-- **Recent check-ins** — events you have physically attended via QR code check-in.
-
-If you haven't updated your preferences in a while, a review banner will appear prompting you to update.
-
-#### Profile Management (`/dashboard/profile`)
-Edit your personal information from the profile page:
-- Update your first name, last name, academic year, and major.
-- Add an optional **secondary email** (non-UIC) as a backup contact method.
-- Manage your club memberships (check/uncheck Astronomy or Physics).
-- Update your event interest preferences to help the clubs plan events you care about.
-- **Email Preferences** — toggle to opt out of event reminders and announcements. Account security emails (verification, password reset) are always sent regardless of this setting.
-
-Click **Save** to apply your changes.
-
-#### Email Unsubscribe (`/unsubscribe`)
-
-Every event reminder and announcement email includes an unsubscribe link. Click it to open the unsubscribe page, where you can opt out of all event-related emails with one click. A resubscribe option is available if you change your mind. Account security emails (verification, password reset) are never affected by this setting. You can also manage this preference from your profile page.
-
-#### Preference Review Reminders
-
-If your event interest preferences have not been updated in over 4 months, the system will send you an email prompting you to review and update them. This helps the clubs plan events that align with current member interests. The email links directly to your profile page.
-
-#### Browsing & RSVPing to Events
-Navigate to any club's events page (`/astronomy/events` or `/physics/events`) and click an event to view its detail page. If you are logged in and your email is verified, you will see RSVP buttons at the bottom of the event detail. Choose **Going**, **Maybe**, or **Not Going** — your RSVP will appear on your dashboard. You can also manage RSVPs from `/dashboard/events`.
-
-#### Event Check-In (`/checkin/[eventId]`)
-At in-person events, scan the QR code provided at the venue with your phone. This will open the check-in page and automatically record your attendance. If you are not yet a member of the hosting club, you will be auto-enrolled. A confirmation message will show the event title and date.
-
-#### Gallery Viewing
-Visit the gallery on either club's page (`/astronomy/gallery` or `/physics/gallery`). Photos are displayed in a masonry grid. Click any image to open a full-screen lightbox showing the image at full resolution, along with the caption, photographer credit, and (for astronomy images) observation metadata like coordinates, exposure time, and equipment used. Close the lightbox by clicking outside the image or pressing Escape.
+### How to Promote a Member
+`/admin/members` → search the member → open their detail page → set the role dropdown → save. The change is logged in the audit trail.
 
 ---
 
-### For Admins
+## 3. Public Site — What Every Visitor Sees
 
-#### Admin Login & Dashboard (`/admin`)
-Navigate to `/admin` and log in with your admin credentials. The admin dashboard shows:
-- **Membership statistics** — total members, per-club breakdown, and how many members have set preferences.
-- **Interest breakdown** — bar charts showing which event interests are most popular and how they split across clubs, with actionable insights (e.g., "plan more observing sessions").
-- Quick links to club-specific admin sections.
+These pages require no login.
 
-Access is role-based: **Super Admins** can manage both clubs; **Astronomy Admins** and **Physics Admins** can only manage their respective club.
+| Page | Path | Purpose |
+|------|------|---------|
+| **Home** | `/` | Upcoming events, pinned announcements, community info |
+| **About** | `/about` | Maynegaite history, 197 lots, mission, community at-a-glance |
+| **Events** | `/events` | All published events, filter by category |
+| **Event Detail** | `/event/[id]` | Full event info, RSVP, check-in QR |
+| **Gallery** | `/gallery` | Community photos with captions and credits |
+| **Board** | `/board` | Officer profiles — photos, titles, bios, contact |
+| **Documents** | `/documents` | Bylaws, covenants, minutes, newsletters, financials |
+| **Owner Resources** | `/owner-resources` | Editable resource links, education section, school listings |
+| **Contact** | `/contact` | Spam-protected form that emails the board |
+| **Register / Login** | `/register`, `/login` | Account flows for residents |
 
-#### Member Management (`/admin/members`)
-View all registered members in a searchable, filterable table:
-- **Search** by name or email.
-- **Filter** by club (Astronomy / Physics) or role (Board).
-- **Filter by interest** to see which members prefer specific event types.
-- **Promote/demote** members between "member" and "board" roles using the role dropdown.
-- **Export** the full member list as a CSV file.
-- Click a member's name to view their **detail page** (`/admin/members/[id]`), which shows their full RSVP history and event check-in records.
-
-#### Event Management (`/admin/astronomy/events` or `/admin/physics/events`)
-Create and manage events for your club:
-- **Create** — Fill in the title, description, date, time, location (with optional map URL), upload an event image, set max capacity, and choose to publish immediately or save as a draft.
-- **Edit** — Update any event detail. Toggle between draft and published state.
-- **View statistics** — See RSVP counts (going / maybe / not going), check-in attendance, estimated turnout based on member reliability scores, and historical turnout rate for the club.
-- **Reliability scores** — Each member in the RSVP list displays a color-coded reliability percentage (green >75%, orange 50-75%, red <50%, gray for new members) based on their check-in history.
-- **RSVP list management** — Filter by status (going / maybe / not going), sort by name, status, or reliability score, and export the full list as a CSV file including reliability and check-in data.
-- **Email announcements** — Send an event announcement email to all eligible members (verified, opted-in, belonging to the club, not yet notified). A confirmation dialog appears before sending. If the announcement was already sent, a "Send to New Members" button appears to notify only members who joined since the last send.
-- **Delete** — Remove an event and its associated image.
-
-Each event automatically gets a unique check-in code used to generate the QR code for in-person attendance.
-
-#### Gallery Management (`/admin/astronomy/gallery` or `/admin/physics/gallery`)
-Manage your club's photo gallery:
-- **Upload** — Select an image file, add a caption and photographer credit. For astronomy images, you can also add observation metadata (coordinates, exposure time, equipment, sensor settings, observation date).
-- **View** — See all gallery images with their metadata and dimensions.
-- **Delete** — Remove an image from the gallery.
-
-#### Announcement Management (`/admin/announcements`)
-Create and manage announcements displayed on member dashboards and club pages:
-- **Create** — Set a title, body text, and target audience (both clubs, astronomy only, or physics only). Optionally set a publish date and expiration date.
-- **Pin/Unpin** — Toggle pin status to feature important announcements prominently at the top.
-- **Delete** — Remove outdated announcements.
-
-#### Officer Profile Management (`/admin/astronomy/officers` or `/admin/physics/officers`)
-Manage the officer profiles displayed on club About and Board pages:
-- **Create/Edit** — Set the officer's name, position, bio, email, upload a photo, assign an academic year, and set the display sort order.
-- Officers appear on the club's About page and Board page automatically.
-
-#### Page Content Editor (`/admin/astronomy/content` or `/admin/physics/content`)
-Edit the static text content on club pages without touching code:
-- Browse editable content sections by slug (e.g., `hero-title`, `hero-subtitle`, `about-subtitle`).
-- Edit the title and body of each section. Markdown is supported for rich formatting.
-- Adjust sort ordering to control how sections appear on the page.
+Everything on these pages is editable from the admin panel — no developer needed for typical content changes.
 
 ---
 
-## Tech Stack
+## 4. Resident Member Experience
+
+After a resident registers and verifies their email, they get:
+
+**Dashboard (`/dashboard`)**
+- Events attended in the last 6 months
+- Upcoming events they've RSVP'd to
+- Recent check-ins
+- Community info shortcuts
+
+**Profile (`/dashboard/profile`)**
+- Name, phone, address, secondary email
+- Lot number and section (Maynegaite Woods)
+- **Directory opt-in** — whether they appear in any shared directory
+- **Email opt-out** — unsubscribe from announcements/reminders (security emails always send)
+- Profile photo upload (auto-optimized to WebP)
+
+**Event Actions**
+- RSVP (Going / Maybe / Not Going)
+- Self-check-in at events via QR code
+
+**Account Security**
+- Email verification (24-hour token)
+- Forgot-password flow (1-hour token)
+- 30-day sliding sessions
+
+### Registration Protections
+Every registration passes through: honeypot fields, rate limiting, a proof-of-work challenge, submission-timing validation, and a spam content filter. Board members will rarely see bot signups make it through.
+
+---
+
+## 5. Board & Admin Panel
+
+Entry point: **`/admin`** (visible only to users with an admin role).
+
+### Admin Dashboard
+- Membership statistics (total, verified vs unverified)
+- Quick access to every admin section
+- Role and permissions of the current user
+
+### Admin Panel Sections
+
+| Section | Path | What It Does |
+|---------|------|--------------|
+| **Members** | `/admin/members` | Search, filter, promote/demote, view contact info |
+| **Events** | `/admin/events` | Create, edit, publish events; attendance analytics |
+| **Gallery** | `/admin/gallery` | Upload photos, captions, photographer credits |
+| **Officers** | `/admin/officers` | Board profiles shown on public `/board` page |
+| **Announcements** | `/admin/announcements` | Homepage banners with pin + expiry scheduling |
+| **Content** | `/admin/content` | Edit page text (homepage, about, footer, owner resources) |
+| **Documents** | `/admin/documents` | Upload bylaws, minutes, financials, covenants |
+| **Properties** | `/admin/properties` | 197-lot database with owner mapping |
+| **Architectural** | `/admin/architectural` | Review queue for modification requests |
+| **Violations** | `/admin/violations` | Reported violations and resolution tracking |
+| **Poster** | `/admin/poster/[eventId]` | Printable event poster with QR code |
+| **Changelog** | `/admin/changelog` | Complete audit log of admin actions |
+
+### Member Management (`/admin/members`)
+- Search by name or email
+- Filter by section or role
+- See each member's event-attendance history
+- Click into any member to update their admin role
+- View lot number and directory preference
+
+---
+
+## 6. Governance Tools (Architectural + Violations)
+
+These are the two workflows that most directly represent the board's compliance responsibilities.
+
+### Architectural Requests (`/admin/architectural`)
+
+Residents submit requests for things like fences, paint changes, new construction, or landscaping. Each request has a **status lifecycle**:
+
+`Submitted → Under Review → Approved / Denied / Revision Requested`
+
+For every request you can see:
+- Requester, property/lot, request type, description, attachments
+- Reviewer notes
+- Every status change, who made it, and when (audit log)
+
+**Request Types:** Modification · New Construction · Fence · Landscaping · Paint · Other
+
+The **Architectural Chair** owns this queue in practice; any admin can act, but the chair should be the one clearing items.
+
+### Violation Reports (`/admin/violations`)
+
+Community-reported issues with a similar lifecycle:
+
+`Reported → Investigating → Resolved / Dismissed`
+
+Each record captures reporter, affected property, description, resolution notes, and full audit history. Status changes can trigger email notifications.
+
+**Violation Types:** Signage · Architectural · Maintenance · Noise · Other
+
+### Why the Audit Trail Matters
+Both systems write to `/admin/changelog`. For any item that ends up disputed, you have an immutable record of who did what and when. Treat the audit log as your legal-safety net — do not edit the database directly to change history.
+
+---
+
+## 7. Events, RSVPs & Check-In
+
+### Creating an Event
+`/admin/events` → **New Event**. Fill in:
+- Title, description (Markdown supported), date, time
+- Location + optional map URL
+- **Category:** Community · Board Meeting · Village · Social · Maintenance
+- Event image (auto-optimized)
+- Max attendees (optional)
+- **Custom check-in questions** — multi-type (text, select, checkbox); responses are saved per check-in
+- Draft vs. publish toggle
+
+The system auto-generates a **check-in code** and a **QR code** for each event.
+
+### RSVP + Attendance Analytics
+On any event page in the admin panel you see:
+- Counts of Going / Maybe / Not Going
+- Actual check-ins
+- **Estimated turnout** — a prediction based on historical RSVP-to-check-in rates
+
+### Event Day: Check-In
+Two ways to check a resident in:
+1. **QR code** — posted/printed at the venue; members scan with their phone
+2. **Manual** — the check-in code can be entered at `/checkin/[eventId]`
+
+The system prevents double check-ins and time-stamps every entry.
+
+### Event Poster Generator (`/admin/poster/[eventId]`)
+Produces a printable poster with event details and a QR code (RSVP mode or check-in mode). Useful for community boards, mailbox kiosks, and clubhouse postings.
+
+### Reminders
+Automatic emails send at **7 days out**, **1 day out**, and **day-of** to members who RSVP'd. Sends are logged in `reminder_logs` so members never receive duplicates.
+
+---
+
+## 8. Communications — Email, Announcements, Contact
+
+### Announcements (`/admin/announcements`)
+- Title, body, category
+- **Pin to top** for high-priority items
+- **Publish date** (schedule for the future)
+- **Expiration date** (auto-retire the item)
+
+Announcements show on the homepage and on the member dashboard.
+
+### Email System
+All email is sent via **Resend**. Categories:
+
+| Email | Trigger | Opt-out? |
+|-------|---------|----------|
+| Email verification | Registration | No (security) |
+| Password reset | `/forgot-password` | No (security) |
+| Event reminders | 7d / 1d / day-of | Yes |
+| Event announcements | Manual admin send | Yes |
+| Event correction | Admin edits a published event | Yes |
+| Contact form reply | Resident submits `/contact` | N/A |
+
+Every opt-out-able email includes a one-click **unsubscribe link** with a per-member token, plus `List-Unsubscribe` headers so email clients can unsubscribe natively.
+
+### Contact Form (`/contact`)
+Routes to the board email list. Protected by the same five-layer spam defense as registration.
+
+---
+
+## 9. Documents, Gallery & Site Content
+
+### Documents (`/admin/documents`)
+Upload records for: **Bylaws · Covenants · Minutes · Newsletter · Financial · Other**. Each document stores title, description, category, publication date, and a URL to the file (documents are linked, not stored as binaries).
+
+### Gallery (`/admin/gallery`)
+Photos with caption, photographer credit, and optional link to a specific event. Images are auto-converted to WebP with a thumbnail variant so the public gallery loads fast.
+
+### Site Content Editor (`/admin/content`)
+Edit page text without touching code. Sections are grouped by page (homepage, about, footer, owner resources, education/school listings). Changes are live immediately and recorded in the audit log.
+
+### Officer Profiles (`/admin/officers`)
+Powers the public `/board` page. Each officer has name, position, bio, email, photo, and a sort order for display.
+
+---
+
+## 10. Property Database
+
+`/admin/properties` is the canonical list of all **197 Maynegaite lots**. For each lot:
+
+- Lot number, address, section (Woods)
+- Property type (single-family / townhome)
+- Assigned owner (links to a member account)
+- Occupancy tracking
+
+This database feeds architectural requests and violation reports — when a resident submits either, the system ties the submission to their lot automatically.
+
+---
+
+## 11. Security & Audit Trail
+
+### Multi-Layered Bot & Spam Defense
+Every public form (registration, contact, password reset) passes through:
+1. **Honeypot fields** — hidden, invisible to humans
+2. **Rate limiting** — tiered per endpoint (auth: 5–10/hr, contact: 3/hr)
+3. **Proof-of-work** — browser CPU challenge
+4. **Submission timing** — rejects sub-500ms fills
+5. **Spam content filter** — keyword and pattern detection
+
+### Authentication Security
+- Passwords hashed with **bcrypt** (12 salt rounds)
+- Sessions: random 64-char tokens, HttpOnly + Secure + SameSite cookies
+- 30-day sliding expiry
+- Required email verification before sensitive actions
+
+### Data Protection
+- All user input validated with **Zod** schemas
+- HTML content sanitized before display
+- File uploads validated by content, not just MIME type
+- Database access through an ORM — parameterized queries, no SQL injection surface
+
+### Audit Log (`/admin/changelog`)
+Every administrative action — create, update, delete, status change, review — is logged with actor, entity, timestamp, and details. The audit log is append-only; board members should rely on it for compliance and dispute resolution.
+
+---
+
+## 12. Technology Summary
+
+*(Included so board members can answer basic questions and know what the project depends on. No technical action required from you.)*
 
 | Category | Technology |
 |----------|-----------|
 | **Framework** | SvelteKit 2.0 + Svelte 5 |
 | **Language** | TypeScript 5 |
-| **Runtime** | Node.js 22 |
 | **Database** | PostgreSQL + Drizzle ORM |
-| **CSS** | Tailwind CSS |
+| **Styling** | Tailwind CSS (Maynegaite palette: forest green, gold, parchment) |
+| **Email** | Resend |
+| **Images** | Sharp (WebP optimization) + PostgreSQL bytea storage |
+| **QR Codes** | `qrcode` library |
+| **Hosting** | Node.js 22 |
 
 ---
 
-## Getting Started
+## 13. Getting Started (Board Onboarding)
 
-### Prerequisites
+### Your First Login
+1. An existing admin creates your account (or you register at `/register`).
+2. An existing admin promotes you to the correct role at `/admin/members`.
+3. Verify your email (check your inbox).
+4. Visit `/admin` — you should see the admin dashboard.
 
-- **Node.js** 22 or higher
-- **PostgreSQL** database (local or hosted)
+### First-Week Checklist for New Board Members
 
-### Installation
+- [ ] Log in and verify `/admin` loads
+- [ ] Click into every sidebar item — get familiar with the layout
+- [ ] Review the current announcement list and note which are pinned
+- [ ] Review the current event list and confirm drafts vs. published
+- [ ] Open `/admin/architectural` and skim open requests
+- [ ] Open `/admin/violations` and skim open reports
+- [ ] Open `/admin/changelog` to understand the audit trail
+- [ ] Update your own profile photo and bio so you appear correctly on the public `/board` page (edit via `/admin/officers` if needed)
 
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/yourusername/SPSATUIC.git
-   cd SPSATUIC
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-
-   Copy `.env.example` or create a `.env` file in the project root with the required variables (database URL, session secret, origin, etc.).
-
-4. **Set up the database**
-
-   ```bash
-   npm run db:generate
-   npm run db:migrate
-   npm run db:seed
-   ```
-
-5. **Start the development server**
-
-   ```bash
-   npm run dev
-   ```
-
-   The app will be available at `http://localhost:5173`.
+### When in Doubt
+- **Don't delete.** Archive by unpublishing, or change status. Deletes cannot be undone cleanly.
+- **Check the audit log.** If something looks wrong, `/admin/changelog` tells you who changed what.
+- **Ask the Tech Admin** before modifying roles or touching settings outside your area.
 
 ---
 
-## Scripts
+## 14. Quick Reference
 
-| Script | Command | Description |
-|--------|---------|-------------|
-| **Dev** | `npm run dev` | Start development server with hot reload |
-| **Build** | `npm run build` | Create production build |
-| **Start** | `npm run start` | Start production server |
-| **Preview** | `npm run preview` | Preview production build locally |
-| **Check** | `npm run check` | Run `svelte-check` for type checking |
-| **Lint** | `npm run lint` | Run ESLint + Prettier checks |
-| **Format** | `npm run format` | Auto-format code with Prettier |
-| **DB: Generate** | `npm run db:generate` | Generate Drizzle migrations from schema |
-| **DB: Migrate** | `npm run db:migrate` | Apply pending database migrations |
-| **DB: Seed** | `npm run db:seed` | Seed database with initial admin user |
+### Common Board Tasks
+
+| Task | Where |
+|------|-------|
+| Post an event | `/admin/events` → New Event |
+| Send an announcement | `/admin/announcements` → New |
+| Approve a fence request | `/admin/architectural` → open item → Approve |
+| Log a violation resolution | `/admin/violations` → open item → Resolve |
+| Upload meeting minutes | `/admin/documents` → New Document |
+| Add a new board member photo | `/admin/officers` |
+| Change homepage text | `/admin/content` |
+| Promote a resident to admin | `/admin/members` → member → role dropdown |
+| Generate an event poster | `/admin/poster/[eventId]` |
+| See who did what, when | `/admin/changelog` |
+
+### Key Paths for Residents
+
+| Task | Where |
+|------|-------|
+| Register | `/register` |
+| Log in | `/login` |
+| RSVP | `/event/[id]` |
+| Check in at an event | Scan QR or `/checkin/[eventId]` |
+| Update profile / opt out of email | `/dashboard/profile` |
+| Reset password | `/forgot-password` |
 
 ---
 
-## License
-
-This project is maintained by the Society of Physics Students at the University of Illinois Chicago.
+*Maintained by the Maynegaite Property Owners Association. For technical issues, contact the site's Tech Admin. For governance questions, contact the Board President.*
